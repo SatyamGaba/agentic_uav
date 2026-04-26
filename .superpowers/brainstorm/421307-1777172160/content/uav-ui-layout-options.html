@@ -1,0 +1,113 @@
+<h2>UAV Simulator UI Layout</h2>
+<p class="subtitle">Three ways to organize config controls, the grid, action buttons, and metrics.</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">A. Left controls, center mission, right metrics</div>
+        <div class="mockup-body">
+          <div style="display:grid;grid-template-columns:1fr 1.7fr 1fr;gap:12px;min-height:260px">
+            <div class="mock-sidebar">
+              <div class="label">Primary Config</div>
+              <div class="mock-input">Planning type</div>
+              <div class="mock-input">Grid size</div>
+              <div class="mock-input">UAV count</div>
+              <div class="mock-input">Comm distance</div>
+              <hr>
+              <div class="label">Advanced</div>
+              <div class="mock-input">Seed</div>
+              <div class="mock-input">Speed</div>
+            </div>
+            <div class="mock-content">
+              <div style="display:flex;gap:8px;justify-content:center;margin-bottom:10px">
+                <button class="mock-button">Reset</button>
+                <button class="mock-button">Next</button>
+                <button class="mock-button">End</button>
+              </div>
+              <div class="placeholder" style="height:190px">Mission grid</div>
+            </div>
+            <div class="mock-sidebar">
+              <div class="label">Metrics</div>
+              <div class="placeholder">Coverage</div>
+              <div class="placeholder">Active UAVs</div>
+              <div class="placeholder">Messages</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Recommended: balanced dashboard</h3>
+      <p>Keeps configuration on the left, core stepping controls above the grid, and telemetry on the right.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">B. Compact left rail, wider grid</div>
+        <div class="mockup-body">
+          <div style="display:grid;grid-template-columns:.75fr 2fr .9fr;gap:12px;min-height:260px">
+            <div class="mock-sidebar">
+              <div class="label">Essentials</div>
+              <div class="mock-input">Planning</div>
+              <div class="mock-input">Grid</div>
+              <div class="mock-input">UAVs</div>
+              <details open><summary>Advanced</summary><div class="mock-input">Seed</div></details>
+            </div>
+            <div class="mock-content">
+              <div class="placeholder" style="height:205px">Larger mission grid</div>
+              <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+                <button class="mock-button">Reset</button>
+                <button class="mock-button">Next</button>
+                <button class="mock-button">End</button>
+              </div>
+            </div>
+            <div class="mock-sidebar"><div class="placeholder">Metrics + chart</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Grid-first</h3>
+      <p>Best if the simulator is mostly watched visually; controls are denser and less explanatory.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">C. Left controls, all status below grid</div>
+        <div class="mockup-body">
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:12px;min-height:260px">
+            <div class="mock-sidebar">
+              <div class="label">Config</div>
+              <div class="mock-input">Planning type</div>
+              <div class="mock-input">Grid size</div>
+              <div class="mock-input">UAV count</div>
+              <div class="mock-input">Comm distance</div>
+            </div>
+            <div class="mock-content">
+              <div style="display:flex;gap:8px;justify-content:center;margin-bottom:10px">
+                <button class="mock-button">Reset</button>
+                <button class="mock-button">Next</button>
+                <button class="mock-button">End</button>
+              </div>
+              <div class="placeholder" style="height:150px">Mission grid</div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px">
+                <div class="placeholder">Coverage</div>
+                <div class="placeholder">Active</div>
+                <div class="placeholder">Messages</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Two-column simple</h3>
+      <p>Cleaner on smaller screens, but gives up the dedicated right-side metrics panel.</p>
+    </div>
+  </div>
+</div>
