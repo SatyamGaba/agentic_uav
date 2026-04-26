@@ -6,16 +6,16 @@ from agentic_uav.simulation import Simulation, coverage_ratio
 
 
 ROLE_COLORS = {
-    "coverage": "#F8FAFC",
-    "priority_responder": "#FF5A3D",
-    "relay": "#18A999",
+    "coverage": "#E8F7F1",
+    "priority_responder": "#FF6B4A",
+    "relay": "#35C7B8",
 }
 
 CELL_STYLES = {
-    "uncovered": {"fill": "#1F2937", "label": "Uncovered"},
-    "covered": {"fill": "#23A455", "label": "Covered"},
-    "urgent": {"fill": "#F59E0B", "label": "Urgent"},
-    "blocked": {"fill": "#5B3A32", "label": "Blocked"},
+    "uncovered": {"fill": "#1B2120", "label": "Uncovered"},
+    "covered": {"fill": "#2E8F67", "label": "Covered"},
+    "urgent": {"fill": "#E7B84A", "label": "Urgent"},
+    "blocked": {"fill": "#573C36", "label": "Blocked"},
 }
 
 
@@ -38,6 +38,7 @@ def build_grid_portrayal(simulation: Simulation) -> dict[str, Any]:
             "role": uav.role,
             "color": ROLE_COLORS.get(uav.role, "#CBD5E1"),
             "active": uav.active,
+            "status": "active" if uav.active else "dropped",
             "target_cell": uav.target_cell,
         }
         for uav in simulation.uavs.values()
@@ -72,14 +73,35 @@ def build_metric_series(simulation: Simulation) -> dict[str, list[Any]]:
 
 
 def build_dashboard_state(simulation: Simulation) -> dict[str, Any]:
+    active_uavs = sum(1 for uav in simulation.uavs.values() if uav.active)
+    total_uavs = len(simulation.uavs)
     return {
         "tick": simulation.tick,
         "is_finished": simulation.is_finished,
         "coverage_ratio": coverage_ratio(simulation.world),
         "messages_sent": simulation.metrics.messages_sent,
-        "active_uavs": sum(1 for uav in simulation.uavs.values() if uav.active),
+        "active_uavs": active_uavs,
+        "total_uavs": total_uavs,
+        "dropped_uavs": total_uavs - active_uavs,
         "urgent_targets": list(simulation.metrics.urgent_targets),
+        "urgent_target_count": len(simulation.metrics.urgent_targets),
     }
+
+
+def build_event_timeline(simulation: Simulation) -> list[dict[str, Any]]:
+    timeline: list[dict[str, Any]] = []
+    for event in sorted(simulation.config.events, key=lambda item: item.tick):
+        timeline.append(
+            {
+                "tick": event.tick,
+                "event_type": event.event_type,
+                "label": _event_label(event.event_type),
+                "detail": _event_detail(event.payload),
+                "tone": _event_tone(event.event_type),
+                "state": _event_state(event.tick, simulation.tick),
+            }
+        )
+    return timeline
 
 
 def run_to_end(simulation: Simulation) -> None:
@@ -95,3 +117,38 @@ def _sector_state(sector: Any) -> str:
     if sector.coverage >= 1.0:
         return "covered"
     return "uncovered"
+
+
+def _event_label(event_type: str) -> str:
+    labels = {
+        "block_sector": "Sector blocked",
+        "dropout": "UAV dropout",
+        "urgent_sector": "Urgent sector",
+    }
+    return labels.get(event_type, event_type.replace("_", " ").title())
+
+
+def _event_detail(payload: dict[str, Any]) -> str:
+    if "cell" in payload:
+        cell = tuple(payload["cell"])
+        return f"cell {cell[0]},{cell[1]}"
+    if "uav_id" in payload:
+        return str(payload["uav_id"])
+    return ""
+
+
+def _event_tone(event_type: str) -> str:
+    tones = {
+        "block_sector": "blocked",
+        "dropout": "dropout",
+        "urgent_sector": "urgent",
+    }
+    return tones.get(event_type, "neutral")
+
+
+def _event_state(event_tick: int, current_tick: int) -> str:
+    if event_tick < current_tick:
+        return "past"
+    if event_tick == current_tick:
+        return "active"
+    return "upcoming"

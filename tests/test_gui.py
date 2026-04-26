@@ -4,6 +4,7 @@ import unittest
 import agentic_uav.gui as gui
 from agentic_uav.gui_support import (
     build_dashboard_state,
+    build_event_timeline,
     build_grid_portrayal,
     build_metric_series,
     run_to_end,
@@ -88,6 +89,29 @@ class GuiSupportTest(unittest.TestCase):
         self.assertEqual(portrayal["uavs"][0]["id"], "u0")
         self.assertEqual(portrayal["uavs"][0]["role"], "coverage")
 
+    def test_grid_portrayal_marks_dropped_uavs(self) -> None:
+        scenario = build_gui_scenario()
+        scenario.uavs.append(UavConfig(uav_id="u1", cell=(3, 3)))
+        simulation = Simulation.from_config(scenario)
+        simulation.uavs["u1"].active = False
+
+        portrayal = build_grid_portrayal(simulation)
+
+        dropped = [uav for uav in portrayal["uavs"] if uav["id"] == "u1"][0]
+        self.assertFalse(dropped["active"])
+        self.assertEqual(dropped["status"], "dropped")
+
+    def test_grid_html_renders_uavs_as_icon_overlays(self) -> None:
+        simulation = Simulation.from_config(build_gui_scenario())
+        portrayal = build_grid_portrayal(simulation)
+
+        html = gui._grid_html(portrayal)
+
+        self.assertIn("grid-cell uncovered", html)
+        self.assertIn("uav-marker active", html)
+        self.assertIn("--uav-color:", html)
+        self.assertNotIn(">0</span>", html)
+
     def test_metric_series_tracks_coverage_messages_and_active_uavs(self) -> None:
         simulation = Simulation.from_config(build_gui_scenario())
         simulation.step()
@@ -111,6 +135,27 @@ class GuiSupportTest(unittest.TestCase):
         series = build_metric_series(simulation)
 
         self.assertEqual(series["active_uavs"], [2, 1])
+
+    def test_event_timeline_describes_scheduled_events(self) -> None:
+        scenario = build_gui_scenario()
+        scenario.events.extend(
+            [
+                CommunicationEvent(tick=1, event_type="urgent_sector", payload={"cell": (3, 3)}),
+                CommunicationEvent(tick=2, event_type="dropout", payload={"uav_id": "u0"}),
+            ]
+        )
+        simulation = Simulation.from_config(scenario)
+
+        timeline = build_event_timeline(simulation)
+
+        self.assertEqual([event["tick"] for event in timeline], [1, 2])
+        self.assertEqual(timeline[0]["label"], "Urgent sector")
+        self.assertEqual(timeline[0]["detail"], "cell 3,3")
+        self.assertEqual(timeline[0]["state"], "upcoming")
+
+        simulation.step()
+        timeline = build_event_timeline(simulation)
+        self.assertEqual(timeline[0]["state"], "active")
 
     def test_dashboard_state_is_small_summary_for_ui(self) -> None:
         simulation = Simulation.from_config(build_gui_scenario())
