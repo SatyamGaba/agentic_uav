@@ -8,3 +8,11 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Local UI state
+.agentic_uav/
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key

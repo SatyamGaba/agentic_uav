@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "agentic_uav",
+  "project_id": "0d77e425-8e6c-4f96-8bd7-aad248efb0a5"
+}
