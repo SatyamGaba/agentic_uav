@@ -4,7 +4,7 @@ from pathlib import Path
 
 from agentic_uav.methods import AgenticMethod, RuleAdaptiveMethod, StaticPartitionMethod
 from agentic_uav.rendering import Renderer
-from agentic_uav.scenarios import build_demo_scenario
+from agentic_uav.scenarios import ScenarioParams, build_demo_scenario
 from agentic_uav.simulation import (
     CommunicationEvent,
     Message,
@@ -62,6 +62,8 @@ class SwappableMethodsTest(unittest.TestCase):
                 self.assertEqual(summary["ticks_run"], 3)
                 self.assertIn("coverage_ratio", summary)
                 self.assertIn("messages_sent", summary)
+                self.assertIn("is_solved", summary)
+                self.assertIn("termination_reason", summary)
 
     def test_static_vs_adaptive_behavior_differs_on_urgent_sector(self) -> None:
         static_summary = Simulation.from_config(build_scenario("static")).run()
@@ -101,7 +103,7 @@ class CommunicationModelTest(unittest.TestCase):
             sensing_radius=1,
             heartbeat_interval=10,
             urgent_message_ttl=2,
-            world=WorldConfig(width=3, height=1),
+            world=WorldConfig(width=5, height=1),
             uavs=[
                 UavConfig(uav_id="u0", cell=(0, 0)),
                 UavConfig(uav_id="u1", cell=(1, 0)),
@@ -138,10 +140,80 @@ class CommunicationModelTest(unittest.TestCase):
         )
 
 
+class GoalBasedCompletionTest(unittest.TestCase):
+    def test_run_stops_early_when_full_coverage_is_reached(self) -> None:
+        scenario = ScenarioConfig(
+            method_name="static",
+            ticks=50,
+            communication_range=1,
+            sensing_radius=0,
+            heartbeat_interval=3,
+            urgent_message_ttl=2,
+            world=WorldConfig(width=1, height=1),
+            uavs=[UavConfig(uav_id="u0", cell=(0, 0))],
+            events=[],
+            seed=1,
+        )
+
+        summary = Simulation.from_config(scenario).run()
+
+        self.assertEqual(summary["ticks_run"], 1)
+        self.assertEqual(summary["coverage_ratio"], 1.0)
+        self.assertTrue(summary["is_solved"])
+        self.assertEqual(summary["termination_reason"], "solved")
+
+    def test_run_reports_unsolved_when_max_ticks_are_exhausted(self) -> None:
+        scenario = ScenarioConfig(
+            method_name="static",
+            ticks=2,
+            communication_range=1,
+            sensing_radius=0,
+            heartbeat_interval=3,
+            urgent_message_ttl=2,
+            world=WorldConfig(width=4, height=1),
+            uavs=[UavConfig(uav_id="u0", cell=(0, 0))],
+            events=[],
+            seed=1,
+        )
+
+        summary = Simulation.from_config(scenario).run()
+
+        self.assertEqual(summary["ticks_run"], 2)
+        self.assertLess(summary["coverage_ratio"], 1.0)
+        self.assertFalse(summary["is_solved"])
+        self.assertEqual(summary["termination_reason"], "max_ticks")
+
+
 class ScenarioBuilderTest(unittest.TestCase):
+    def test_builder_defaults_to_twelve_by_twelve_grid(self) -> None:
+        scenario = build_demo_scenario()
+
+        self.assertEqual((scenario.world.width, scenario.world.height), (12, 12))
+        self.assertEqual(scenario.ticks, 50)
+        self.assertEqual(scenario.mission_type, "disaster_mapping")
+
+    def test_default_disaster_mapping_keeps_demo_disruptions(self) -> None:
+        scenario = build_demo_scenario()
+
+        self.assertEqual(scenario.mission_type, "disaster_mapping")
+        self.assertIn("urgent", {sector.priority for sector in scenario.world.sectors})
+        self.assertTrue(any(sector.blocked for sector in scenario.world.sectors))
+        self.assertEqual(
+            [event.event_type for event in scenario.events],
+            ["urgent_sector", "dropout"],
+        )
+
+    def test_survey_mission_has_clean_coverage_setup(self) -> None:
+        scenario = build_demo_scenario(params=ScenarioParams(mission_type="survey"))
+
+        self.assertEqual(scenario.mission_type, "survey")
+        self.assertEqual(scenario.world.sectors, [])
+        self.assertEqual(scenario.events, [])
+
     def test_builder_applies_ui_parameters_and_deterministic_uav_positions(self) -> None:
         scenario = build_demo_scenario(
             method_name="rules",
+            mission_type="survey",
             grid_size=6,
             uav_count=5,
             sensing_radius=2,
@@ -153,6 +225,7 @@ class ScenarioBuilderTest(unittest.TestCase):
         )
         repeat = build_demo_scenario(
             method_name="rules",
+            mission_type="survey",
             grid_size=6,
             uav_count=5,
             sensing_radius=2,
@@ -164,6 +237,7 @@ class ScenarioBuilderTest(unittest.TestCase):
         )
 
         self.assertEqual(scenario.method_name, "rules")
+        self.assertEqual(scenario.mission_type, "survey")
         self.assertEqual((scenario.world.width, scenario.world.height), (6, 6))
         self.assertEqual(len(scenario.uavs), 5)
         self.assertEqual(scenario.sensing_radius, 2)

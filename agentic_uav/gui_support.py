@@ -78,6 +78,8 @@ def build_dashboard_state(simulation: Simulation) -> dict[str, Any]:
     return {
         "tick": simulation.tick,
         "is_finished": simulation.is_finished,
+        "is_solved": simulation.is_solved,
+        "termination_reason": simulation.termination_reason,
         "coverage_ratio": coverage_ratio(simulation.world),
         "messages_sent": simulation.metrics.messages_sent,
         "active_uavs": active_uavs,

@@ -10,16 +10,19 @@ from agentic_uav.simulation import (
     WorldConfig,
 )
 
+MISSION_TYPES = ["survey", "disaster_mapping"]
+
 
 @dataclass(frozen=True)
 class ScenarioParams:
     method_name: str = "agentic"
-    grid_size: int = 8
+    mission_type: str = "disaster_mapping"
+    grid_size: int = 12
     uav_count: int = 4
     sensing_radius: int = 1
     communication_range: int = 3
     seed: int = 7
-    ticks: int = 12
+    ticks: int = 50
     heartbeat_interval: int = 3
     urgent_message_ttl: int = 2
 
@@ -27,12 +30,13 @@ class ScenarioParams:
 def build_demo_scenario(
     method_name: str | None = None,
     *,
-    grid_size: int = 8,
+    mission_type: str = "disaster_mapping",
+    grid_size: int = 12,
     uav_count: int = 4,
     sensing_radius: int = 1,
     communication_range: int = 3,
     seed: int = 7,
-    ticks: int = 12,
+    ticks: int = 50,
     heartbeat_interval: int = 3,
     urgent_message_ttl: int = 2,
     params: ScenarioParams | None = None,
@@ -40,6 +44,7 @@ def build_demo_scenario(
     if params is None:
         params = ScenarioParams(
             method_name=method_name or "agentic",
+            mission_type=mission_type,
             grid_size=grid_size,
             uav_count=uav_count,
             sensing_radius=sensing_radius,
@@ -52,6 +57,7 @@ def build_demo_scenario(
     elif method_name is not None:
         params = ScenarioParams(
             method_name=method_name,
+            mission_type=params.mission_type,
             grid_size=params.grid_size,
             uav_count=params.uav_count,
             sensing_radius=params.sensing_radius,
@@ -62,7 +68,11 @@ def build_demo_scenario(
             urgent_message_ttl=params.urgent_message_ttl,
         )
 
-    blocked = _demo_blocked_cells(params.grid_size)
+    if params.mission_type not in MISSION_TYPES:
+        raise ValueError(f"Unknown mission type: {params.mission_type}")
+
+    sectors = _mission_sectors(params.mission_type, params.grid_size)
+    events = _mission_events(params.mission_type, params.grid_size, params.ticks)
     return ScenarioConfig(
         method_name=params.method_name,
         ticks=params.ticks,
@@ -73,29 +83,47 @@ def build_demo_scenario(
         world=WorldConfig(
             width=params.grid_size,
             height=params.grid_size,
-            sectors=[
-                Sector(cell=_clamp_cell((6, 6), params.grid_size), priority="urgent"),
-                *[Sector(cell=cell, blocked=True) for cell in blocked],
-            ],
+            sectors=sectors,
         ),
         uavs=[
             UavConfig(uav_id=f"u{index}", cell=cell)
             for index, cell in enumerate(_uav_start_cells(params.grid_size, params.uav_count))
         ],
-        events=[
-            CommunicationEvent(
-                tick=min(4, max(0, params.ticks - 1)),
-                event_type="urgent_sector",
-                payload={"cell": _clamp_cell((1, 6), params.grid_size)},
-            ),
-            CommunicationEvent(
-                tick=min(6, max(0, params.ticks - 1)),
-                event_type="dropout",
-                payload={"uav_id": "u1"},
-            ),
-        ],
+        events=events,
         seed=params.seed,
+        mission_type=params.mission_type,
     )
+
+
+def _mission_sectors(mission_type: str, grid_size: int) -> list[Sector]:
+    if mission_type == "survey":
+        return []
+    blocked = _demo_blocked_cells(grid_size)
+    return [
+        Sector(cell=_clamp_cell((6, 6), grid_size), priority="urgent"),
+        *[Sector(cell=cell, blocked=True) for cell in blocked],
+    ]
+
+
+def _mission_events(
+    mission_type: str,
+    grid_size: int,
+    ticks: int,
+) -> list[CommunicationEvent]:
+    if mission_type == "survey":
+        return []
+    return [
+        CommunicationEvent(
+            tick=min(4, max(0, ticks - 1)),
+            event_type="urgent_sector",
+            payload={"cell": _clamp_cell((1, 6), grid_size)},
+        ),
+        CommunicationEvent(
+            tick=min(6, max(0, ticks - 1)),
+            event_type="dropout",
+            payload={"uav_id": "u1"},
+        ),
+    ]
 
 
 def _demo_blocked_cells(grid_size: int) -> list[tuple[int, int]]:

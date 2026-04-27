@@ -41,6 +41,7 @@ class GuiSupportTest(unittest.TestCase):
 
     def test_step_once_advances_grid_refresh_key(self) -> None:
         gui.method_name.value = "agentic"
+        gui.mission_type.value = "disaster_mapping"
         gui.seed.value = 7
         gui._reset()
         before_tick = gui.simulation.value.tick
@@ -63,6 +64,33 @@ class GuiSupportTest(unittest.TestCase):
         self.assertEqual(gui.simulation.value.config.world.height, 6)
         self.assertEqual(gui.version.value, before_version + 1)
 
+    def test_scenario_params_include_mission_type(self) -> None:
+        gui.mission_type.value = "survey"
+
+        params = gui._scenario_params()
+
+        self.assertEqual(params.mission_type, "survey")
+
+    def test_scenario_params_default_to_fifty_max_ticks(self) -> None:
+        gui.tick_horizon.value = gui.DEFAULT_PARAMS.ticks
+
+        params = gui._scenario_params()
+
+        self.assertEqual(params.ticks, 50)
+
+    def test_mission_type_change_resets_simulation_to_tick_zero(self) -> None:
+        gui._set_mission_type("disaster_mapping")
+        gui._step_once()
+        before_version = gui.version.value
+
+        gui._set_mission_type("survey")
+
+        self.assertEqual(gui.simulation.value.tick, 0)
+        self.assertEqual(gui.simulation.value.config.mission_type, "survey")
+        self.assertEqual(gui.simulation.value.config.world.sectors, [])
+        self.assertEqual(gui.simulation.value.config.events, [])
+        self.assertEqual(gui.version.value, before_version + 1)
+
     def test_next_step_and_end_actions_advance_expected_ticks(self) -> None:
         gui.tick_horizon.value = 4
         gui._reset()
@@ -73,6 +101,28 @@ class GuiSupportTest(unittest.TestCase):
         gui._end()
         self.assertEqual(gui.simulation.value.tick, 4)
         self.assertTrue(gui.simulation.value.is_finished)
+
+    def test_end_stops_when_goal_is_solved(self) -> None:
+        gui.simulation.value = Simulation.from_config(
+            ScenarioConfig(
+                method_name="static",
+                ticks=50,
+                communication_range=1,
+                sensing_radius=0,
+                heartbeat_interval=3,
+                urgent_message_ttl=2,
+                world=WorldConfig(width=1, height=1),
+                uavs=[UavConfig(uav_id="u0", cell=(0, 0))],
+                events=[],
+                seed=1,
+            )
+        )
+
+        gui._end()
+
+        self.assertEqual(gui.simulation.value.tick, 1)
+        self.assertTrue(gui.simulation.value.is_solved)
+        self.assertEqual(gui.simulation.value.termination_reason, "solved")
 
     def test_grid_panel_accepts_refresh_key(self) -> None:
         self.assertIn("refresh_key", inspect.signature(gui._GridPanel).parameters)
@@ -165,8 +215,24 @@ class GuiSupportTest(unittest.TestCase):
 
         self.assertEqual(state["tick"], 1)
         self.assertFalse(state["is_finished"])
+        self.assertFalse(state["is_solved"])
+        self.assertEqual(state["termination_reason"], "running")
         self.assertIn("coverage_ratio", state)
         self.assertIn("messages_sent", state)
+
+    def test_run_status_html_renders_solved_and_unsolved_states(self) -> None:
+        base_state = {
+            "tick": 1,
+            "active_uavs": 1,
+            "total_uavs": 1,
+            "messages_sent": 0,
+        }
+
+        solved = gui._run_status_html({**base_state, "termination_reason": "solved"})
+        unsolved = gui._run_status_html({**base_state, "termination_reason": "max_ticks"})
+
+        self.assertIn("<strong>Solved</strong>", solved)
+        self.assertIn("<strong>Unsolved</strong>", unsolved)
 
     def test_run_to_end_advances_until_horizon(self) -> None:
         simulation = Simulation.from_config(build_gui_scenario())

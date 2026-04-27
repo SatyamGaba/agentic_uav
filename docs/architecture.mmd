@@ -1,0 +1,111 @@
+flowchart TD
+    %% Repo-level simulator architecture for the current mission-level UAV system.
+
+    classDef config fill:#E8F3FF,stroke:#2F6EA5,color:#102A43
+    classDef backbone fill:#F3F7F0,stroke:#4E7D3A,color:#172B12
+    classDef decision fill:#FFF4D8,stroke:#A66F00,color:#3D2900
+    classDef state fill:#F7F0FF,stroke:#6D4BA3,color:#25183D
+    classDef comm fill:#E9FBF7,stroke:#21806F,color:#123B35
+    classDef output fill:#F2F2F2,stroke:#666666,color:#222222
+    classDef gap fill:#FFE8E8,stroke:#B42318,color:#3B0A0A,stroke-width:2px
+
+    subgraph Config["Config"]
+        ScenarioConfig["ScenarioConfig<br/>method_name, ticks, seed<br/>communication_range, sensing_radius<br/>heartbeat_interval, urgent_message_ttl"]:::config
+        WorldConfig["WorldConfig<br/>width, height, sectors"]:::config
+        UavConfig["UavConfig<br/>uav_id, cell, role<br/>energy, health"]:::config
+        EventsConfig["CommunicationEvent list<br/>dropout, block_sector, urgent_sector"]:::config
+    end
+
+    subgraph SimulationBackbone["Simulation Backbone"]
+        Simulation["Simulation<br/>shared tick loop and runtime state"]:::backbone
+        WorldState["WorldState<br/>sector grid, coverage, priority<br/>blocked, hazard, visibility, comm_quality"]:::backbone
+        EventInjector["EventInjector.apply()<br/>mutates world and UAV availability"]:::backbone
+        ObservationBuilder["ObservationBuilder.build()<br/>self, urgent_cells, nearby sectors"]:::backbone
+        ResolveActions["resolve_actions()<br/>validates target, sets role/target<br/>moves UAVs, enqueues messages"]:::backbone
+        Sensing["apply_sensing()<br/>marks non-blocked nearby sectors covered"]:::backbone
+    end
+
+    subgraph DecisionLayer["Decision Layer"]
+        SwarmMethod["SwarmMethod interface<br/>initialize_mission()<br/>decide_tick()<br/>handle_event()"]:::decision
+        StaticMethod["StaticPartitionMethod<br/>pre-mission sector assignments"]:::decision
+        RulesMethod["RuleAdaptiveMethod<br/>nearest urgent, else nearest uncovered"]:::decision
+        AgenticMethod["AgenticMethod<br/>role switch plus intent_summary messages"]:::decision
+        Actions["Action list<br/>action_type, target_cell<br/>new_role, messages"]:::decision
+    end
+
+    subgraph PlanningState["Planning State"]
+        UavState["UavState<br/>role, target_cell<br/>inbox, outbox<br/>active, health, energy"]:::state
+        MethodState["MethodState<br/>assignments only today"]:::state
+    end
+
+    subgraph Communication["Communication"]
+        NetworkModel["NetworkModel<br/>range-limited one-hop delivery<br/>TTL-limited urgent forwarding"]:::comm
+        Message["Message<br/>sender_id, message_type, payload<br/>ttl, urgency, recipient_id"]:::comm
+        Inbox["Per-UAV inbox<br/>cleared before each delivery"]:::comm
+    end
+
+    subgraph MetricsAndOutputs["Metrics and Outputs"]
+        MetricsLogger["MetricsLogger<br/>coverage_ratio, active_uavs<br/>messages_sent, urgent_targets"]:::output
+        Renderer["Renderer / GUI<br/>reads world and UAV states"]:::output
+        Summary["Run summary<br/>ticks_run, coverage_ratio<br/>messages_sent, urgent_targets"]:::output
+    end
+
+    subgraph ReviewGaps["Review Gaps"]
+        GapEvents["Gap: handle_event() contract<br/>is defined but not invoked"]:::gap
+        GapMessages["Gap: intent_summary messages<br/>are emitted but not consumed"]:::gap
+        GapState["Gap: planning state is thin<br/>needed for recovery analysis:<br/>commitments, task status, plan age,<br/>replan reason, abandoned work"]:::gap
+    end
+
+    ScenarioConfig --> Simulation
+    WorldConfig --> WorldState
+    UavConfig --> UavState
+    EventsConfig --> EventInjector
+
+    Simulation --> WorldState
+    Simulation --> UavState
+    Simulation --> MethodState
+    Simulation --> EventInjector
+    Simulation --> NetworkModel
+    Simulation --> ObservationBuilder
+
+    EventInjector --> WorldState
+    EventInjector --> UavState
+    NetworkModel --> Inbox
+    Inbox --> UavState
+    ObservationBuilder --> UavState
+    ObservationBuilder --> WorldState
+    ObservationBuilder --> SwarmMethod
+
+    SwarmMethod --> StaticMethod
+    SwarmMethod --> RulesMethod
+    SwarmMethod --> AgenticMethod
+    StaticMethod --> Actions
+    RulesMethod --> Actions
+    AgenticMethod --> Actions
+    MethodState --> StaticMethod
+    MethodState --> RulesMethod
+    MethodState --> AgenticMethod
+    UavState --> StaticMethod
+    UavState --> RulesMethod
+    UavState --> AgenticMethod
+
+    Actions --> ResolveActions
+    ResolveActions --> UavState
+    ResolveActions --> WorldState
+    ResolveActions --> Message
+    Message --> NetworkModel
+    ResolveActions --> Sensing
+    Sensing --> WorldState
+
+    WorldState --> MetricsLogger
+    UavState --> MetricsLogger
+    MetricsLogger --> Summary
+    WorldState --> Renderer
+    UavState --> Renderer
+
+    GapEvents -. affects .-> EventInjector
+    GapEvents -. missing call .-> SwarmMethod
+    GapMessages -. affects .-> AgenticMethod
+    GapMessages -. ignored by decisions .-> Inbox
+    GapState -. affects .-> UavState
+    GapState -. affects .-> MethodState

@@ -19,23 +19,26 @@ from agentic_uav.gui_support import (
     build_metric_series,
     run_to_end,
 )
-from agentic_uav.scenarios import ScenarioParams, build_demo_scenario
+from agentic_uav.scenarios import MISSION_TYPES, ScenarioParams, build_demo_scenario
 from agentic_uav.simulation import Simulation
 
 
 METHODS = ["static", "rules", "agentic"]
+DEFAULT_PARAMS = ScenarioParams()
+PAGE_STYLE = {"padding": "22px", "background": "#FFFFFF", "min-height": "100vh"}
 
-method_name = solara.reactive("agentic")
-seed = solara.reactive(7)
-grid_size = solara.reactive(8)
-uav_count = solara.reactive(4)
-sensing_radius = solara.reactive(1)
-communication_range = solara.reactive(3)
-tick_horizon = solara.reactive(12)
-heartbeat_interval = solara.reactive(3)
-urgent_message_ttl = solara.reactive(2)
+method_name = solara.reactive(DEFAULT_PARAMS.method_name)
+mission_type = solara.reactive(DEFAULT_PARAMS.mission_type)
+seed = solara.reactive(DEFAULT_PARAMS.seed)
+grid_size = solara.reactive(DEFAULT_PARAMS.grid_size)
+uav_count = solara.reactive(DEFAULT_PARAMS.uav_count)
+sensing_radius = solara.reactive(DEFAULT_PARAMS.sensing_radius)
+communication_range = solara.reactive(DEFAULT_PARAMS.communication_range)
+tick_horizon = solara.reactive(DEFAULT_PARAMS.ticks)
+heartbeat_interval = solara.reactive(DEFAULT_PARAMS.heartbeat_interval)
+urgent_message_ttl = solara.reactive(DEFAULT_PARAMS.urgent_message_ttl)
 version = solara.reactive(0)
-simulation = solara.reactive(Simulation.from_config(build_demo_scenario(params=ScenarioParams())))
+simulation = solara.reactive(Simulation.from_config(build_demo_scenario(params=DEFAULT_PARAMS)))
 
 
 @solara.component
@@ -48,7 +51,7 @@ def Page() -> None:
     portrayal = build_grid_portrayal(simulation.value)
     timeline = build_event_timeline(simulation.value)
 
-    with solara.Column(gap="18px", style={"padding": "22px", "background": "#FFFFFF", "min-height": "100vh"}):
+    with solara.Column(gap="18px", style=PAGE_STYLE):
         _MissionHeader(state)
         with solara.ColumnsResponsive(default=12, medium=[3, 6, 3], gutters=True, classes=["mission-layout"]):
             _Controls(state)
@@ -67,7 +70,7 @@ def _MissionHeader(state: dict[str, object]) -> None:
             "<div class='eyebrow'>Decentralized UAV Evaluation</div>"
             "<h1>Agentic Swarm Mission Console</h1>"
             "<div class='header-subtitle'>"
-            f"{html.escape(method_name.value)} method | seed {seed.value} | "
+            f"{html.escape(mission_type.value)} mission | {html.escape(method_name.value)} method | seed {seed.value} | "
             f"{state['active_uavs']} of {state['total_uavs']} UAVs active"
             "</div>"
             "</div>"
@@ -84,25 +87,39 @@ def _MissionHeader(state: dict[str, object]) -> None:
 @solara.component
 def _Controls(state: dict[str, object]) -> None:
     with solara.Column(gap="14px"):
-        with solara.Card(title="Mission Setup", elevation=0, margin=0):
-            solara.Select("Method", values=METHODS, value=method_name, on_value=_set_method)
-            solara.SliderInt("Grid size", value=grid_size, min=4, max=14, step=1, on_value=_set_grid_size)
-            solara.SliderInt("UAV count", value=uav_count, min=1, max=12, step=1, on_value=_set_uav_count)
-            solara.SliderInt("Sensing radius", value=sensing_radius, min=0, max=4, step=1, on_value=_set_sensing_radius)
-            solara.SliderInt("Communication distance", value=communication_range, min=1, max=8, step=1, on_value=_set_communication_range)
-            solara.InputInt("Seed", value=seed, on_value=_set_seed)
+        _MissionSetupCard()
+        _RunControlCard(state)
 
-            with solara.Details(summary="Advanced", expand=False):
-                solara.SliderInt("Tick horizon", value=tick_horizon, min=1, max=60, step=1, on_value=_set_tick_horizon)
-                solara.SliderInt("Heartbeat interval", value=heartbeat_interval, min=1, max=12, step=1, on_value=_set_heartbeat_interval)
-                solara.SliderInt("Urgent message TTL", value=urgent_message_ttl, min=1, max=8, step=1, on_value=_set_urgent_message_ttl)
 
-        with solara.Card(title="Run Control", elevation=0, margin=0):
-            with solara.Row(gap="8px", style={"flex-wrap": "wrap"}):
-                solara.Button("Reset", on_click=_reset, color="primary", outlined=True)
-                solara.Button("Next Step", on_click=_step_once, color="primary", disabled=state["is_finished"])
-                solara.Button("End", on_click=_end, color="success", disabled=state["is_finished"])
-            solara.HTML(tag="div", unsafe_innerHTML=_run_status_html(state), classes=["run-status"])
+@solara.component
+def _MissionSetupCard() -> None:
+    with solara.Card(title="Mission Setup", elevation=0, margin=0):
+        solara.Select("Mission", values=MISSION_TYPES, value=mission_type, on_value=_set_mission_type)
+        solara.Select("Method", values=METHODS, value=method_name, on_value=_set_method)
+        solara.SliderInt("Grid size", value=grid_size, min=4, max=20, step=1, on_value=_set_grid_size)
+        solara.SliderInt("UAV count", value=uav_count, min=1, max=12, step=1, on_value=_set_uav_count)
+        solara.SliderInt("Sensing radius", value=sensing_radius, min=0, max=4, step=1, on_value=_set_sensing_radius)
+        solara.SliderInt("Communication distance", value=communication_range, min=1, max=8, step=1, on_value=_set_communication_range)
+        solara.InputInt("Seed", value=seed, on_value=_set_seed)
+        _AdvancedControls()
+
+
+@solara.component
+def _AdvancedControls() -> None:
+    with solara.Details(summary="Advanced", expand=False):
+        solara.SliderInt("Max ticks", value=tick_horizon, min=1, max=50, step=1, on_value=_set_tick_horizon)
+        solara.SliderInt("Heartbeat interval", value=heartbeat_interval, min=1, max=12, step=1, on_value=_set_heartbeat_interval)
+        solara.SliderInt("Urgent message TTL", value=urgent_message_ttl, min=1, max=8, step=1, on_value=_set_urgent_message_ttl)
+
+
+@solara.component
+def _RunControlCard(state: dict[str, object]) -> None:
+    with solara.Card(title="Run Control", elevation=0, margin=0):
+        with solara.Row(gap="8px", style={"flex-wrap": "wrap"}):
+            solara.Button("Reset", on_click=_reset, color="primary", outlined=True)
+            solara.Button("Next Step", on_click=_step_once, color="primary", disabled=state["is_finished"])
+            solara.Button("End", on_click=_end, color="success", disabled=state["is_finished"])
+        solara.HTML(tag="div", unsafe_innerHTML=_run_status_html(state), classes=["run-status"])
 
 
 @solara.component
@@ -115,17 +132,27 @@ def _GridPanel(portrayal: dict[str, object], state: dict[str, object], refresh_k
 @solara.component
 def _MetricsPanel(state: dict[str, object], timeline: list[dict[str, object]]) -> None:
     with solara.Card(title="Mission Telemetry", elevation=0, margin=0):
-        with solara.Column(gap="10px"):
-            with solara.Row(gap="10px"):
-                _MetricCard("Coverage", f"{state['coverage_ratio']:.0%}", "green")
-                _MetricCard("Active", f"{state['active_uavs']}/{state['total_uavs']}", "cyan")
-            with solara.Row(gap="10px"):
-                _MetricCard("Messages", str(state["messages_sent"]), "amber")
-                _MetricCard("Urgent", str(state["urgent_target_count"]), "coral")
-        figure = _metric_figure(simulation.value)
-        solara.FigureMatplotlib(figure, dependencies=[version.value])
-        plt.close(figure)
+        _MetricSummary(state)
+        _MetricChart()
         solara.HTML(tag="div", unsafe_innerHTML=_timeline_html(timeline), classes=["event-timeline"])
+
+
+@solara.component
+def _MetricSummary(state: dict[str, object]) -> None:
+    with solara.Column(gap="10px"):
+        with solara.Row(gap="10px"):
+            _MetricCard("Coverage", f"{state['coverage_ratio']:.0%}", "green")
+            _MetricCard("Active", f"{state['active_uavs']}/{state['total_uavs']}", "cyan")
+        with solara.Row(gap="10px"):
+            _MetricCard("Messages", str(state["messages_sent"]), "amber")
+            _MetricCard("Urgent", str(state["urgent_target_count"]), "coral")
+
+
+@solara.component
+def _MetricChart() -> None:
+    figure = _metric_figure(simulation.value)
+    solara.FigureMatplotlib(figure, dependencies=[version.value])
+    plt.close(figure)
 
 
 @solara.component
@@ -142,6 +169,11 @@ def _MetricCard(label: str, value: str, tone: str = "green") -> None:
 
 def _set_method(value: str) -> None:
     method_name.value = value
+    _reset()
+
+
+def _set_mission_type(value: str) -> None:
+    mission_type.value = value
     _reset()
 
 
@@ -203,6 +235,7 @@ def _end() -> None:
 def _scenario_params() -> ScenarioParams:
     return ScenarioParams(
         method_name=method_name.value,
+        mission_type=mission_type.value,
         grid_size=grid_size.value,
         uav_count=uav_count.value,
         sensing_radius=sensing_radius.value,
@@ -219,32 +252,46 @@ def _grid_html(portrayal: dict[str, object], refresh_key: int = 0) -> str:
     height = portrayal["height"]
     cells = portrayal["cells"]
     uavs = portrayal["uavs"]
-    by_cell: dict[tuple[int, int], list[dict[str, object]]] = {}
-    target_cells = {uav["target_cell"] for uav in uavs if uav["target_cell"] is not None and uav["active"]}
-    for uav in uavs:
-        by_cell.setdefault(uav["cell"], []).append(uav)
+    by_cell = _uavs_by_cell(uavs)
+    target_cells = _target_cells(uavs)
 
-    items: list[str] = []
-    for y in range(height):
-        for x in range(width):
-            cell = (x, y)
-            sector = cells[cell]
-            classes = ["grid-cell", str(sector["state"])]
-            if cell in target_cells:
-                classes.append("targeted")
-            badges = "".join(_uav_badge(uav, index) for index, uav in enumerate(by_cell.get(cell, [])))
-            items.append(
-                "<div class='{classes}' style='background:{fill}'>"
-                "{badges}</div>".format(
-                    classes=" ".join(classes),
-                    fill=sector["fill"],
-                    badges=badges,
-                )
-            )
+    items = [
+        _grid_cell_html((x, y), cells[(x, y)], by_cell.get((x, y), []), target_cells)
+        for y in range(height)
+        for x in range(width)
+    ]
     return "<div class='uav-grid' data-refresh='{refresh_key}' style='grid-template-columns: repeat({width}, 1fr)'>{items}</div>".format(
         refresh_key=refresh_key,
         width=width,
         items="".join(items),
+    )
+
+
+def _uavs_by_cell(uavs: list[dict[str, object]]) -> dict[tuple[int, int], list[dict[str, object]]]:
+    by_cell: dict[tuple[int, int], list[dict[str, object]]] = {}
+    for uav in uavs:
+        by_cell.setdefault(uav["cell"], []).append(uav)
+    return by_cell
+
+
+def _target_cells(uavs: list[dict[str, object]]) -> set[tuple[int, int]]:
+    return {uav["target_cell"] for uav in uavs if uav["target_cell"] is not None and uav["active"]}
+
+
+def _grid_cell_html(
+    cell: tuple[int, int],
+    sector: dict[str, object],
+    uavs: list[dict[str, object]],
+    target_cells: set[tuple[int, int]],
+) -> str:
+    classes = ["grid-cell", str(sector["state"])]
+    if cell in target_cells:
+        classes.append("targeted")
+    badges = "".join(_uav_badge(uav, index) for index, uav in enumerate(uavs))
+    return "<div class='{classes}' style='background:{fill}'>{badges}</div>".format(
+        classes=" ".join(classes),
+        fill=sector["fill"],
+        badges=badges,
     )
 
 
@@ -291,7 +338,7 @@ def _legend_html() -> str:
 
 
 def _run_status_html(state: dict[str, object]) -> str:
-    status = "Complete" if state["is_finished"] else "Running"
+    status = _run_status_label(state)
     return (
         "<div class='status-grid'>"
         f"<div><span>Tick</span><strong>{state['tick']}/{simulation.value.config.ticks}</strong></div>"
@@ -302,27 +349,38 @@ def _run_status_html(state: dict[str, object]) -> str:
     )
 
 
+def _run_status_label(state: dict[str, object]) -> str:
+    if state["termination_reason"] == "solved":
+        return "Solved"
+    if state["termination_reason"] == "max_ticks":
+        return "Unsolved"
+    return "Running"
+
+
 def _timeline_html(timeline: list[dict[str, object]]) -> str:
     if not timeline:
         return "<div class='timeline-title'>Scenario Events</div><div class='timeline-empty'>No scheduled events</div>"
-    items = []
-    for event in timeline:
-        items.append(
-            "<div class='timeline-item {tone} {state}'>"
-            "<div class='timeline-marker'></div>"
-            "<div>"
-            "<div class='timeline-row'><strong>{label}</strong><span>t={tick}</span></div>"
-            "<div class='timeline-detail'>{detail}</div>"
-            "</div>"
-            "</div>".format(
-                tone=html.escape(str(event["tone"])),
-                state=html.escape(str(event["state"])),
-                label=html.escape(str(event["label"])),
-                tick=html.escape(str(event["tick"])),
-                detail=html.escape(str(event["detail"])),
-            )
+    return "<div class='timeline-title'>Scenario Events</div>" + "".join(
+        _timeline_item_html(event) for event in timeline
+    )
+
+
+def _timeline_item_html(event: dict[str, object]) -> str:
+    return (
+        "<div class='timeline-item {tone} {state}'>"
+        "<div class='timeline-marker'></div>"
+        "<div>"
+        "<div class='timeline-row'><strong>{label}</strong><span>t={tick}</span></div>"
+        "<div class='timeline-detail'>{detail}</div>"
+        "</div>"
+        "</div>".format(
+            tone=html.escape(str(event["tone"])),
+            state=html.escape(str(event["state"])),
+            label=html.escape(str(event["label"])),
+            tick=html.escape(str(event["tick"])),
+            detail=html.escape(str(event["detail"])),
         )
-    return "<div class='timeline-title'>Scenario Events</div>" + "".join(items)
+    )
 
 
 def _metric_figure(sim: Simulation):

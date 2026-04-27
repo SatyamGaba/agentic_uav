@@ -44,14 +44,18 @@ class CliTest(unittest.TestCase):
         for method_name in ("static", "rules", "agentic"):
             with self.subTest(method_name=method_name):
                 summary = run_scenario(build_demo_scenario(method_name))
-                self.assertEqual(summary["ticks_run"], 12)
+                self.assertLessEqual(summary["ticks_run"], 50)
                 self.assertIn("coverage_ratio", summary)
+                self.assertIn("is_solved", summary)
+                self.assertIn("termination_reason", summary)
 
     def test_run_command_executes_headless_scenario(self) -> None:
         summary = main.run_headless(main.parse_args(["run", "--method", "agentic"]))
 
-        self.assertEqual(summary["ticks_run"], 12)
+        self.assertLessEqual(summary["ticks_run"], 50)
         self.assertIn("coverage_ratio", summary)
+        self.assertIn("is_solved", summary)
+        self.assertIn("termination_reason", summary)
 
     def test_readme_documents_uv_run_main_as_default_ui_launch(self) -> None:
         readme = Path("README.md").read_text()

@@ -1,118 +1,23 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from random import Random
 from typing import Any
 
-
-Cell = tuple[int, int]
-
-
-@dataclass
-class Sector:
-    cell: Cell
-    coverage: float = 0.0
-    priority: str = "normal"
-    blocked: bool = False
-    hazard: str = "none"
-    visibility: float = 1.0
-    comm_quality: float = 1.0
-
-
-@dataclass
-class WorldConfig:
-    width: int
-    height: int
-    sectors: list[Sector] = field(default_factory=list)
-
-
-@dataclass
-class UavConfig:
-    uav_id: str
-    cell: Cell
-    role: str = "coverage"
-    energy: float = 1.0
-    health: str = "nominal"
-
-
-@dataclass
-class CommunicationEvent:
-    tick: int
-    event_type: str
-    payload: dict[str, Any]
-
-
-@dataclass
-class ScenarioConfig:
-    method_name: str
-    ticks: int
-    communication_range: int
-    sensing_radius: int
-    heartbeat_interval: int
-    urgent_message_ttl: int
-    world: WorldConfig
-    uavs: list[UavConfig]
-    events: list[CommunicationEvent] = field(default_factory=list)
-    seed: int = 0
-
-
-@dataclass
-class Message:
-    sender_id: str
-    message_type: str
-    payload: dict[str, Any]
-    ttl: int
-    urgency: str = "routine"
-    recipient_id: str | None = None
-
-
-@dataclass
-class UavState:
-    uav_id: str
-    cell: Cell
-    role: str = "coverage"
-    energy: float = 1.0
-    health: str = "nominal"
-    target_cell: Cell | None = None
-    inbox: list[Message] = field(default_factory=list)
-    outbox: list[Message] = field(default_factory=list)
-    active: bool = True
-
-
-@dataclass
-class WorldState:
-    width: int
-    height: int
-    sectors: dict[Cell, Sector]
-
-    @classmethod
-    def from_config(cls, config: WorldConfig) -> WorldState:
-        sectors = {
-            (x, y): Sector(cell=(x, y))
-            for y in range(config.height)
-            for x in range(config.width)
-        }
-        for sector in config.sectors:
-            sectors[sector.cell] = sector
-        return cls(width=config.width, height=config.height, sectors=sectors)
-
-    def in_bounds(self, cell: Cell) -> bool:
-        x, y = cell
-        return 0 <= x < self.width and 0 <= y < self.height
-
-
-@dataclass
-class Action:
-    uav_id: str
-    action_type: str
-    target_cell: Cell | None = None
-    new_role: str | None = None
-    messages: list[Message] = field(default_factory=list)
-
-
-@dataclass
-class MethodState:
-    assignments: dict[str, list[Cell]] = field(default_factory=dict)
+from agentic_uav.communication import Message, NetworkModel
+from agentic_uav.models import (
+    Cell,
+    CommunicationEvent,
+    ScenarioConfig,
+    Sector,
+    UavConfig,
+    UavState,
+    WorldConfig,
+    WorldState,
+    coverage_ratio,
+    manhattan,
+    neighborhood,
+)
+from agentic_uav.planning import Action, MethodState, ObservationBuilder
 
 
 class MetricsLogger:
@@ -132,73 +37,20 @@ class MetricsLogger:
             }
         )
 
-    def summary(self, ticks_run: int, world: WorldState) -> dict[str, Any]:
+    def summary(self, ticks_run: int, world: WorldState, max_ticks: int) -> dict[str, Any]:
+        coverage = coverage_ratio(world)
+        is_solved = coverage >= 1.0
+        termination_reason = "solved" if is_solved else "max_ticks"
+        if not is_solved and ticks_run < max_ticks:
+            termination_reason = "running"
         return {
             "ticks_run": ticks_run,
-            "coverage_ratio": coverage_ratio(world),
+            "coverage_ratio": coverage,
             "messages_sent": self.messages_sent,
             "urgent_targets": sorted(self.urgent_targets),
+            "is_solved": is_solved,
+            "termination_reason": termination_reason,
         }
-
-
-class NetworkModel:
-    def __init__(self, communication_range: int) -> None:
-        self.communication_range = communication_range
-        self.pending: list[Message] = []
-
-    def enqueue(self, messages: list[Message]) -> None:
-        self.pending.extend(messages)
-
-    def deliver(self, uavs: dict[str, UavState]) -> None:
-        current = self.pending
-        self.pending = []
-        forwarded: list[Message] = []
-
-        for message in current:
-            delivered_to = self._neighbors(message.sender_id, uavs, message.recipient_id)
-            for uav_id in delivered_to:
-                received = Message(
-                    sender_id=message.sender_id,
-                    message_type=message.message_type,
-                    payload=dict(message.payload),
-                    ttl=message.ttl,
-                    urgency=message.urgency,
-                    recipient_id=uav_id,
-                )
-                uavs[uav_id].inbox.append(received)
-                if message.urgency == "urgent" and message.ttl > 1:
-                    forwarded.append(
-                        Message(
-                            sender_id=uav_id,
-                            message_type=message.message_type,
-                            payload=dict(message.payload),
-                            ttl=message.ttl - 1,
-                            urgency=message.urgency,
-                        )
-                    )
-        self.pending.extend(forwarded)
-
-    def _neighbors(
-        self,
-        sender_id: str,
-        uavs: dict[str, UavState],
-        recipient_id: str | None = None,
-    ) -> list[str]:
-        if sender_id not in uavs:
-            return []
-        sender = uavs[sender_id]
-        if not sender.active:
-            return []
-
-        neighbors: list[str] = []
-        for uav_id, uav in uavs.items():
-            if uav_id == sender_id or not uav.active:
-                continue
-            if recipient_id is not None and uav_id != recipient_id:
-                continue
-            if manhattan(sender.cell, uav.cell) <= self.communication_range:
-                neighbors.append(uav_id)
-        return neighbors
 
 
 class EventInjector:
@@ -220,30 +72,6 @@ class EventInjector:
             elif event.event_type == "urgent_sector":
                 cell = tuple(event.payload["cell"])
                 world.sectors[cell].priority = "urgent"
-
-
-class ObservationBuilder:
-    def __init__(self, sensing_radius: int) -> None:
-        self.sensing_radius = sensing_radius
-
-    def build(self, world: WorldState, uavs: dict[str, UavState]) -> dict[str, dict[str, Any]]:
-        observations: dict[str, dict[str, Any]] = {}
-        urgent_cells = [
-            cell for cell, sector in world.sectors.items() if sector.priority == "urgent"
-        ]
-        for uav_id, uav in uavs.items():
-            if not uav.active:
-                continue
-            observations[uav_id] = {
-                "self": uav,
-                "urgent_cells": urgent_cells,
-                "nearby": self._nearby_sectors(world, uav.cell),
-            }
-        return observations
-
-    def _nearby_sectors(self, world: WorldState, center: Cell) -> list[Sector]:
-        cells = neighborhood(center, radius=self.sensing_radius)
-        return [world.sectors[cell] for cell in cells if cell in world.sectors]
 
 
 class Simulation:
@@ -271,18 +99,30 @@ class Simulation:
 
     @classmethod
     def from_config(cls, config: ScenarioConfig) -> Simulation:
-        from agentic_uav.methods import build_method
+        from agentic_uav.policy import build_method
 
         return cls(config, build_method(config.method_name))
 
     def run(self) -> dict[str, Any]:
-        for _ in range(self.config.ticks):
+        while not self.is_finished:
             self.step()
-        return self.metrics.summary(self.tick, self.world)
+        return self.metrics.summary(self.tick, self.world, self.config.ticks)
+
+    @property
+    def is_solved(self) -> bool:
+        return coverage_ratio(self.world) >= 1.0
 
     @property
     def is_finished(self) -> bool:
-        return self.tick >= self.config.ticks
+        return self.is_solved or self.tick >= self.config.ticks
+
+    @property
+    def termination_reason(self) -> str:
+        if self.is_solved:
+            return "solved"
+        if self.tick >= self.config.ticks:
+            return "max_ticks"
+        return "running"
 
     def step(self) -> None:
         if self.is_finished:
@@ -346,21 +186,24 @@ class Simulation:
                     self.world.sectors[cell].coverage = 1.0
 
 
-def coverage_ratio(world: WorldState) -> float:
-    sectors = [sector for sector in world.sectors.values() if not sector.blocked]
-    if not sectors:
-        return 0.0
-    return sum(1 for sector in sectors if sector.coverage >= 1.0) / len(sectors)
-
-
-def neighborhood(cell: Cell, radius: int) -> list[Cell]:
-    x0, y0 = cell
-    return [
-        (x, y)
-        for y in range(y0 - radius, y0 + radius + 1)
-        for x in range(x0 - radius, x0 + radius + 1)
-    ]
-
-
-def manhattan(left: Cell, right: Cell) -> int:
-    return abs(left[0] - right[0]) + abs(left[1] - right[1])
+__all__ = [
+    "Action",
+    "Cell",
+    "CommunicationEvent",
+    "EventInjector",
+    "Message",
+    "MethodState",
+    "MetricsLogger",
+    "NetworkModel",
+    "ObservationBuilder",
+    "ScenarioConfig",
+    "Sector",
+    "Simulation",
+    "UavConfig",
+    "UavState",
+    "WorldConfig",
+    "WorldState",
+    "coverage_ratio",
+    "manhattan",
+    "neighborhood",
+]
