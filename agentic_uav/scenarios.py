@@ -17,12 +17,12 @@ MISSION_TYPES = ["survey", "disaster_mapping"]
 class ScenarioParams:
     method_name: str = "agentic"
     mission_type: str = "disaster_mapping"
-    grid_size: int = 12
+    grid_size: int = 25
     uav_count: int = 4
     sensing_radius: int = 1
     communication_range: int = 3
     seed: int = 7
-    ticks: int = 50
+    ticks: int = 500
     heartbeat_interval: int = 3
     urgent_message_ttl: int = 2
 
@@ -31,12 +31,12 @@ def build_demo_scenario(
     method_name: str | None = None,
     *,
     mission_type: str = "disaster_mapping",
-    grid_size: int = 12,
+    grid_size: int = 25,
     uav_count: int = 4,
     sensing_radius: int = 1,
     communication_range: int = 3,
     seed: int = 7,
-    ticks: int = 50,
+    ticks: int = 500,
     heartbeat_interval: int = 3,
     urgent_message_ttl: int = 2,
     params: ScenarioParams | None = None,
@@ -140,43 +140,4 @@ def _uav_start_cells(grid_size: int, uav_count: int) -> list[tuple[int, int]]:
     if uav_count <= 0:
         return []
 
-    last = max(0, grid_size - 1)
-    mid = grid_size // 2
-    anchors = [
-        (0, 0),
-        (last, 0),
-        (0, last),
-        (last, last),
-        (mid, 0),
-        (mid, last),
-        (0, mid),
-        (last, mid),
-    ]
-
-    starts: list[tuple[int, int]] = []
-    for cell in anchors + _perimeter_cells(grid_size) + _interior_cells(grid_size):
-        if cell not in starts:
-            starts.append(cell)
-        if len(starts) == uav_count:
-            return starts
-    return starts
-
-
-def _perimeter_cells(grid_size: int) -> list[tuple[int, int]]:
-    last = max(0, grid_size - 1)
-    cells: list[tuple[int, int]] = []
-    for x in range(grid_size):
-        cells.append((x, 0))
-        cells.append((x, last))
-    for y in range(1, last):
-        cells.append((0, y))
-        cells.append((last, y))
-    return cells
-
-
-def _interior_cells(grid_size: int) -> list[tuple[int, int]]:
-    return [
-        (x, y)
-        for y in range(1, max(1, grid_size - 1))
-        for x in range(1, max(1, grid_size - 1))
-    ]
+    return [(0, 0)] * uav_count

@@ -20,28 +20,29 @@ flowchart TD
         Simulation["Simulation<br/>shared tick loop and runtime state"]:::backbone
         WorldState["WorldState<br/>sector grid, coverage, priority<br/>blocked, hazard, visibility, comm_quality"]:::backbone
         EventInjector["EventInjector.apply()<br/>mutates world and UAV availability"]:::backbone
-        ObservationBuilder["ObservationBuilder.build()<br/>self, urgent_cells, nearby sectors"]:::backbone
+        ObservationBuilder["ObservationBuilder.build()<br/>self, urgent_cells, nearby sectors<br/>messages"]:::backbone
         ResolveActions["resolve_actions()<br/>validates target, sets role/target<br/>moves UAVs, enqueues messages"]:::backbone
         Sensing["apply_sensing()<br/>marks non-blocked nearby sectors covered"]:::backbone
     end
 
-    subgraph DecisionLayer["Decision Layer"]
+    subgraph DecisionLayer["Per-UAV Decentralized Decision Layer"]
         SwarmMethod["SwarmMethod interface<br/>initialize_mission()<br/>decide_tick()<br/>handle_event()"]:::decision
-        StaticMethod["StaticPartitionMethod<br/>pre-mission sector assignments"]:::decision
-        RulesMethod["RuleAdaptiveMethod<br/>nearest urgent, else nearest uncovered"]:::decision
-        AgenticMethod["AgenticMethod<br/>role switch plus intent_summary messages"]:::decision
+        StaticMethod["StaticPartitionMethod<br/>centralized pre-mission baseline<br/>sector assignments"]:::decision
+        RulesMethod["RuleAdaptiveMethod<br/>decentralized fixed rules<br/>local/messaged urgent, local coverage"]:::decision
+        TaskConsiderationMethod["TaskConsiderationMethod<br/>Baseline C<br/>decentralized task-consideration scheduler"]:::decision
+        AgenticMethod["AgenticMethod<br/>decentralized per-UAV role/target choice<br/>intent_summary messages"]:::decision
         Actions["Action list<br/>action_type, target_cell<br/>new_role, messages"]:::decision
     end
 
     subgraph PlanningState["Planning State"]
-        UavState["UavState<br/>role, target_cell<br/>inbox, outbox<br/>active, health, energy"]:::state
-        MethodState["MethodState<br/>assignments only today"]:::state
+        UavState["UavState<br/>local role, target_cell<br/>inbox, outbox<br/>active, health, energy"]:::state
+        MethodState["MethodState<br/>assignments and cursors<br/>targets, roles, urgent memory<br/>peer intents, task commitments"]:::state
     end
 
     subgraph Communication["Communication"]
-        NetworkModel["NetworkModel<br/>range-limited one-hop delivery<br/>TTL-limited urgent forwarding"]:::comm
+        NetworkModel["NetworkModel<br/>peer information path<br/>range-limited one-hop delivery<br/>TTL-limited urgent forwarding"]:::comm
         Message["Message<br/>sender_id, message_type, payload<br/>ttl, urgency, recipient_id"]:::comm
-        Inbox["Per-UAV inbox<br/>cleared before each delivery"]:::comm
+        Inbox["Per-UAV inbox<br/>delayed peer context<br/>cleared before each delivery"]:::comm
     end
 
     subgraph MetricsAndOutputs["Metrics and Outputs"]
@@ -52,8 +53,8 @@ flowchart TD
 
     subgraph ReviewGaps["Review Gaps"]
         GapEvents["Gap: handle_event() contract<br/>is defined but not invoked"]:::gap
-        GapMessages["Gap: intent_summary messages<br/>are emitted but not consumed"]:::gap
-        GapState["Gap: planning state is thin<br/>needed for recovery analysis:<br/>commitments, task status, plan age,<br/>replan reason, abandoned work"]:::gap
+        GapMessages["Gap: agentic intent_summary messages<br/>are emitted but not consumed"]:::gap
+        GapState["Gap: metrics lack action traces<br/>needed for recovery analysis:<br/>task status, plan age,<br/>replan reason, abandoned work"]:::gap
     end
 
     ScenarioConfig --> Simulation
@@ -72,21 +73,26 @@ flowchart TD
     EventInjector --> UavState
     NetworkModel --> Inbox
     Inbox --> UavState
+    Inbox --> AgenticMethod
     ObservationBuilder --> UavState
     ObservationBuilder --> WorldState
     ObservationBuilder --> SwarmMethod
 
     SwarmMethod --> StaticMethod
     SwarmMethod --> RulesMethod
+    SwarmMethod --> TaskConsiderationMethod
     SwarmMethod --> AgenticMethod
     StaticMethod --> Actions
     RulesMethod --> Actions
+    TaskConsiderationMethod --> Actions
     AgenticMethod --> Actions
     MethodState --> StaticMethod
     MethodState --> RulesMethod
+    MethodState --> TaskConsiderationMethod
     MethodState --> AgenticMethod
     UavState --> StaticMethod
     UavState --> RulesMethod
+    UavState --> TaskConsiderationMethod
     UavState --> AgenticMethod
 
     Actions --> ResolveActions

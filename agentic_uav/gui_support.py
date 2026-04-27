@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from agentic_uav.simulation import Simulation, coverage_ratio
+from agentic_uav.simulation import Simulation, coverage_ratio, manhattan
 
 
 ROLE_COLORS = {
@@ -11,11 +11,26 @@ ROLE_COLORS = {
     "relay": "#35C7B8",
 }
 
+UAV_COLORS = [
+    "#4F8EF7",
+    "#F97316",
+    "#22C55E",
+    "#E11D48",
+    "#8B5CF6",
+    "#06B6D4",
+    "#F59E0B",
+    "#EC4899",
+    "#84CC16",
+    "#14B8A6",
+    "#A855F7",
+    "#64748B",
+]
+
 CELL_STYLES = {
-    "uncovered": {"fill": "#1B2120", "label": "Uncovered"},
-    "covered": {"fill": "#2E8F67", "label": "Covered"},
-    "urgent": {"fill": "#E7B84A", "label": "Urgent"},
-    "blocked": {"fill": "#573C36", "label": "Blocked"},
+    "uncovered": {"fill": "rgba(31, 41, 51, 0.24)", "label": "Uncovered"},
+    "covered": {"fill": "rgba(61, 220, 151, 0.34)", "label": "Covered"},
+    "urgent": {"fill": "rgba(231, 184, 74, 0.42)", "label": "Urgent"},
+    "blocked": {"fill": "rgba(87, 60, 54, 0.42)", "label": "Blocked"},
 }
 
 
@@ -31,12 +46,22 @@ def build_grid_portrayal(simulation: Simulation) -> dict[str, Any]:
             "blocked": sector.blocked,
         }
 
+    uav_colors = _uav_colors(simulation)
+    paths = [
+        {
+            "id": uav_id,
+            "color": uav_colors[uav_id],
+            "points": _uav_path_points(simulation, uav_id),
+            "active": simulation.uavs[uav_id].active,
+        }
+        for uav_id in simulation.uavs
+    ]
     uavs = [
         {
             "id": uav.uav_id,
             "cell": uav.cell,
             "role": uav.role,
-            "color": ROLE_COLORS.get(uav.role, "#CBD5E1"),
+            "color": uav_colors[uav.uav_id],
             "active": uav.active,
             "status": "active" if uav.active else "dropped",
             "target_cell": uav.target_cell,
@@ -49,6 +74,8 @@ def build_grid_portrayal(simulation: Simulation) -> dict[str, Any]:
         "height": simulation.world.height,
         "cells": cells,
         "uavs": uavs,
+        "paths": paths,
+        "communication_links": _communication_links(simulation),
     }
 
 
@@ -109,6 +136,54 @@ def build_event_timeline(simulation: Simulation) -> list[dict[str, Any]]:
 def run_to_end(simulation: Simulation) -> None:
     while not simulation.is_finished:
         simulation.step()
+
+
+def _uav_colors(simulation: Simulation) -> dict[str, str]:
+    return {
+        uav_id: UAV_COLORS[index % len(UAV_COLORS)]
+        for index, uav_id in enumerate(simulation.uavs)
+    }
+
+
+def _uav_path_points(simulation: Simulation, uav_id: str) -> list[tuple[int, int]]:
+    starts = {uav.uav_id: uav.cell for uav in simulation.config.uavs}
+    points: list[tuple[int, int]] = []
+    if uav_id in starts:
+        points.append(starts[uav_id])
+
+    for record in simulation.metrics.records:
+        cell = record["uav_cells"].get(uav_id)
+        if cell is not None:
+            points.append(cell)
+
+    current = simulation.uavs[uav_id].cell
+    if not points or points[-1] != current:
+        points.append(current)
+
+    deduped: list[tuple[int, int]] = []
+    for point in points:
+        if not deduped or deduped[-1] != point:
+            deduped.append(point)
+    return deduped
+
+
+def _communication_links(simulation: Simulation) -> list[dict[str, Any]]:
+    active_uavs = [uav for uav in simulation.uavs.values() if uav.active]
+    links: list[dict[str, Any]] = []
+    for index, source in enumerate(active_uavs):
+        for target in active_uavs[index + 1 :]:
+            distance = manhattan(source.cell, target.cell)
+            if distance <= simulation.config.communication_range:
+                links.append(
+                    {
+                        "source_id": source.uav_id,
+                        "target_id": target.uav_id,
+                        "source_cell": source.cell,
+                        "target_cell": target.cell,
+                        "distance": distance,
+                    }
+                )
+    return links
 
 
 def _sector_state(sector: Any) -> str:

@@ -2,9 +2,15 @@
 
 ## Summary
 
-Build a custom Python, tick-based 2D disaster-mapping simulator with a sector grid as both the simulation state and the visualization layer. The architecture must make `Baseline A`, `Baseline B`, and the `Agentic` method directly swappable by changing only one top-level method selection, while keeping the world model, event schedule, communication model, metrics, seeds, renderer, and action validator identical.
+Build a custom Python, tick-based 2D disaster-mapping simulator with a sector grid as both the simulation state and the visualization layer. The architecture must make `Baseline A`, `Baseline B`, `Baseline C`, and the `Agentic` method directly swappable by changing only one top-level method selection, while keeping the world model, event schedule, communication model, metrics, seeds, renderer, and action validator identical.
 
 The top-level swappable unit is a `SwarmMethod`, not only a per-UAV policy, because `Baseline A` needs a pre-mission global assignment step while the other methods can operate in a distributed runtime style.
+
+## Decentralization Principle
+
+The proposed `AgenticMethod` is decentralized at runtime. Each active UAV receives a local structured observation, reasons over its own role, target, health, and peer messages, and emits its own action package. Peer information must flow through range-limited, delayed communication rather than instantaneous global broadcast.
+
+The simulator may keep global state internally because it is the experiment harness, but that state should not be treated as an onboard global oracle for the proposed method. Any future implementation should make the allowed per-UAV information boundary explicit and avoid adding hidden global knowledge to the agentic decision path except through observations or messages.
 
 ## Core Architecture
 
@@ -36,7 +42,7 @@ class SwarmMethod(Protocol):
         ...
 ```
 
-The experiment runner swaps methods through `method_name` or the CLI flag `--method static|rules|agentic`. No other subsystem should change when the method changes.
+The paper-ready experiment runner should swap methods through `method_name` or the CLI flag `--method static|rules|task_consideration|agentic`. No other subsystem should change when the method changes. Current code supports `static`, `rules`, `task_consideration`, and `agentic`.
 
 Shared action schema:
 
@@ -56,19 +62,29 @@ Shared role set:
 ## Method Definitions
 
 - `Baseline A: StaticPartitionMethod`
-  - Performs pre-mission grid partitioning.
+  - Performs centralized pre-mission grid partitioning for comparison.
   - Each UAV mostly follows its assigned sector list.
   - It does not perform meaningful dynamic reassignment when urgent sectors appear or a peer drops out.
 
 - `Baseline B: RuleAdaptiveMethod`
-  - Uses fixed triggers and heuristics at runtime.
+  - Uses decentralized fixed triggers and heuristics at runtime.
   - It reacts to urgent sectors and nearby uncovered work through deterministic rules.
   - It does not perform broader mission reasoning or open-ended reprioritization.
 
+- `Baseline C: TaskConsiderationMethod`
+  - Modern decentralized scheduler inspired by Chen, Li, and Peng (2023), "Decentralized UAV Swarm Scheduling with Constrained Task Exploration Balance."
+  - Scores candidate tasks per UAV from local observations, onboard state, and received peer context.
+  - Balances low-cost or nearby task selection with completion of neighboring tasks to reduce excessive outward exploration.
+  - Resolves conflicting task choices through explicit communication or consensus-style updates.
+  - Serves as the strongest non-agentic decentralized scheduler in the comparison set.
+
 - `Proposed: AgenticMethod`
   - Uses the same world, tools, movement, communication, and action schema.
-  - Chooses role and target from structured observations, local mission state, and peer/message context.
+  - Chooses role, target, and messages per UAV from structured observations, local mission state, and peer/message context.
+  - Has no central runtime controller; coordination emerges through local decisions and explicit communication.
   - May later be backed by a real LLM that emits the same validated JSON action package.
+
+CBBA and PI should be discussed as classical task-allocation ancestors in related work. When feasible, the main quantitative comparison should prioritize `task_consideration` as the newer non-agentic decentralized baseline.
 
 ## Simulation Semantics
 
@@ -107,6 +123,7 @@ Recommended sweeps:
 - swarm sizes: `5`, `10`, `15`
 - multiple random seeds per condition
 - increasing disruption severity per study
+- implemented sweep output: paired trial rows, aggregate CSV/JSON tables, survey dropout degradation plots, and one representative coverage timeline
 
 ## Metrics
 

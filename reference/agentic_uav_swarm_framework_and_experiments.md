@@ -603,6 +603,10 @@ A suitable scenario for the paper is a disaster-response or search-and-assist mi
 
 A swarm of UAVs is deployed to inspect and map a disaster zone, maintain communication coverage, and identify designated areas of interest.
 
+### Initial deployment assumption
+
+For the main simulation experiments, we explicitly assume that all UAVs are initially deployed from the same or nearby sector. This reflects missions launched from a common base, depot, command vehicle, charging station, or staging area. The assumption should be stated as part of the experimental setup, because other UAV swarm studies may use distributed, random, predefined, or optimized initial positions.
+
 ### Dynamic events introduced during the mission
 
 - one UAV drops out,
@@ -657,21 +661,27 @@ This gives enough diversity without making implementation too large.
 
 ## 9.5 Baselines
 
-We should include at least one strong baseline and preferably two.
+The final comparison set should include three baselines and the proposed decentralized agentic method.
 
-### Baseline 1: Centralized static assignment
+### Baseline A: Centralized static assignment
 
 A classical mission controller assigns tasks and roles at mission start. Reallocation is limited or delayed.
 
-### Baseline 2: Decentralized rule-based system
+### Baseline B: Decentralized rule-based system
 
 Each UAV follows fixed rules for role switching and communication without an agentic reasoning layer.
 
+### Baseline C: Decentralized task-consideration scheduling
+
+Each UAV uses a modern non-agentic decentralized scheduler inspired by Chen, Li, and Peng (2023), "Decentralized UAV Swarm Scheduling with Constrained Task Exploration Balance." This baseline should score candidate tasks locally, balance low-cost or nearby task selection with completion of neighboring tasks, and resolve conflicts through explicit communication or consensus-style updates.
+
 ### Proposed method
 
-Each UAV uses the proposed mission-level agent along with the same planning and execution backbone.
+Each UAV uses the proposed decentralized mission-level agent along with the same planning and execution backbone. The agent reasons over local observations, peer messages, mission goals, and internal state to choose roles, targets, and communication actions.
 
-This baseline structure is important because it isolates the benefit of the agentic reasoning layer rather than changing everything at once.
+This baseline structure is important because it isolates the benefit of the agentic reasoning layer against centralized static planning, fixed decentralized rules, and a stronger modern decentralized scheduling method.
+
+CBBA and PI should be discussed as classical task-allocation ancestors in related work, but the main experiments should prioritize the newer task-consideration scheduler as Baseline C when implementation time allows.
 
 ---
 

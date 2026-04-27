@@ -34,6 +34,9 @@ class MetricsLogger:
                 "active_uavs": sum(1 for uav in uavs.values() if uav.active),
                 "messages_sent": self.messages_sent,
                 "uav_cells": {uav_id: uav.cell for uav_id, uav in uavs.items()},
+                "uav_roles": {uav_id: uav.role for uav_id, uav in uavs.items()},
+                "uav_targets": {uav_id: uav.target_cell for uav_id, uav in uavs.items()},
+                "urgent_targets": sorted(self.urgent_targets),
             }
         )
 

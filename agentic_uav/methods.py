@@ -14,6 +14,7 @@ from agentic_uav.policy import (
     RuleAdaptiveMethod,
     StaticPartitionMethod,
     SwarmMethod,
+    TaskConsiderationMethod,
     build_method,
 )
 
@@ -26,6 +27,7 @@ __all__ = [
     "RuleAdaptiveMethod",
     "StaticPartitionMethod",
     "SwarmMethod",
+    "TaskConsiderationMethod",
     "build_method",
     "first_uncovered",
     "manhattan",

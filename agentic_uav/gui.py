@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import math
 import sys
 from pathlib import Path
 
@@ -21,30 +22,53 @@ from agentic_uav.gui_support import (
 )
 from agentic_uav.scenarios import MISSION_TYPES, ScenarioParams, build_demo_scenario
 from agentic_uav.simulation import Simulation
+from agentic_uav.ui_config import LAST_CONFIG_PATH, METHODS as UI_METHODS, load_ui_params, save_ui_params
 
 
-METHODS = ["static", "rules", "agentic"]
+METHODS = list(UI_METHODS)
 DEFAULT_PARAMS = ScenarioParams()
+STARTUP_PARAMS = load_ui_params()
 PAGE_STYLE = {"padding": "22px", "background": "#FFFFFF", "min-height": "100vh"}
+TICK_HORIZON_MIN = 1
+TICK_HORIZON_MAX = 10_000
+TICK_HORIZON_SCALE_MAX = 1_000
 
-method_name = solara.reactive(DEFAULT_PARAMS.method_name)
-mission_type = solara.reactive(DEFAULT_PARAMS.mission_type)
-seed = solara.reactive(DEFAULT_PARAMS.seed)
-grid_size = solara.reactive(DEFAULT_PARAMS.grid_size)
-uav_count = solara.reactive(DEFAULT_PARAMS.uav_count)
-sensing_radius = solara.reactive(DEFAULT_PARAMS.sensing_radius)
-communication_range = solara.reactive(DEFAULT_PARAMS.communication_range)
-tick_horizon = solara.reactive(DEFAULT_PARAMS.ticks)
-heartbeat_interval = solara.reactive(DEFAULT_PARAMS.heartbeat_interval)
-urgent_message_ttl = solara.reactive(DEFAULT_PARAMS.urgent_message_ttl)
+
+def _tick_to_log_slider(ticks: int) -> int:
+    bounded = min(max(ticks, TICK_HORIZON_MIN), TICK_HORIZON_MAX)
+    ratio = math.log(bounded / TICK_HORIZON_MIN) / math.log(TICK_HORIZON_MAX / TICK_HORIZON_MIN)
+    return round(ratio * TICK_HORIZON_SCALE_MAX)
+
+
+def _log_slider_to_tick(scale: int) -> int:
+    ratio = min(max(scale, 0), TICK_HORIZON_SCALE_MAX) / TICK_HORIZON_SCALE_MAX
+    value = TICK_HORIZON_MIN * ((TICK_HORIZON_MAX / TICK_HORIZON_MIN) ** ratio)
+    return int(round(value))
+
+
+method_name = solara.reactive(STARTUP_PARAMS.method_name)
+mission_type = solara.reactive(STARTUP_PARAMS.mission_type)
+seed = solara.reactive(STARTUP_PARAMS.seed)
+grid_size = solara.reactive(STARTUP_PARAMS.grid_size)
+uav_count = solara.reactive(STARTUP_PARAMS.uav_count)
+sensing_radius = solara.reactive(STARTUP_PARAMS.sensing_radius)
+communication_range = solara.reactive(STARTUP_PARAMS.communication_range)
+tick_horizon = solara.reactive(STARTUP_PARAMS.ticks)
+tick_horizon_scale = solara.reactive(_tick_to_log_slider(STARTUP_PARAMS.ticks))
+heartbeat_interval = solara.reactive(STARTUP_PARAMS.heartbeat_interval)
+urgent_message_ttl = solara.reactive(STARTUP_PARAMS.urgent_message_ttl)
+show_communication_links = solara.reactive(False)
 version = solara.reactive(0)
-simulation = solara.reactive(Simulation.from_config(build_demo_scenario(params=DEFAULT_PARAMS)))
+simulation = solara.reactive(Simulation.from_config(build_demo_scenario(params=STARTUP_PARAMS)))
+_has_loaded_persisted_config = False
 
 
 @solara.component
 def Page() -> None:
     solara.Title("Agentic UAV Swarm")
     solara.Style(_CSS)
+    solara.use_effect(_load_persisted_config, [])
+    solara.use_effect(_persist_current_config, [_config_dependency()])
 
     refresh_key = version.value
     state = build_dashboard_state(simulation.value)
@@ -96,18 +120,25 @@ def _MissionSetupCard() -> None:
     with solara.Card(title="Mission Setup", elevation=0, margin=0):
         solara.Select("Mission", values=MISSION_TYPES, value=mission_type, on_value=_set_mission_type)
         solara.Select("Method", values=METHODS, value=method_name, on_value=_set_method)
-        solara.SliderInt("Grid size", value=grid_size, min=4, max=20, step=1, on_value=_set_grid_size)
+        solara.SliderInt("Grid size", value=grid_size, min=4, max=64, step=1, on_value=_set_grid_size)
         solara.SliderInt("UAV count", value=uav_count, min=1, max=12, step=1, on_value=_set_uav_count)
         solara.SliderInt("Sensing radius", value=sensing_radius, min=0, max=4, step=1, on_value=_set_sensing_radius)
         solara.SliderInt("Communication distance", value=communication_range, min=1, max=8, step=1, on_value=_set_communication_range)
-        solara.InputInt("Seed", value=seed, on_value=_set_seed)
+        solara.InputInt("Seed", value=seed, on_value=_set_seed, continuous_update=True)
         _AdvancedControls()
 
 
 @solara.component
 def _AdvancedControls() -> None:
     with solara.Details(summary="Advanced", expand=False):
-        solara.SliderInt("Max ticks", value=tick_horizon, min=1, max=50, step=1, on_value=_set_tick_horizon)
+        solara.SliderInt(
+            f"Max ticks ({tick_horizon.value:,})",
+            value=tick_horizon_scale,
+            min=0,
+            max=TICK_HORIZON_SCALE_MAX,
+            step=1,
+            on_value=_set_tick_horizon_scale,
+        )
         solara.SliderInt("Heartbeat interval", value=heartbeat_interval, min=1, max=12, step=1, on_value=_set_heartbeat_interval)
         solara.SliderInt("Urgent message TTL", value=urgent_message_ttl, min=1, max=8, step=1, on_value=_set_urgent_message_ttl)
 
@@ -125,7 +156,12 @@ def _RunControlCard(state: dict[str, object]) -> None:
 @solara.component
 def _GridPanel(portrayal: dict[str, object], state: dict[str, object], refresh_key: int) -> None:
     with solara.Card(title="Operating Area", subtitle=f"Tick {state['tick']} of {simulation.value.config.ticks}", elevation=0, margin=0):
-        solara.HTML(tag="div", unsafe_innerHTML=_grid_html(portrayal, refresh_key), classes=["uav-grid-wrap"])
+        solara.Checkbox(label="Show communication links", value=show_communication_links)
+        solara.HTML(
+            tag="div",
+            unsafe_innerHTML=_grid_html(portrayal, refresh_key, show_communication_links.value),
+            classes=["uav-grid-wrap"],
+        )
         solara.HTML(tag="div", unsafe_innerHTML=_grid_footer_html(state), classes=["grid-footer"])
 
 
@@ -169,52 +205,128 @@ def _MetricCard(label: str, value: str, tone: str = "green") -> None:
 
 def _set_method(value: str) -> None:
     method_name.value = value
-    _reset()
+    _persist_and_reset()
 
 
 def _set_mission_type(value: str) -> None:
     mission_type.value = value
-    _reset()
+    _persist_and_reset()
 
 
 def _set_seed(value: int | None) -> None:
     seed.value = 0 if value is None else value
-    _reset()
+    _persist_and_reset()
 
 
 def _set_grid_size(value: int) -> None:
     grid_size.value = value
-    _reset()
+    _persist_and_reset()
 
 
 def _set_uav_count(value: int) -> None:
     uav_count.value = value
-    _reset()
+    _persist_and_reset()
 
 
 def _set_sensing_radius(value: int) -> None:
     sensing_radius.value = value
-    _reset()
+    _persist_and_reset()
 
 
 def _set_communication_range(value: int) -> None:
     communication_range.value = value
-    _reset()
+    _persist_and_reset()
 
 
 def _set_tick_horizon(value: int) -> None:
-    tick_horizon.value = value
-    _reset()
+    tick_horizon.value = min(max(value, TICK_HORIZON_MIN), TICK_HORIZON_MAX)
+    tick_horizon_scale.value = _tick_to_log_slider(tick_horizon.value)
+    _persist_and_reset()
+
+
+def _set_tick_horizon_scale(value: int) -> None:
+    tick_horizon_scale.value = value
+    tick_horizon.value = _log_slider_to_tick(value)
+    _persist_and_reset()
 
 
 def _set_heartbeat_interval(value: int) -> None:
     heartbeat_interval.value = value
-    _reset()
+    _persist_and_reset()
 
 
 def _set_urgent_message_ttl(value: int) -> None:
     urgent_message_ttl.value = value
+    _persist_and_reset()
+
+
+def _persist_and_reset() -> None:
+    save_ui_params(_scenario_params(), LAST_CONFIG_PATH)
     _reset()
+
+
+def _load_persisted_config() -> None:
+    global _has_loaded_persisted_config
+    params = load_ui_params(last_path=LAST_CONFIG_PATH)
+    if params != _scenario_params():
+        _apply_scenario_params(params)
+        _reset()
+    _has_loaded_persisted_config = True
+
+
+def _persist_current_config() -> None:
+    if not _has_loaded_persisted_config:
+        return
+    params = _scenario_params()
+    save_ui_params(params, LAST_CONFIG_PATH)
+    if params != _simulation_params():
+        _reset()
+
+
+def _apply_scenario_params(params: ScenarioParams) -> None:
+    method_name.value = params.method_name
+    mission_type.value = params.mission_type
+    grid_size.value = params.grid_size
+    uav_count.value = params.uav_count
+    sensing_radius.value = params.sensing_radius
+    communication_range.value = params.communication_range
+    seed.value = params.seed
+    tick_horizon.value = params.ticks
+    tick_horizon_scale.value = _tick_to_log_slider(params.ticks)
+    heartbeat_interval.value = params.heartbeat_interval
+    urgent_message_ttl.value = params.urgent_message_ttl
+
+
+def _config_dependency() -> tuple[object, ...]:
+    params = _scenario_params()
+    return (
+        params.method_name,
+        params.mission_type,
+        params.grid_size,
+        params.uav_count,
+        params.sensing_radius,
+        params.communication_range,
+        params.seed,
+        params.ticks,
+        params.heartbeat_interval,
+        params.urgent_message_ttl,
+    )
+
+
+def _simulation_params() -> ScenarioParams:
+    config = simulation.value.config
+    return ScenarioParams(
+        method_name=config.method_name,
+        mission_type=config.mission_type,
+        grid_size=config.world.width,
+        uav_count=len(config.uavs),
+        sensing_radius=config.sensing_radius,
+        communication_range=config.communication_range,
+        seed=config.seed,
+        ticks=config.ticks,
+        heartbeat_interval=config.heartbeat_interval,
+        urgent_message_ttl=config.urgent_message_ttl,
+    )
 
 
 def _reset() -> None:
@@ -247,24 +359,106 @@ def _scenario_params() -> ScenarioParams:
     )
 
 
-def _grid_html(portrayal: dict[str, object], refresh_key: int = 0) -> str:
+def _grid_html(
+    portrayal: dict[str, object],
+    refresh_key: int = 0,
+    show_links: bool = False,
+) -> str:
     width = portrayal["width"]
     height = portrayal["height"]
     cells = portrayal["cells"]
     uavs = portrayal["uavs"]
+    paths = portrayal.get("paths", [])
+    links = portrayal.get("communication_links", []) if show_links else []
     by_cell = _uavs_by_cell(uavs)
     target_cells = _target_cells(uavs)
+    path_layer = _path_layer_html(paths, width, height)
+    link_layer = _communication_layer_html(links, width, height)
 
     items = [
         _grid_cell_html((x, y), cells[(x, y)], by_cell.get((x, y), []), target_cells)
         for y in range(height)
         for x in range(width)
     ]
-    return "<div class='uav-grid' data-refresh='{refresh_key}' style='grid-template-columns: repeat({width}, 1fr)'>{items}</div>".format(
+    return "<div class='uav-grid' data-refresh='{refresh_key}' style='grid-template-columns: repeat({width}, 1fr)'>{path_layer}{link_layer}{items}</div>".format(
         refresh_key=refresh_key,
         width=width,
+        path_layer=path_layer,
+        link_layer=link_layer,
         items="".join(items),
     )
+
+
+def _path_layer_html(paths: list[dict[str, object]], width: int, height: int) -> str:
+    if not paths:
+        return ""
+
+    path_items = "".join(_uav_path_html(path) for path in paths)
+    if not path_items:
+        return ""
+    return (
+        "<svg class='uav-path-layer' viewBox='0 0 {width} {height}' "
+        "preserveAspectRatio='none' aria-hidden='true'>{path_items}</svg>"
+    ).format(width=width, height=height, path_items=path_items)
+
+
+def _uav_path_html(path: dict[str, object]) -> str:
+    points = path.get("points", [])
+    if not points:
+        return ""
+
+    color = html.escape(str(path["color"]))
+    uav_id = html.escape(str(path["id"]))
+    point_text = _path_points_attribute(points)
+    start_x, start_y = _svg_point(points[0])
+    end_x, end_y = _svg_point(points[-1])
+    polyline = ""
+    if len(points) > 1:
+        polyline = (
+            "<polyline class='uav-path-line' points='{points}' stroke='{color}'>"
+            "<title>{uav_id} path</title>"
+            "</polyline>"
+        ).format(points=point_text, color=color, uav_id=uav_id)
+    current = (
+        "<circle class='uav-path-current' cx='{x:.3f}' cy='{y:.3f}' r='0.100' fill='{color}'>"
+        "<title>{uav_id} current position</title>"
+        "</circle>"
+    ).format(x=end_x, y=end_y, color=color, uav_id=uav_id)
+    start = (
+        "<circle class='uav-path-start' cx='{x:.3f}' cy='{y:.3f}' r='0.075' fill='{color}'></circle>"
+    ).format(x=start_x, y=start_y, color=color)
+    return polyline + start + current
+
+
+def _communication_layer_html(links: list[dict[str, object]], width: int, height: int) -> str:
+    if not links:
+        return ""
+
+    link_items = "".join(_communication_link_html(link) for link in links)
+    return (
+        "<svg class='communication-link-layer' viewBox='0 0 {width} {height}' "
+        "preserveAspectRatio='none' aria-hidden='true'>{link_items}</svg>"
+    ).format(width=width, height=height, link_items=link_items)
+
+
+def _communication_link_html(link: dict[str, object]) -> str:
+    source_x, source_y = _svg_point(link["source_cell"])
+    target_x, target_y = _svg_point(link["target_cell"])
+    title = html.escape(f"{link['source_id']} to {link['target_id']} | d={link['distance']}")
+    return (
+        "<line class='communication-link-line' x1='{source_x:.3f}' y1='{source_y:.3f}' "
+        "x2='{target_x:.3f}' y2='{target_y:.3f}'>"
+        "<title>{title}</title>"
+        "</line>"
+    ).format(source_x=source_x, source_y=source_y, target_x=target_x, target_y=target_y, title=title)
+
+
+def _path_points_attribute(points: list[tuple[int, int]]) -> str:
+    return " ".join(f"{x:.3f},{y:.3f}" for x, y in (_svg_point(point) for point in points))
+
+
+def _svg_point(point: tuple[int, int]) -> tuple[float, float]:
+    return point[0] + 0.5, point[1] + 0.5
 
 
 def _uavs_by_cell(uavs: list[dict[str, object]]) -> dict[tuple[int, int], list[dict[str, object]]]:
@@ -334,7 +528,9 @@ def _legend_html() -> str:
         "<span class='legend-item'><span class='role-dot relay'></span>Relay</span>"
     )
     target = "<span class='legend-item'><span class='target-dot'></span>Targeted sector</span>"
-    return cells + roles + target
+    communication = "<span class='legend-item'><span class='communication-dot'></span>Communication link</span>"
+    path = "<span class='legend-item'><span class='path-dot'></span>Path taken</span>"
+    return cells + roles + target + communication + path
 
 
 def _run_status_html(state: dict[str, object]) -> str:
@@ -546,16 +742,64 @@ _CSS = """
   display: grid;
   gap: 4px;
   padding: 14px;
-  background: #0B0F0D;
-  border: 1px solid #31423B;
+  background: #FFFFFF;
+  border: 1px solid #D8E1DE;
   border-radius: 8px;
-  box-shadow: 0 12px 26px rgba(31, 41, 51, 0.12);
+  box-shadow: 0 12px 26px rgba(31, 41, 51, 0.08);
+  position: relative;
+}
+.uav-path-layer {
+  position: absolute;
+  inset: 14px;
+  width: calc(100% - 28px);
+  height: calc(100% - 28px);
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+.uav-path-line {
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.58;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 1px 3px rgba(31, 41, 51, 0.12));
+}
+.uav-path-start {
+  opacity: 0.72;
+  stroke: rgba(255, 255, 255, 0.92);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+.uav-path-current {
+  opacity: 0.84;
+  stroke: rgba(255, 255, 255, 0.96);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.communication-link-layer {
+  position: absolute;
+  inset: 14px;
+  width: calc(100% - 28px);
+  height: calc(100% - 28px);
+  pointer-events: none;
+  z-index: 2;
+  overflow: visible;
+}
+.communication-link-line {
+  stroke: rgba(20, 184, 166, 0.64);
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-dasharray: 6 5;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 1px 3px rgba(20, 184, 166, 0.20));
 }
 .grid-cell {
   aspect-ratio: 1;
   position: relative;
   border-radius: 4px;
-  border: 1px solid rgba(220, 231, 224, 0.12);
+  border: 1px solid rgba(49, 66, 59, 0.16);
   overflow: hidden;
 }
 .grid-cell.covered {
@@ -571,54 +815,71 @@ _CSS = """
   content: "";
   position: absolute;
   inset: 17%;
-  border: 2px solid rgba(255, 107, 74, 0.92);
+  border: 2px solid rgba(255, 107, 74, 0.86);
   border-radius: 50%;
-  box-shadow: 0 0 16px rgba(255, 107, 74, 0.34);
+  box-shadow: 0 0 14px rgba(255, 107, 74, 0.24);
   pointer-events: none;
+  z-index: 2;
 }
 .uav-marker {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(calc(-50% + var(--uav-offset, 0px)), calc(-50% + var(--uav-offset, 0px)));
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: rgba(255, 255, 255, 0.9);
-  border: 2px solid var(--uav-color);
+  width: 22px;
+  height: 22px;
+  display: block;
+  background:
+    radial-gradient(circle at 4px 4px, rgba(255,255,255,0.96) 0 2px, var(--uav-color) 2px 4px, transparent 4px),
+    radial-gradient(circle at 18px 4px, rgba(255,255,255,0.96) 0 2px, var(--uav-color) 2px 4px, transparent 4px),
+    radial-gradient(circle at 4px 18px, rgba(255,255,255,0.96) 0 2px, var(--uav-color) 2px 4px, transparent 4px),
+    radial-gradient(circle at 18px 18px, rgba(255,255,255,0.96) 0 2px, var(--uav-color) 2px 4px, transparent 4px),
+    radial-gradient(ellipse at center, rgba(255,255,255,0.98) 0 4px, var(--uav-color) 4px 7px, transparent 7px);
   color: var(--uav-color);
-  box-shadow: 0 7px 16px rgba(0, 0, 0, 0.38);
-  z-index: 2;
+  filter: drop-shadow(0 7px 10px rgba(0, 0, 0, 0.42));
+  z-index: 3;
 }
 .uav-marker::before {
   content: "";
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: 13px solid var(--uav-color);
-  transform: translateY(-1px);
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  top: 10px;
+  height: 3px;
+  background: var(--uav-color);
+  border-radius: 999px;
+}
+.uav-marker::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 10px;
+  width: 3px;
+  background: var(--uav-color);
+  border-radius: 999px;
 }
 .uav-marker.dropped {
-  background: rgba(255, 255, 255, 0.74);
-  border-color: #66756F;
+  background: rgba(255, 255, 255, 0.5);
   color: #66756F;
-  filter: grayscale(0.7);
+  filter: grayscale(0.85) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.32));
+  opacity: 0.76;
 }
 .uav-marker.dropped::before,
 .uav-marker.dropped::after {
   content: "";
   position: absolute;
-  width: 15px;
+  left: 5px;
+  right: auto;
+  top: 10px;
+  bottom: auto;
+  width: 12px;
   height: 3px;
   background: #FF6B4A;
   border-radius: 999px;
 }
 .uav-marker.dropped::before {
   transform: rotate(45deg);
-  border: 0;
 }
 .uav-marker.dropped::after {
   transform: rotate(-45deg);
@@ -673,6 +934,44 @@ _CSS = """
 .target-dot {
   border-radius: 50%;
   border: 2px solid #FF6B4A;
+}
+.communication-dot {
+  position: relative;
+  background: transparent;
+  border: 2px solid #35C7B8;
+  border-radius: 50%;
+}
+.communication-dot::before,
+.communication-dot::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  width: 4px;
+  height: 4px;
+  background: #35C7B8;
+  border-radius: 50%;
+}
+.communication-dot::before {
+  left: 1px;
+}
+.communication-dot::after {
+  right: 1px;
+}
+.path-dot {
+  position: relative;
+  background: transparent;
+  border: 2px solid #4F8EF7;
+  border-radius: 50%;
+}
+.path-dot::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 5px;
+  height: 2px;
+  background: #4F8EF7;
+  border-radius: 999px;
 }
 .metric-card {
   flex: 1;

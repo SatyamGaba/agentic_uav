@@ -19,6 +19,12 @@ class Action:
 @dataclass
 class MethodState:
     assignments: dict[str, list[Cell]] = field(default_factory=dict)
+    assignment_indices: dict[str, int] = field(default_factory=dict)
+    targets_by_uav: dict[str, Cell] = field(default_factory=dict)
+    roles_by_uav: dict[str, str] = field(default_factory=dict)
+    known_urgent: set[Cell] = field(default_factory=set)
+    peer_intents: dict[str, Cell] = field(default_factory=dict)
+    task_commitments: dict[str, Cell] = field(default_factory=dict)
 
 
 class ObservationBuilder:
@@ -37,6 +43,7 @@ class ObservationBuilder:
                 "self": uav,
                 "urgent_cells": urgent_cells,
                 "nearby": self._nearby_sectors(world, uav.cell),
+                "messages": list(uav.inbox),
             }
         return observations
 

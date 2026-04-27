@@ -1,5 +1,8 @@
 import inspect
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
 import agentic_uav.gui as gui
 from agentic_uav.gui_support import (
@@ -36,6 +39,18 @@ def build_gui_scenario() -> ScenarioConfig:
 
 
 class GuiSupportTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self._tempdir = tempfile.TemporaryDirectory()
+        self._original_last_config_path = gui.LAST_CONFIG_PATH
+        self._original_has_loaded_persisted_config = gui._has_loaded_persisted_config
+        gui.LAST_CONFIG_PATH = Path(self._tempdir.name) / "last_config.json"
+        gui._has_loaded_persisted_config = False
+
+    def tearDown(self) -> None:
+        gui.LAST_CONFIG_PATH = self._original_last_config_path
+        gui._has_loaded_persisted_config = self._original_has_loaded_persisted_config
+        self._tempdir.cleanup()
+
     def test_gui_module_exposes_solara_page(self) -> None:
         self.assertTrue(callable(gui.Page))
 
@@ -63,6 +78,32 @@ class GuiSupportTest(unittest.TestCase):
         self.assertEqual(gui.simulation.value.config.world.width, 6)
         self.assertEqual(gui.simulation.value.config.world.height, 6)
         self.assertEqual(gui.version.value, before_version + 1)
+        saved_config = json.loads(gui.LAST_CONFIG_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(saved_config["grid_size"], 6)
+
+    def test_page_reload_loads_persisted_config_into_controls(self) -> None:
+        gui.save_ui_params(gui.ScenarioParams(grid_size=9, seed=31), gui.LAST_CONFIG_PATH)
+        gui._apply_scenario_params(gui.ScenarioParams())
+        gui._reset()
+
+        gui._load_persisted_config()
+
+        self.assertEqual(gui.grid_size.value, 9)
+        self.assertEqual(gui.seed.value, 31)
+        self.assertEqual(gui.simulation.value.config.world.width, 9)
+        self.assertEqual(gui.simulation.value.config.seed, 31)
+
+    def test_reactive_config_change_persists_and_resets_without_setter(self) -> None:
+        gui._has_loaded_persisted_config = True
+        gui._apply_scenario_params(gui.ScenarioParams())
+        gui._reset()
+
+        gui.grid_size.value = 7
+        gui._persist_current_config()
+
+        saved_config = json.loads(gui.LAST_CONFIG_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(saved_config["grid_size"], 7)
+        self.assertEqual(gui.simulation.value.config.world.width, 7)
 
     def test_scenario_params_include_mission_type(self) -> None:
         gui.mission_type.value = "survey"
@@ -71,12 +112,26 @@ class GuiSupportTest(unittest.TestCase):
 
         self.assertEqual(params.mission_type, "survey")
 
-    def test_scenario_params_default_to_fifty_max_ticks(self) -> None:
+    def test_scenario_params_default_to_five_hundred_max_ticks(self) -> None:
         gui.tick_horizon.value = gui.DEFAULT_PARAMS.ticks
 
         params = gui._scenario_params()
 
-        self.assertEqual(params.ticks, 50)
+        self.assertEqual(params.ticks, 500)
+
+    def test_log_tick_slider_maps_to_full_tick_range(self) -> None:
+        self.assertEqual(gui._log_slider_to_tick(0), 1)
+        self.assertEqual(gui._log_slider_to_tick(gui.TICK_HORIZON_SCALE_MAX), 10_000)
+        self.assertEqual(gui._log_slider_to_tick(gui.TICK_HORIZON_SCALE_MAX // 2), 100)
+
+    def test_tick_horizon_scale_updates_actual_max_ticks(self) -> None:
+        before_version = gui.version.value
+
+        gui._set_tick_horizon_scale(gui.TICK_HORIZON_SCALE_MAX)
+
+        self.assertEqual(gui.tick_horizon.value, 10_000)
+        self.assertEqual(gui.simulation.value.config.ticks, 10_000)
+        self.assertEqual(gui.version.value, before_version + 1)
 
     def test_mission_type_change_resets_simulation_to_tick_zero(self) -> None:
         gui._set_mission_type("disaster_mapping")
@@ -106,7 +161,7 @@ class GuiSupportTest(unittest.TestCase):
         gui.simulation.value = Simulation.from_config(
             ScenarioConfig(
                 method_name="static",
-                ticks=50,
+                ticks=500,
                 communication_range=1,
                 sensing_radius=0,
                 heartbeat_interval=3,
@@ -136,8 +191,68 @@ class GuiSupportTest(unittest.TestCase):
         self.assertEqual(portrayal["height"], 4)
         self.assertEqual(portrayal["cells"][(1, 1)]["state"], "blocked")
         self.assertEqual(portrayal["cells"][(2, 2)]["state"], "urgent")
+        self.assertTrue(portrayal["cells"][(0, 0)]["fill"].startswith("rgba("))
         self.assertEqual(portrayal["uavs"][0]["id"], "u0")
         self.assertEqual(portrayal["uavs"][0]["role"], "coverage")
+        self.assertIn("paths", portrayal)
+        self.assertIn("communication_links", portrayal)
+
+    def test_grid_portrayal_tracks_uav_paths_from_initial_cell(self) -> None:
+        simulation = Simulation.from_config(build_gui_scenario())
+        initial_cell = simulation.uavs["u0"].cell
+        simulation.step()
+        simulation.step()
+
+        portrayal = build_grid_portrayal(simulation)
+
+        path = [path for path in portrayal["paths"] if path["id"] == "u0"][0]
+        self.assertEqual(path["points"][0], initial_cell)
+        self.assertEqual(path["points"][-1], simulation.uavs["u0"].cell)
+        self.assertEqual(path["color"], portrayal["uavs"][0]["color"])
+        self.assertTrue(
+            all(left != right for left, right in zip(path["points"], path["points"][1:]))
+        )
+
+    def test_grid_portrayal_assigns_distinct_uav_identity_colors(self) -> None:
+        scenario = build_gui_scenario()
+        scenario.uavs.extend(
+            [
+                UavConfig(uav_id="u1", cell=(0, 0)),
+                UavConfig(uav_id="u2", cell=(0, 0)),
+            ]
+        )
+        simulation = Simulation.from_config(scenario)
+
+        portrayal = build_grid_portrayal(simulation)
+        colors = [uav["color"] for uav in portrayal["uavs"]]
+
+        self.assertEqual(len(colors), len(set(colors)))
+
+    def test_grid_portrayal_marks_uavs_within_communication_range(self) -> None:
+        scenario = build_gui_scenario()
+        scenario.communication_range = 2
+        scenario.uavs = [
+            UavConfig(uav_id="u0", cell=(0, 0)),
+            UavConfig(uav_id="u1", cell=(2, 0)),
+            UavConfig(uav_id="u2", cell=(3, 3)),
+        ]
+        simulation = Simulation.from_config(scenario)
+        simulation.uavs["u2"].active = False
+
+        portrayal = build_grid_portrayal(simulation)
+
+        self.assertEqual(
+            portrayal["communication_links"],
+            [
+                {
+                    "source_id": "u0",
+                    "target_id": "u1",
+                    "source_cell": (0, 0),
+                    "target_cell": (2, 0),
+                    "distance": 2,
+                }
+            ],
+        )
 
     def test_grid_portrayal_marks_dropped_uavs(self) -> None:
         scenario = build_gui_scenario()
@@ -160,7 +275,37 @@ class GuiSupportTest(unittest.TestCase):
         self.assertIn("grid-cell uncovered", html)
         self.assertIn("uav-marker active", html)
         self.assertIn("--uav-color:", html)
+        self.assertIn("uav-path-layer", html)
+        self.assertNotIn("communication-link-layer", html)
+        self.assertIn("rgba(", html)
         self.assertNotIn(">0</span>", html)
+        self.assertNotIn(">u0</span>", html)
+
+    def test_grid_html_renders_uav_paths_as_svg_polylines(self) -> None:
+        simulation = Simulation.from_config(build_gui_scenario())
+        simulation.step()
+        portrayal = build_grid_portrayal(simulation)
+
+        html = gui._grid_html(portrayal)
+
+        self.assertIn("<svg class='uav-path-layer'", html)
+        self.assertIn("<polyline class='uav-path-line'", html)
+        self.assertIn("u0 path", html)
+
+    def test_grid_html_renders_communication_links_when_enabled(self) -> None:
+        scenario = build_gui_scenario()
+        scenario.communication_range = 2
+        scenario.uavs.append(UavConfig(uav_id="u1", cell=(2, 0)))
+        simulation = Simulation.from_config(scenario)
+        portrayal = build_grid_portrayal(simulation)
+
+        hidden_html = gui._grid_html(portrayal, show_links=False)
+        visible_html = gui._grid_html(portrayal, show_links=True)
+
+        self.assertNotIn("communication-link-layer", hidden_html)
+        self.assertIn("<svg class='communication-link-layer'", visible_html)
+        self.assertIn("<line class='communication-link-line'", visible_html)
+        self.assertIn("u0 to u1", visible_html)
 
     def test_metric_series_tracks_coverage_messages_and_active_uavs(self) -> None:
         simulation = Simulation.from_config(build_gui_scenario())

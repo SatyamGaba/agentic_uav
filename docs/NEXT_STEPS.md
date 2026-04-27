@@ -11,17 +11,18 @@ This roadmap turns the current prototype into a paper-ready simulation and evalu
 
 ## 2. Improve Method Comparisons
 
-- Make `static`, `rules`, and `agentic` report the same action traces.
+- Make `static`, `rules`, `task_consideration`, and `agentic` report the same action traces.
 - Strengthen the rule-based baseline with fixed but credible trigger logic.
+- Implement `task_consideration` as the modern non-agentic decentralized scheduling baseline inspired by Chen, Li, and Peng (2023).
 - Add action validation for unsupported roles, blocked targets, invalid messages, and unsafe moves.
 - Add role-transition metrics for `coverage`, `priority_responder`, and `relay`.
 
 ## 3. Build Experiment Sweeps
 
-- Create a batch runner for repeated trials over method, seed, swarm size, and disruption severity.
-- Save outputs to a structured `runs/` directory with one summary file per trial.
-- Add experiment families for dropout, communication degradation, blocked sectors, and urgent task insertion.
-- Generate aggregate tables for success rate, recovery time, coverage by deadline, and communication overhead.
+- Extend the batch runner beyond `survey_dropout` and `disaster_urgent_dropout` once communication degradation is implemented.
+- Save richer action traces alongside the current trial and aggregate outputs.
+- Add communication degradation / blackout experiment families.
+- Expand aggregate tables with network fragmentation once packet loss or blackout regions exist.
 
 ## 4. Upgrade Visualization
 
@@ -44,10 +45,18 @@ This roadmap turns the current prototype into a paper-ready simulation and evalu
 - Document assumptions and limitations in the repo so the paper methods section can reference them directly.
 - Keep the simulation framing clear: mission-level reasoning only, not low-level UAV control.
 
+## 7. Decentralization Fidelity
+
+- Document the exact information boundary for each UAV: local observation, onboard state, current assignment, and received peer messages.
+- Add metrics for local decision ratio, peer-message dependence, and any action that required global synchronization.
+- Keep `static` as a centralized/pre-mission comparison baseline, while ensuring `rules`, `task_consideration`, and `agentic` are described and evaluated as decentralized runtime methods.
+- Avoid implementation changes that let the `agentic` method use hidden global state except through explicit observations or range-limited delayed messages.
+
 ## Suggested Immediate Order
 
 1. Add file-based scenario configs.
-2. Add batch experiment runner and CSV/JSON outputs.
-3. Implement the four disruption experiment families.
-4. Add aggregate metrics and paper plots.
-5. Add the LLM JSON adapter as a separate optional backend.
+2. Add communication degradation and blackout event support.
+3. Extend experiment sweeps to communication stress.
+4. Add richer action traces and task reassignment metrics.
+5. Document and enforce the decentralized information boundary.
+6. Add the LLM JSON adapter as a separate optional backend.

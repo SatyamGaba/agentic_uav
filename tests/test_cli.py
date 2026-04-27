@@ -1,4 +1,5 @@
 import unittest
+import tempfile
 from pathlib import Path
 
 import main
@@ -41,18 +42,72 @@ class CliTest(unittest.TestCase):
         self.assertEqual(main.main(["ui"], run_command=interrupted_runner), 130)
 
     def test_demo_scenario_runs_for_each_method(self) -> None:
-        for method_name in ("static", "rules", "agentic"):
+        for method_name in ("static", "rules", "task_consideration", "agentic"):
             with self.subTest(method_name=method_name):
                 summary = run_scenario(build_demo_scenario(method_name))
-                self.assertLessEqual(summary["ticks_run"], 50)
+                self.assertLessEqual(summary["ticks_run"], 500)
                 self.assertIn("coverage_ratio", summary)
                 self.assertIn("is_solved", summary)
                 self.assertIn("termination_reason", summary)
 
+    def test_run_parser_accepts_task_consideration_method(self) -> None:
+        args = main.parse_args(["run", "--method", "task_consideration"])
+
+        self.assertEqual(args.method, "task_consideration")
+
+    def test_experiment_parser_accepts_sweep_options(self) -> None:
+        args = main.parse_args(
+            [
+                "experiment",
+                "--seed-count",
+                "2",
+                "--swarm-sizes",
+                "5",
+                "--dropout-fractions",
+                "0,0.25",
+                "--family",
+                "survey_dropout",
+                "--no-plots",
+            ]
+        )
+
+        self.assertEqual(args.command, "experiment")
+        self.assertEqual(args.seed_count, 2)
+        self.assertEqual(args.swarm_sizes, "5")
+        self.assertEqual(args.dropout_fractions, "0,0.25")
+
+    def test_experiment_command_runs_small_sweep(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            summary = main.run_experiments(
+                main.parse_args(
+                    [
+                        "experiment",
+                        "--output-dir",
+                        tmp,
+                        "--seed-count",
+                        "1",
+                        "--swarm-sizes",
+                        "5",
+                        "--dropout-fractions",
+                        "0.25",
+                        "--ticks",
+                        "20",
+                        "--grid-size",
+                        "8",
+                        "--family",
+                        "survey_dropout",
+                        "--no-plots",
+                    ]
+                )
+            )
+
+            self.assertEqual(summary["trials"], 4)
+            self.assertTrue((Path(tmp) / "trials.csv").exists())
+
     def test_run_command_executes_headless_scenario(self) -> None:
         summary = main.run_headless(main.parse_args(["run", "--method", "agentic"]))
 
-        self.assertLessEqual(summary["ticks_run"], 50)
+        self.assertLessEqual(summary["ticks_run"], 500)
         self.assertIn("coverage_ratio", summary)
         self.assertIn("is_solved", summary)
         self.assertIn("termination_reason", summary)
