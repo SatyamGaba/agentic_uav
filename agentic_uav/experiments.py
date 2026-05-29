@@ -14,7 +14,7 @@ from agentic_uav.scenarios import build_demo_scenario
 from agentic_uav.simulation import Simulation
 
 
-METHODS = ("static", "rules", "task_consideration", "agentic")
+METHODS = ("static", "rules", "task_consideration", "greedy", "agentic")
 SURVEY_DROPOUT = "survey_dropout"
 DISASTER_URGENT_DROPOUT = "disaster_urgent_dropout"
 
@@ -40,6 +40,26 @@ class ExperimentSuiteResult:
     trial_rows: list[dict[str, Any]]
     aggregate_rows: list[dict[str, Any]]
     output_paths: dict[str, Path]
+
+
+def recovery_focus_config(output_dir: Path) -> ExperimentSuiteConfig:
+    """A small, targeted recovery-after-disruption suite (decision 5).
+
+    One seed, one swarm size, the disaster+urgent+dropout family, on a compact
+    grid with plots disabled. Intended for fast, focused recovery analysis,
+    not the full factorial. Does not change the default suite config.
+    """
+
+    return ExperimentSuiteConfig(
+        output_dir=output_dir,
+        seed_count=1,
+        base_seed=7,
+        swarm_sizes=(6,),
+        family=DISASTER_URGENT_DROPOUT,
+        ticks=120,
+        grid_size=12,
+        make_plots=False,
+    )
 
 
 def run_experiment_suite(config: ExperimentSuiteConfig) -> ExperimentSuiteResult:
@@ -145,6 +165,7 @@ def run_trial(
     records = simulation.metrics.records
     urgent_response_time = urgent_response_time_from_records(scenario, records)
     completion_tick = summary["ticks_run"] if summary["coverage_ratio"] >= 1.0 else None
+    recovery_ticks_to_target = ticks_to_reach_coverage(records, success_threshold, dropout_tick)
     return {
         "family": family,
         "method": scenario.method_name,
@@ -161,9 +182,12 @@ def run_trial(
         "completion_tick": completion_tick,
         "coverage_auc": normalized_coverage_auc(records, scenario.ticks, summary["coverage_ratio"]),
         "recovery_slope": recovery_slope(records, dropout_tick, scenario.ticks),
+        "recovery_ticks_to_target": recovery_ticks_to_target,
         "messages_sent": summary["messages_sent"],
         "role_switches": count_record_changes(records, "uav_roles"),
         "target_changes": count_record_changes(records, "uav_targets"),
+        "replan_count": len(simulation.metrics.replans),
+        "plan_change_count": len(simulation.metrics.plan_changes),
         "urgent_response_time": urgent_response_time,
         "urgent_targets": len(summary["urgent_targets"]),
         "termination_reason": summary["termination_reason"],
@@ -201,10 +225,15 @@ def aggregate_trials(trial_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "final_coverage_sem": sem(final_coverage_values),
                 "mean_coverage_auc": _mean_numeric(row["coverage_auc"] for row in rows),
                 "mean_recovery_slope": _mean_numeric(row["recovery_slope"] for row in rows),
+                "mean_recovery_ticks_to_target": _mean_numeric(
+                    row["recovery_ticks_to_target"] for row in rows
+                ),
                 "mean_completion_tick": _mean_numeric(row["completion_tick"] for row in rows),
                 "mean_messages_sent": _mean_numeric(row["messages_sent"] for row in rows),
                 "mean_role_switches": _mean_numeric(row["role_switches"] for row in rows),
                 "mean_target_changes": _mean_numeric(row["target_changes"] for row in rows),
+                "mean_replan_count": _mean_numeric(row["replan_count"] for row in rows),
+                "mean_plan_change_count": _mean_numeric(row["plan_change_count"] for row in rows),
                 "mean_urgent_response_time": _mean_numeric(row["urgent_response_time"] for row in rows),
             }
         )
@@ -279,6 +308,16 @@ def recovery_slope(
     dropout_tick: int | None,
     max_ticks: int,
 ) -> float | None:
+    """Average coverage gain per tick over the window after a dropout.
+
+    Caveat: coverage is monotonic in this simulator (it never decreases), so
+    this measures *continued progress despite UAV loss* during the recovery
+    window, NOT coverage regained after a drop. A higher slope means the
+    swarm kept making progress through the disruption; it is not a measure of
+    healing lost coverage. See ``ticks_to_reach_coverage`` for the headline
+    "how fast did the swarm re-reach target coverage" metric.
+    """
+
     if dropout_tick is None or not records:
         return None
     window = max(1, int(max_ticks * 0.2))
@@ -289,6 +328,29 @@ def recovery_slope(
     start_coverage = coverage_at_tick(records, start_tick)
     end_coverage = coverage_at_tick(records, end_tick)
     return (end_coverage - start_coverage) / (end_tick - start_tick)
+
+
+def ticks_to_reach_coverage(
+    records: list[dict[str, Any]],
+    target: float,
+    after_tick: int | None,
+) -> int | None:
+    """Ticks elapsed after ``after_tick`` until coverage first reaches ``target``.
+
+    The headline recovery metric: how fast the swarm (re-)reaches the target
+    coverage threshold following the disruption. Returns ``None`` if the
+    target is never reached within the recorded ticks.
+    """
+
+    if not records:
+        return None
+    baseline_tick = 0 if after_tick is None else after_tick
+    for record in records:
+        if record["tick"] < baseline_tick:
+            continue
+        if record["coverage_ratio"] >= target:
+            return record["tick"] - baseline_tick
+    return None
 
 
 def urgent_response_time_from_records(

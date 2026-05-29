@@ -25,6 +25,33 @@ class MetricsLogger:
         self.records: list[dict[str, Any]] = []
         self.messages_sent = 0
         self.urgent_targets: set[Cell] = set()
+        self.replans: list[dict[str, Any]] = []
+        self.plan_changes: list[dict[str, Any]] = []
+
+    def log_replan(self, tick: int, reason: str, uav_ids: list[str]) -> None:
+        self.replans.append(
+            {"tick": tick, "reason": reason, "uav_ids": sorted(uav_ids)}
+        )
+
+    def log_plan_change(
+        self,
+        tick: int,
+        uav_id: str,
+        old_target: Cell | None,
+        new_target: Cell | None,
+        old_role: str | None,
+        new_role: str | None,
+    ) -> None:
+        self.plan_changes.append(
+            {
+                "tick": tick,
+                "uav_id": uav_id,
+                "old_target": old_target,
+                "new_target": new_target,
+                "old_role": old_role,
+                "new_role": new_role,
+            }
+        )
 
     def log_tick(self, tick: int, world: WorldState, uavs: dict[str, UavState]) -> None:
         self.records.append(
@@ -60,7 +87,10 @@ class EventInjector:
     def __init__(self, events: list[CommunicationEvent]) -> None:
         self.events = events
 
-    def apply(self, tick: int, world: WorldState, uavs: dict[str, UavState]) -> None:
+    def apply(
+        self, tick: int, world: WorldState, uavs: dict[str, UavState]
+    ) -> list[CommunicationEvent]:
+        fired: list[CommunicationEvent] = []
         for event in self.events:
             if event.tick != tick:
                 continue
@@ -75,6 +105,8 @@ class EventInjector:
             elif event.event_type == "urgent_sector":
                 cell = tuple(event.payload["cell"])
                 world.sectors[cell].priority = "urgent"
+            fired.append(event)
+        return fired
 
 
 class Simulation:
@@ -130,12 +162,16 @@ class Simulation:
     def step(self) -> None:
         if self.is_finished:
             return
-        self.events.apply(self.tick, self.world, self.uavs)
+        fired = self.events.apply(self.tick, self.world, self.uavs)
+        for event in fired:
+            self.method.handle_event(event, self.method_state)
         for uav in self.uavs.values():
             uav.inbox.clear()
         self.network.deliver(self.uavs)
 
-        observations = self.observations.build(self.world, self.uavs)
+        observations = self.observations.build(
+            self.world, self.uavs, self.method_state.beliefs
+        )
         actions = self.method.decide_tick(self, observations, self.method_state)
         self.resolve_actions(actions)
 
@@ -153,6 +189,8 @@ class Simulation:
             uav = self.uavs.get(action.uav_id)
             if uav is None or not uav.active:
                 continue
+            old_target = uav.target_cell
+            old_role = uav.role
             if action.new_role is not None:
                 uav.role = action.new_role
             if action.target_cell is not None and self._is_valid_target(action.target_cell):
@@ -160,6 +198,15 @@ class Simulation:
                 if self.world.sectors[action.target_cell].priority == "urgent":
                     self.metrics.urgent_targets.add(action.target_cell)
                 self._move_toward(uav, action.target_cell)
+            if uav.target_cell != old_target or uav.role != old_role:
+                self.metrics.log_plan_change(
+                    self.tick,
+                    action.uav_id,
+                    old_target,
+                    uav.target_cell,
+                    old_role,
+                    uav.role,
+                )
             outgoing.extend(action.messages)
         self.send_messages(outgoing)
 

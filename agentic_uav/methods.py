@@ -5,23 +5,25 @@ from agentic_uav.models import Cell, manhattan
 from agentic_uav.planning import (
     Action,
     MethodState,
-    first_uncovered,
     nearest_open_urgent,
     nearest_uncovered,
 )
 from agentic_uav.policy import (
     AgenticMethod,
+    GreedyMethod,
     RuleAdaptiveMethod,
     StaticPartitionMethod,
     SwarmMethod,
     TaskConsiderationMethod,
     build_method,
+    greedy_decision,
 )
 
 __all__ = [
     "Action",
     "AgenticMethod",
     "Cell",
+    "GreedyMethod",
     "Message",
     "MethodState",
     "RuleAdaptiveMethod",
@@ -29,7 +31,7 @@ __all__ = [
     "SwarmMethod",
     "TaskConsiderationMethod",
     "build_method",
-    "first_uncovered",
+    "greedy_decision",
     "manhattan",
     "nearest_open_urgent",
     "nearest_uncovered",

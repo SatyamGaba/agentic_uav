@@ -6,7 +6,32 @@ Build a custom Python, tick-based 2D disaster-mapping simulator with a sector gr
 
 The top-level swappable unit is a `SwarmMethod`, not only a per-UAV policy, because `Baseline A` needs a pre-mission global assignment step while the other methods can operate in a distributed runtime style.
 
+> **Update (2026-05-28).** This is the original design spec and is preserved for
+> history; the following clarifications supersede parts of it. The
+> `AgenticMethod` described below as the proposed method was a **greedy
+> heuristic** and has been **renamed to the `greedy` baseline**. The proposed
+> `agentic` method is now an **LLM-driven, decentralized decision agent** behind
+> a **provider-agnostic adapter** (a `decide(observation) -> action JSON` seam
+> with a deterministic mock decider as the default and a `greedy` fallback on
+> invalid output); the LLM is event-triggered rather than per-tick. The full
+> method set is therefore four heuristic **baselines** — `static`, `rules`,
+> `task_consideration`, `greedy` — and the **proposed** LLM method `agentic`,
+> with the thesis that `agentic` beats the heuristic baselines on recovery after
+> disruption. The information boundary is now **hybrid and symmetric**: the
+> static grid layout is global, but coverage progress and urgent events must be
+> discovered locally (sensed nearby) or learned via range-limited peer messages,
+> held in a **per-UAV belief**; all methods get the same observation and differ
+> only in reasoning. When affected UAVs decide independently, **negotiation
+> resolves synchronously within one tick**. See `CONTEXT.md` and `docs/adr/` for
+> the locked decisions.
+
 ## Decentralization Principle
+
+> **Update (2026-05-28):** read "the proposed `AgenticMethod`" below as "every
+> method", since observation symmetry now applies to all five methods (the
+> proposed method is the LLM `agentic`; the heuristic here is the `greedy`
+> baseline). The information boundary is now hybrid: layout global, coverage and
+> urgent discovered locally via a per-UAV belief or range-limited messages.
 
 The proposed `AgenticMethod` is decentralized at runtime. Each active UAV receives a local structured observation, reasons over its own role, target, health, and peer messages, and emits its own action package. Peer information must flow through range-limited, delayed communication rather than instantaneous global broadcast.
 
@@ -79,6 +104,13 @@ Shared role set:
   - Serves as the strongest non-agentic decentralized scheduler in the comparison set.
 
 - `Proposed: AgenticMethod`
+  - **Update (2026-05-28):** the heuristic described in this bullet is now the
+    `greedy` **baseline** (renamed `GreedyMethod`). The proposed `agentic`
+    method is the **LLM-driven** agent: same interface and validated JSON action
+    package, but decisions come from a provider-agnostic LLM adapter (mock
+    decider by default), event-triggered, with a `greedy` fallback on invalid
+    output. The bullets below describe the (now-`greedy`) heuristic behavior that
+    the LLM method also builds on.
   - Uses the same world, tools, movement, communication, and action schema.
   - Chooses role, target, and messages per UAV from structured observations, local mission state, and peer/message context.
   - Has no central runtime controller; coordination emerges through local decisions and explicit communication.

@@ -65,7 +65,7 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser = subparsers.add_parser("run", help="Run a headless simulation.")
     run_parser.add_argument(
         "--method",
-        choices=["static", "rules", "task_consideration", "agentic"],
+        choices=["static", "rules", "task_consideration", "greedy", "agentic"],
         default="agentic",
     )
     run_parser.add_argument("--snapshot", type=Path, default=None)

@@ -42,7 +42,7 @@ class CliTest(unittest.TestCase):
         self.assertEqual(main.main(["ui"], run_command=interrupted_runner), 130)
 
     def test_demo_scenario_runs_for_each_method(self) -> None:
-        for method_name in ("static", "rules", "task_consideration", "agentic"):
+        for method_name in ("static", "rules", "task_consideration", "greedy", "agentic"):
             with self.subTest(method_name=method_name):
                 summary = run_scenario(build_demo_scenario(method_name))
                 self.assertLessEqual(summary["ticks_run"], 500)
@@ -101,7 +101,8 @@ class CliTest(unittest.TestCase):
                 )
             )
 
-            self.assertEqual(summary["trials"], 4)
+            # 5 methods x 1 size x 1 fraction x 1 seed = 5 trials.
+            self.assertEqual(summary["trials"], 5)
             self.assertTrue((Path(tmp) / "trials.csv").exists())
 
     def test_run_command_executes_headless_scenario(self) -> None:
