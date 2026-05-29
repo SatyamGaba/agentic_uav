@@ -1,3 +1,4 @@
+import json
 import unittest
 import tempfile
 from pathlib import Path
@@ -117,6 +118,90 @@ class CliTest(unittest.TestCase):
         readme = Path("README.md").read_text()
 
         self.assertIn("uv run main.py", readme)
+
+    def test_run_parser_parses_comma_separated_grid_sizes(self) -> None:
+        args = main.parse_args(["run", "--grid-size", "10,20,30"])
+
+        self.assertEqual(args.grid_size, "10,20,30")
+        self.assertEqual(main._parse_int_tuple(args.grid_size), (10, 20, 30))
+
+    def test_run_single_combo_returns_summary(self) -> None:
+        summary = main.run_headless(
+            main.parse_args(["run", "--method", "greedy", "--grid-size", "8", "--ticks", "20"])
+        )
+
+        self.assertLessEqual(summary["ticks_run"], 20)
+        self.assertIn("coverage_ratio", summary)
+        self.assertIn("is_solved", summary)
+        self.assertIn("termination_reason", summary)
+
+    def test_run_multi_combo_writes_outputs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            report = main.run_headless(
+                main.parse_args(
+                    [
+                        "run",
+                        "--method",
+                        "greedy,static",
+                        "--grid-size",
+                        "6,8",
+                        "--ticks",
+                        "15",
+                        "--uav-count",
+                        "3",
+                        "--output-dir",
+                        tmp,
+                        "--no-plots",
+                    ]
+                )
+            )
+
+            self.assertEqual(report["runs"], 4)
+            tmp_path = Path(tmp)
+            self.assertTrue((tmp_path / "comparison.csv").exists())
+            self.assertTrue((tmp_path / "comparison.json").exists())
+            for method in ("greedy", "static"):
+                for size in (6, 8):
+                    self.assertTrue(
+                        (tmp_path / f"metrics_{method}_grid{size}_seed7.csv").exists()
+                    )
+            rows = json.loads((tmp_path / "comparison.json").read_text())
+            self.assertEqual(len(rows), 4)
+            self.assertIn("final_coverage_ratio", rows[0])
+            self.assertIn("coverage_auc", rows[0])
+
+    def test_run_multi_combo_generates_plots(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            main.run_headless(
+                main.parse_args(
+                    [
+                        "run",
+                        "--method",
+                        "greedy,static",
+                        "--grid-size",
+                        "6,8",
+                        "--ticks",
+                        "15",
+                        "--uav-count",
+                        "3",
+                        "--output-dir",
+                        tmp,
+                    ]
+                )
+            )
+
+            tmp_path = Path(tmp)
+            self.assertTrue((tmp_path / "coverage_vs_time.png").exists())
+            self.assertTrue((tmp_path / "coverage_vs_grid_size.png").exists())
+
+    def test_run_method_all_keyword_expands(self) -> None:
+        self.assertEqual(main._parse_method_list("all"), list(main.METHODS))
+        with self.assertRaises(ValueError):
+            main._parse_method_list("not_a_method")
+
+    def test_run_rejects_invalid_grid_size(self) -> None:
+        with self.assertRaises(ValueError):
+            main.run_headless(main.parse_args(["run", "--grid-size", "0"]))
 
 
 if __name__ == "__main__":

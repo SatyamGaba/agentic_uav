@@ -30,8 +30,10 @@ _Avoid_: "control", "reference method" used loosely to include agentic.
 
 **static**:
 A baseline that pre-partitions the grid into per-UAV serpentine **assignments**
-at mission start and visits them in order.
-_Avoid_: "fixed partition", "static planner".
+at mission start and visits them in order. The partition is over **individual
+sectors (cells)** handed out as an ordered per-UAV list — not a carve-up into
+contiguous regions, and no region is swept.
+_Avoid_: "fixed partition", "static planner", "region assignment".
 
 **rules**:
 A baseline (`RuleAdaptiveMethod`) that reacts with hand-written rules: chase
@@ -47,9 +49,10 @@ _Avoid_: "auction method", "bidding".
 
 **sector**:
 A single grid cell `(x, y)` — the atomic unit of the world. Every position in
-the grid is exactly one sector.
+the grid is exactly one sector. A sector is NOT a multi-cell region (see the
+"sector = cell, not a region" flag below).
 _Avoid_: using "task" or "target" to mean the cell itself; a sector only becomes
-a target once a UAV commits to it (see **target**).
+a target once a UAV commits to it (see **target**); using "sector" for a region.
 
 **target** (also **task**):
 A **sector** that a specific UAV has chosen to cover or respond to. "Target" and
@@ -174,6 +177,16 @@ the unfair oracle ADR-0001 removes.
   called "agentic" — that usage is retired.
 - **global vs local**: only the static **layout** is global. **Coverage** and
   **urgent** are local, reached through **belief map** + **messages**.
+- **sector = cell, not a region**: There are exactly TWO spatial tiers — the
+  **sector** (a single `(x, y)` cell, the atomic unit) and the whole map
+  (**WorldState** / the "area"). There is NO middle "region of cells" tier:
+  nothing is decomposed into multi-cell zones, no UAV owns a region, and no
+  method sweeps a region's interior. Movement is a one-cell-per-tick greedy
+  Manhattan step (`_move_toward`), not A* path-planning, and a sector is
+  "covered" the instant it is sensed (no interior to sweep). If you mean the
+  atomic square, say **sector** (or **cell**); if you mean the full grid, say
+  **the area** / the **world**. Do not use "sector" for a contiguous region of
+  cells.
 
 ## Example dialogue
 
