@@ -2,68 +2,43 @@
 
 This file provides instructions and context for AI coding agents working on this project.
 
-<!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
-## Beads Issue Tracker
-
-This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full workflow context and commands.
-
-### Quick Reference
-
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work
-bd close <id>         # Complete work
-```
-
-### Rules
-
-- Use `bd` for ALL task tracking — do NOT use TodoWrite, TaskCreate, or markdown TODO lists
-- Run `bd prime` for detailed command reference and session close protocol
-- Use `bd remember` for persistent knowledge — do NOT use MEMORY.md files
-
-## Session Completion
-
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
-
-**MANDATORY WORKFLOW:**
-
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY:
-   ```bash
-   git pull --rebase
-   bd dolt push
-   git push
-   git status  # MUST show "up to date with origin"
-   ```
-5. **Clean up** - Clear stashes, prune remote branches
-6. **Verify** - All changes committed AND pushed
-7. **Hand off** - Provide context for next session
-
-**CRITICAL RULES:**
-- Work is NOT complete until `git push` succeeds
-- NEVER stop before pushing - that leaves work stranded locally
-- NEVER say "ready to push when you are" - YOU must push
-- If push fails, resolve and retry until it succeeds
-<!-- END BEADS INTEGRATION -->
-
-
 ## Build & Test
 
-_Add your build and test commands here_
+This project uses `uv`.
 
 ```bash
-# Example:
-# npm install
-# npm test
+uv sync                          # Install dependencies
+uv run python -m unittest        # Run all tests
+uv run main.py run --method agentic   # Headless demo run
+uv run main.py experiment        # Paired baseline-vs-agentic sweeps
+uv run main.py ui                # Solara browser GUI (http://127.0.0.1:8765)
 ```
 
 ## Architecture Overview
 
-_Add a brief overview of your project architecture_
+A custom tick-based 2D simulator for evaluating decentralized UAV swarm decision
+methods for a disaster-mapping paper. Methods (`static`, `rules`,
+`task_consideration`, `agentic`) are swappable behind a single `SwarmMethod`
+interface; the world model, events, communication, metrics, and renderer are
+shared as an experiment harness.
+
+- `agentic_uav/simulation.py` — grid world, tick loop, events, metrics.
+- `agentic_uav/policy.py` — swappable `SwarmMethod` implementations.
+- `agentic_uav/planning.py` — `Action`, `MethodState`, `ObservationBuilder`.
+- `agentic_uav/models.py` — core dataclasses (`Sector`, `UavState`, `WorldState`).
+- `agentic_uav/communication.py` — range-limited, delayed `NetworkModel`.
+- `agentic_uav/scenarios.py` — reusable demo scenario construction.
+- `agentic_uav/experiments.py` — seeded sweeps, aggregates, paper plots.
+- `agentic_uav/gui.py` / `gui_support.py` — Solara GUI.
+- `agentic_uav/rendering.py` — static Matplotlib snapshots.
+
+See `README.md`, `docs/NEXT_STEPS.md`, and
+`docs/superpowers/specs/2026-04-26-swappable-uav-swarm-simulator-design.md`.
 
 ## Conventions & Patterns
 
-_Add your project-specific conventions here_
+- The `agentic` method is decentralized by design: per-UAV decisions from local
+  observation, peer messages, and onboard state — no global oracle. Keep it that
+  way (see the Decentralization Principle in the design spec).
+- Changing only `method_name` must be enough to swap methods; no other subsystem
+  should branch on the method.
