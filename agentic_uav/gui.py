@@ -21,7 +21,7 @@ from agentic_uav.gui_support import (
     run_to_end,
 )
 from agentic_uav.scenarios import MISSION_TYPES, ScenarioParams, build_demo_scenario
-from agentic_uav.simulation import Simulation
+from agentic_uav.simulation import CommunicationEvent, Simulation
 from agentic_uav.ui_config import LAST_CONFIG_PATH, METHODS as UI_METHODS, load_ui_params, save_ui_params
 
 
@@ -61,6 +61,15 @@ show_communication_links = solara.reactive(False)
 version = solara.reactive(0)
 simulation = solara.reactive(Simulation.from_config(build_demo_scenario(params=STARTUP_PARAMS)))
 _has_loaded_persisted_config = False
+
+# Runtime event-injection controls. These drive the "Inject Event" card and are
+# intentionally NOT part of _scenario_params()/_config_dependency(): injecting an
+# event must mutate the running simulation, never trigger a reset.
+INJECT_EVENT_TYPES = ["dropout", "urgent_sector", "block_sector"]
+inject_event_type = solara.reactive("dropout")
+inject_uav_id = solara.reactive("")
+inject_cell_x = solara.reactive(0)
+inject_cell_y = solara.reactive(0)
 
 
 @solara.component
@@ -113,6 +122,7 @@ def _Controls(state: dict[str, object]) -> None:
     with solara.Column(gap="14px"):
         _MissionSetupCard()
         _RunControlCard(state)
+        _InjectEventCard(state)
 
 
 @solara.component
@@ -151,6 +161,28 @@ def _RunControlCard(state: dict[str, object]) -> None:
             solara.Button("Next Step", on_click=_step_once, color="primary", disabled=state["is_finished"])
             solara.Button("End", on_click=_end, color="success", disabled=state["is_finished"])
         solara.HTML(tag="div", unsafe_innerHTML=_run_status_html(state), classes=["run-status"])
+
+
+@solara.component
+def _InjectEventCard(state: dict[str, object]) -> None:
+    sim = simulation.value
+    active_ids = _active_uav_ids(sim)
+    finished = bool(state["is_finished"])
+    with solara.Card(title="Inject Event", elevation=0, margin=0):
+        solara.Select("Event type", values=INJECT_EVENT_TYPES, value=inject_event_type)
+        if inject_event_type.value == "dropout":
+            solara.Select("UAV", values=active_ids, value=inject_uav_id)
+            disabled = finished or inject_uav_id.value not in active_ids
+        else:
+            solara.SliderInt("Cell X", value=inject_cell_x, min=0, max=max(sim.world.width - 1, 0))
+            solara.SliderInt("Cell Y", value=inject_cell_y, min=0, max=max(sim.world.height - 1, 0))
+            disabled = finished
+        solara.Button("Inject", on_click=_inject_event, color="error", disabled=disabled)
+        solara.HTML(
+            tag="div",
+            unsafe_innerHTML=_inject_hint_html(sim, finished),
+            classes=["run-status"],
+        )
 
 
 @solara.component
@@ -341,6 +373,42 @@ def _step_once() -> None:
 
 def _end() -> None:
     run_to_end(simulation.value)
+    version.value += 1
+
+
+def _active_uav_ids(sim: Simulation) -> list[str]:
+    return [uav_id for uav_id, uav in sim.uavs.items() if uav.active]
+
+
+def _build_inject_event(sim: Simulation) -> CommunicationEvent | None:
+    # Schedule at the current tick so the event fires on the NEXT step() through the
+    # normal path (events.apply -> method.handle_event), preserving the agentic
+    # re-plan. Returns None for an invalid selection so the handler no-ops.
+    tick = sim.tick
+    event_type = inject_event_type.value
+    if event_type == "dropout":
+        uav_id = inject_uav_id.value
+        if not uav_id or uav_id not in sim.uavs:
+            return None
+        return CommunicationEvent(tick=tick, event_type="dropout", payload={"uav_id": uav_id})
+    cell = (inject_cell_x.value, inject_cell_y.value)
+    if not sim.world.in_bounds(cell):
+        return None
+    return CommunicationEvent(
+        tick=tick, event_type=event_type, payload={"cell": [cell[0], cell[1]]}
+    )
+
+
+def _inject_event() -> None:
+    sim = simulation.value
+    if sim.is_finished:
+        return
+    event = _build_inject_event(sim)
+    if event is None:
+        return
+    # sim.events.events is the same list object as sim.config.events, so the
+    # injected event surfaces in the timeline and metric chart automatically.
+    sim.events.events.append(event)
     version.value += 1
 
 
@@ -551,6 +619,15 @@ def _run_status_label(state: dict[str, object]) -> str:
     if state["termination_reason"] == "max_ticks":
         return "Unsolved"
     return "Running"
+
+
+def _inject_hint_html(sim: Simulation, finished: bool) -> str:
+    if finished:
+        return "<small>Mission finished &mdash; reset to inject events.</small>"
+    return (
+        "<small>Fires on the next step (t={tick}); shown in the event timeline now."
+        "</small>".format(tick=sim.tick)
+    )
 
 
 def _timeline_html(timeline: list[dict[str, object]]) -> str:
