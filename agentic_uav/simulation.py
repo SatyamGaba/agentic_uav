@@ -145,9 +145,21 @@ class Simulation:
             uav.inbox.clear()
         self.network.deliver(self.uavs)
 
+        initial_cells = {uav_id: uav.cell for uav_id, uav in self.uavs.items() if uav.active}
+
         observations = self.observations.build(self.world, self.uavs)
         actions = self.method.decide_tick(self, observations, self.method_state)
         self.resolve_actions(actions)
+
+        for uav_id, uav in self.uavs.items():
+            if not uav.active:
+                continue
+            moved = uav_id in initial_cells and uav.cell != initial_cells[uav_id]
+            cost = self.config.move_energy_cost if moved else self.config.energy_drain_rate
+            uav.energy = max(0.0, uav.energy - cost)
+            if uav.energy <= 0.0:
+                uav.active = False
+                uav.health = "depleted"
 
         self._apply_sensing()
         self.metrics.log_tick(self.tick, self.world, self.uavs)

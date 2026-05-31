@@ -627,5 +627,35 @@ class EventHandlingTest(unittest.TestCase):
         self.assertTrue(simulation.world.sectors[(0, 1)].blocked)
 
 
+class SimulationFidelityTest(unittest.TestCase):
+    def test_uav_energy_depletion(self) -> None:
+        scenario = ScenarioConfig(
+            method_name="static",
+            ticks=5,
+            communication_range=1,
+            sensing_radius=1,
+            heartbeat_interval=3,
+            urgent_message_ttl=2,
+            world=WorldConfig(width=3, height=3),
+            uavs=[UavConfig(uav_id="u0", cell=(0, 0), energy=0.005)],
+            events=[],
+            seed=3,
+            energy_drain_rate=0.001,
+            move_energy_cost=0.002,
+        )
+        simulation = Simulation.from_config(scenario)
+
+        simulation.step()
+        self.assertLess(simulation.uavs["u0"].energy, 0.005)
+        self.assertTrue(simulation.uavs["u0"].active)
+
+        for _ in range(4):
+            simulation.step()
+
+        self.assertFalse(simulation.uavs["u0"].active)
+        self.assertEqual(simulation.uavs["u0"].health, "depleted")
+        self.assertEqual(simulation.uavs["u0"].energy, 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()
