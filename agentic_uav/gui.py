@@ -80,7 +80,7 @@ def Page() -> None:
         with solara.ColumnsResponsive(default=12, medium=[3, 6, 3], gutters=True, classes=["mission-layout"]):
             _Controls(state)
             _GridPanel(portrayal, state, refresh_key)
-            _MetricsPanel(state, timeline)
+            _MetricsPanel(state, timeline, refresh_key)
 
 
 @solara.component
@@ -166,11 +166,46 @@ def _GridPanel(portrayal: dict[str, object], state: dict[str, object], refresh_k
 
 
 @solara.component
-def _MetricsPanel(state: dict[str, object], timeline: list[dict[str, object]]) -> None:
+def _MetricsPanel(state: dict[str, object], timeline: list[dict[str, object]], refresh_key: int) -> None:
     with solara.Card(title="Mission Telemetry", elevation=0, margin=0):
         _MetricSummary(state)
         _MetricChart()
+        _UavStatusPanel(refresh_key)
         solara.HTML(tag="div", unsafe_innerHTML=_timeline_html(timeline), classes=["event-timeline"])
+
+
+@solara.component
+def _UavStatusPanel(refresh_key: int) -> None:
+    sim = simulation.value
+    with solara.Column(gap="6px", classes=["uav-status-panel"]):
+        solara.HTML(tag="div", unsafe_innerHTML="<div class='timeline-title'>UAV Fleet Status</div>")
+        for uav_id, uav in sorted(sim.uavs.items()):
+            battery_pct = int(uav.energy * 100)
+            status_cls = uav.health.lower()
+            if not uav.active:
+                status_cls += " inactive"
+            
+            bar_width = f"{battery_pct}%"
+            bar_color = "#3DDC97"
+            if battery_pct < 20:
+                bar_color = "#FF6B4A"
+            elif battery_pct < 50:
+                bar_color = "#E7B84A"
+                
+            uav_html = (
+                f"<div class='uav-status-card {status_cls}'>"
+                f"  <div class='uav-status-row'>"
+                f"    <strong>{html.escape(uav_id)}</strong>"
+                f"    <span class='uav-status-role'>{html.escape(uav.role)}</span>"
+                f"    <span class='uav-status-health {uav.health.lower()}'>{html.escape(uav.health)}</span>"
+                f"  </div>"
+                f"  <div class='uav-battery-container'>"
+                f"    <div class='uav-battery-bar' style='width: {bar_width}; background-color: {bar_color};'></div>"
+                f"    <span class='uav-battery-text'>{battery_pct}%</span>"
+                f"  </div>"
+                f"</div>"
+            )
+            solara.HTML(tag="div", unsafe_innerHTML=uav_html)
 
 
 @solara.component
@@ -1081,5 +1116,71 @@ _CSS = """
   .uav-grid-wrap {
     width: min(92vw, 620px);
   }
+}
+.uav-status-panel {
+  margin-top: 16px;
+  border-top: 1px solid #D8E1DE;
+  padding-top: 12px;
+}
+.uav-status-card {
+  padding: 8px 10px;
+  background: #F7FAF9;
+  border: 1px solid #D8E1DE;
+  border-radius: 6px;
+  margin-bottom: 2px;
+}
+.uav-status-card.inactive {
+  opacity: 0.7;
+}
+.uav-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+.uav-status-role {
+  color: #66756F;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.uav-status-health {
+  font-size: 11px;
+  font-weight: bold;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.uav-status-health.nominal {
+  background: rgba(61, 220, 151, 0.15);
+  color: #3DDC97;
+}
+.uav-status-health.depleted {
+  background: rgba(255, 107, 74, 0.15);
+  color: #FF6B4A;
+}
+.uav-status-health.dropped {
+  background: rgba(102, 117, 111, 0.15);
+  color: #66756F;
+}
+.uav-battery-container {
+  height: 12px;
+  background: #E8F0EE;
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+.uav-battery-bar {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+.uav-battery-text {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 9px;
+  font-weight: bold;
+  color: #1F2933;
 }
 """
