@@ -1,0 +1,12 @@
+{
+  "method_name": "agentic",
+  "mission_type": "disaster_mapping",
+  "grid_size": 25,
+  "uav_count": 4,
+  "sensing_radius": 1,
+  "communication_range": 3,
+  "seed": 7,
+  "ticks": 500,
+  "heartbeat_interval": 3,
+  "urgent_message_ttl": 2
+}

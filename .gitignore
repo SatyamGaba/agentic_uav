@@ -1,0 +1,23 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Local UI state
+.agentic_uav/
+.superpowers/
+.claude/
+.codex/
+runs/
+
+# Beads / Dolt files (added by bd init)
+.beads/
+
+# macOS metadata
+.DS_Store
