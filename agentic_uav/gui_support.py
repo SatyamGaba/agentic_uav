@@ -35,6 +35,11 @@ CELL_STYLES = {
 
 
 def build_grid_portrayal(simulation: Simulation) -> dict[str, Any]:
+    blackout_cells = set()
+    for zone in simulation.network.blackout_zones:
+        if zone.end_tick is None or simulation.tick < zone.end_tick:
+            blackout_cells.update(zone.cells)
+
     cells: dict[tuple[int, int], dict[str, Any]] = {}
     for cell, sector in simulation.world.sectors.items():
         state = _sector_state(sector)
@@ -44,6 +49,7 @@ def build_grid_portrayal(simulation: Simulation) -> dict[str, Any]:
             "coverage": sector.coverage,
             "priority": sector.priority,
             "blocked": sector.blocked,
+            "is_blackout": cell in blackout_cells,
         }
 
     uav_colors = _uav_colors(simulation)
@@ -201,11 +207,14 @@ def _event_label(event_type: str) -> str:
         "block_sector": "Sector blocked",
         "dropout": "UAV dropout",
         "urgent_sector": "Urgent sector",
+        "comm_blackout": "Comms blackout",
     }
     return labels.get(event_type, event_type.replace("_", " ").title())
 
 
 def _event_detail(payload: dict[str, Any]) -> str:
+    if "cells" in payload:
+        return f"{len(payload['cells'])} cells affected"
     if "cell" in payload:
         cell = tuple(payload["cell"])
         return f"cell {cell[0]},{cell[1]}"
@@ -219,6 +228,7 @@ def _event_tone(event_type: str) -> str:
         "block_sector": "blocked",
         "dropout": "dropout",
         "urgent_sector": "urgent",
+        "comm_blackout": "blocked",
     }
     return tones.get(event_type, "neutral")
 

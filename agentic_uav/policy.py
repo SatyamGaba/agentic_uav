@@ -98,7 +98,7 @@ class RuleAdaptiveMethod:
             method_state.known_urgent.update(local_urgent)
 
             urgent_candidates = [
-                cell for cell in sorted(method_state.known_urgent) if _is_open_cell(simulation, cell)
+                cell for cell in sorted(method_state.known_urgent) if _is_urgent_cell(simulation, cell)
             ]
             target = _choose_unclaimed(
                 urgent_candidates,
@@ -209,7 +209,7 @@ class TaskConsiderationMethod:
             method_state.known_urgent.update(_local_urgent_cells(observation))
 
             candidates = set(_local_uncovered_cells(observation))
-            candidates.update(cell for cell in method_state.known_urgent if _is_open_cell(simulation, cell))
+            candidates.update(cell for cell in method_state.known_urgent if _is_urgent_cell(simulation, cell))
             if not candidates:
                 candidates.add(nearest_uncovered(simulation, observation))
 
@@ -329,7 +329,7 @@ def _local_urgent_cells(observation: Observation) -> list[Cell]:
     return sorted(
         sector.cell
         for sector in observation.get("nearby", [])
-        if isinstance(sector, Sector) and sector.priority == "urgent" and not sector.blocked
+        if isinstance(sector, Sector) and sector.priority == "urgent" and not sector.blocked and sector.coverage < 1.0
     )
 
 
@@ -393,7 +393,7 @@ def _patrol_target(simulation: Simulation, uav_id: str) -> Cell:
 
 
 def _is_urgent_cell(simulation: Simulation, cell: Cell | None) -> bool:
-    return _is_open_cell(simulation, cell) and simulation.world.sectors[cell].priority == "urgent"
+    return _is_open_cell(simulation, cell) and simulation.world.sectors[cell].priority == "urgent" and simulation.world.sectors[cell].coverage < 1.0
 
 
 def _task_consideration_rank(

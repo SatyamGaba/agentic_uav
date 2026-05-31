@@ -514,10 +514,12 @@ def _grid_cell_html(
     target_cells: set[tuple[int, int]],
 ) -> str:
     classes = ["grid-cell", str(sector["state"])]
+    if sector.get("is_blackout"):
+        classes.append("blackout")
     if cell in target_cells:
         classes.append("targeted")
     badges = "".join(_uav_badge(uav, index) for index, uav in enumerate(uavs))
-    return "<div class='{classes}' style='background:{fill}'>{badges}</div>".format(
+    return "<div class='{classes}' style='background-color:{fill}'>{badges}</div>".format(
         classes=" ".join(classes),
         fill=sector["fill"],
         badges=badges,
@@ -565,7 +567,8 @@ def _legend_html() -> str:
     target = "<span class='legend-item'><span class='target-dot'></span>Targeted sector</span>"
     communication = "<span class='legend-item'><span class='communication-dot'></span>Communication link</span>"
     path = "<span class='legend-item'><span class='path-dot'></span>Path taken</span>"
-    return cells + roles + target + communication + path
+    blackout = "<span class='legend-item'><span class='blackout-legend-dot'></span>Blackout zone</span>"
+    return cells + blackout + roles + target + communication + path
 
 
 def _run_status_html(state: dict[str, object]) -> str:
@@ -846,6 +849,15 @@ _CSS = """
 .grid-cell.blocked {
   background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.13) 0 4px, transparent 4px 8px);
 }
+.grid-cell.blackout {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 107, 74, 0.15),
+    rgba(255, 107, 74, 0.15) 10px,
+    transparent 10px,
+    transparent 20px
+  ) !important;
+}
 .grid-cell.targeted::after {
   content: "";
   position: absolute;
@@ -899,6 +911,21 @@ _CSS = """
   color: #66756F;
   filter: grayscale(0.85) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.32));
   opacity: 0.76;
+}
+.blackout-legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+  vertical-align: middle;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 107, 74, 0.4),
+    rgba(255, 107, 74, 0.4) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  border: 1px solid rgba(255, 107, 74, 0.6);
 }
 .uav-marker.dropped::before,
 .uav-marker.dropped::after {

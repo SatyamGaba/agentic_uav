@@ -70,7 +70,7 @@ def nearest_open_urgent(simulation: Simulation, observation: Observation) -> Cel
     candidates = [
         cell
         for cell in urgent_cells
-        if not simulation.world.sectors[cell].blocked
+        if not simulation.world.sectors[cell].blocked and simulation.world.sectors[cell].coverage < 1.0
     ]
     if not candidates:
         return None

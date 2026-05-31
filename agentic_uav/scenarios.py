@@ -123,6 +123,14 @@ def _mission_events(
             event_type="dropout",
             payload={"uav_id": "u1"},
         ),
+        CommunicationEvent(
+            tick=min(8, max(0, ticks - 1)),
+            event_type="comm_blackout",
+            payload={
+                "cells": [_clamp_cell((x, y), grid_size) for x in range(3, 6) for y in range(3, 6)],
+                "end_tick": min(30, ticks),
+            },
+        ),
     ]
 
 
@@ -140,4 +148,12 @@ def _uav_start_cells(grid_size: int, uav_count: int) -> list[tuple[int, int]]:
     if uav_count <= 0:
         return []
 
-    return [(0, 0)] * uav_count
+    cells = []
+    for shell in range(max(1, uav_count)):
+        for x in range(shell + 1):
+            y = shell - x
+            if x < grid_size and y < grid_size:
+                cells.append((x, y))
+                if len(cells) == uav_count:
+                    return cells
+    return cells

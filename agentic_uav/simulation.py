@@ -102,7 +102,11 @@ class Simulation:
         }
         self.tick = 0
         self.random = Random(config.seed)
-        self.network = NetworkModel(config.communication_range)
+        self.network = NetworkModel(
+            config.communication_range,
+            packet_loss_rate=config.packet_loss_rate,
+            random=self.random,
+        )
         self.events = EventInjector(config.events)
         self.observations = ObservationBuilder(config.sensing_radius)
         self.metrics = MetricsLogger()
@@ -141,9 +145,19 @@ class Simulation:
         fired_events = self.events.apply(self.tick, self.world, self.uavs)
         for event in fired_events:
             self.method.handle_event(event, self.method_state)
+            if event.event_type == "comm_blackout":
+                from agentic_uav.environment import BlackoutZone
+                cells = {tuple(c) for c in event.payload["cells"]}
+                bz = BlackoutZone(
+                    cells=cells,
+                    start_tick=self.tick,
+                    end_tick=event.payload.get("end_tick"),
+                )
+                self.network.blackout_zones.append(bz)
+                
         for uav in self.uavs.values():
             uav.inbox.clear()
-        self.network.deliver(self.uavs)
+        self.network.deliver(self.uavs, self.world, self.tick)
 
         initial_cells = {uav_id: uav.cell for uav_id, uav in self.uavs.items() if uav.active}
 
@@ -206,9 +220,19 @@ class Simulation:
         for uav in self.uavs.values():
             if not uav.active:
                 continue
-            for cell in neighborhood(uav.cell, radius=self.config.sensing_radius):
+            
+            uav_visibility = 1.0
+            if uav.cell in self.world.sectors:
+                uav_visibility = self.world.sectors[uav.cell].visibility
+                
+            effective_radius = self.config.sensing_radius
+            if uav_visibility < 0.5:
+                effective_radius = max(0, effective_radius - 1)
+                
+            for cell in neighborhood(uav.cell, radius=effective_radius):
                 if cell in self.world.sectors and not self.world.sectors[cell].blocked:
-                    self.world.sectors[cell].coverage = 1.0
+                    sector = self.world.sectors[cell]
+                    sector.coverage = min(1.0, sector.coverage + sector.visibility)
 
 
 __all__ = [

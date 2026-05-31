@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
+from random import Random
 
 from agentic_uav.models import UavState, manhattan
+
+if TYPE_CHECKING:
+    from agentic_uav.environment import BlackoutZone
+    from agentic_uav.models import WorldState
 
 
 @dataclass
@@ -17,21 +22,50 @@ class Message:
 
 
 class NetworkModel:
-    def __init__(self, communication_range: int) -> None:
+    def __init__(self, communication_range: int, packet_loss_rate: float = 0.0, random: Random | None = None) -> None:
         self.communication_range = communication_range
+        self.packet_loss_rate = packet_loss_rate
+        self.random = random if random is not None else Random()
         self.pending: list[Message] = []
+        self.blackout_zones: list[BlackoutZone] = []
 
     def enqueue(self, messages: list[Message]) -> None:
         self.pending.extend(messages)
 
-    def deliver(self, uavs: dict[str, UavState]) -> None:
+    def _in_blackout_zone(self, cell: tuple[int, int], tick: int) -> bool:
+        for bz in self.blackout_zones:
+            if bz.is_active(tick) and cell in bz.cells:
+                return True
+        return False
+
+    def deliver(self, uavs: dict[str, UavState], world: WorldState, tick: int) -> None:
         current = self.pending
         self.pending = []
         forwarded: list[Message] = []
 
         for message in current:
-            delivered_to = self._neighbors(message.sender_id, uavs, message.recipient_id)
+            sender_id = message.sender_id
+            if sender_id not in uavs:
+                continue
+            sender_cell = uavs[sender_id].cell
+            
+            if self._in_blackout_zone(sender_cell, tick):
+                continue
+
+            sender_quality = world.sectors[sender_cell].comm_quality if sender_cell in world.sectors else 1.0
+
+            delivered_to = self._neighbors(sender_id, uavs, message.recipient_id)
             for uav_id in delivered_to:
+                recipient_cell = uavs[uav_id].cell
+                if self._in_blackout_zone(recipient_cell, tick):
+                    continue
+
+                recipient_quality = world.sectors[recipient_cell].comm_quality if recipient_cell in world.sectors else 1.0
+                delivery_prob = (1 - self.packet_loss_rate) * sender_quality * recipient_quality
+                
+                if self.random.random() > delivery_prob:
+                    continue  # Packet lost
+
                 received = Message(
                     sender_id=message.sender_id,
                     message_type=message.message_type,

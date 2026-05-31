@@ -549,7 +549,7 @@ class ScenarioBuilderTest(unittest.TestCase):
         self.assertEqual([uav.cell for uav in scenario.uavs], [uav.cell for uav in repeat.uavs])
         self.assertEqual(
             [uav.cell for uav in scenario.uavs],
-            [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0)],
+            [(0, 0), (0, 1), (1, 0), (0, 2), (1, 1)],
         )
 
 
@@ -655,6 +655,145 @@ class SimulationFidelityTest(unittest.TestCase):
         self.assertFalse(simulation.uavs["u0"].active)
         self.assertEqual(simulation.uavs["u0"].health, "depleted")
         self.assertEqual(simulation.uavs["u0"].energy, 0.0)
+
+    def test_packet_loss_rate_drops_messages(self) -> None:
+        scenario = ScenarioConfig(
+            method_name="static",
+            ticks=1,
+            communication_range=1,
+            sensing_radius=0,
+            heartbeat_interval=3,
+            urgent_message_ttl=2,
+            world=WorldConfig(width=2, height=1),
+            uavs=[
+                UavConfig(uav_id="u0", cell=(0, 0)),
+                UavConfig(uav_id="u1", cell=(1, 0)),
+            ],
+            events=[],
+            seed=1,
+            packet_loss_rate=1.0,
+        )
+        simulation = Simulation.from_config(scenario)
+        simulation.send_messages(
+            [
+                Message(
+                    sender_id="u0",
+                    message_type="heartbeat",
+                    payload={},
+                    ttl=1,
+                    recipient_id="u1",
+                )
+            ]
+        )
+        simulation.step()
+        
+        self.assertEqual(len(simulation.uavs["u1"].inbox), 0)
+
+    def test_comm_blackout_event_blocks_messages(self) -> None:
+        scenario = ScenarioConfig(
+            method_name="static",
+            ticks=2,
+            communication_range=1,
+            sensing_radius=0,
+            heartbeat_interval=3,
+            urgent_message_ttl=2,
+            world=WorldConfig(width=3, height=1),
+            uavs=[
+                UavConfig(uav_id="u0", cell=(0, 0)),
+                UavConfig(uav_id="u1", cell=(1, 0)),
+            ],
+            events=[
+                CommunicationEvent(
+                    tick=0,
+                    event_type="comm_blackout",
+                    payload={"cells": [(1, 0)]},
+                )
+            ],
+            seed=1,
+            packet_loss_rate=0.0,
+        )
+        simulation = Simulation.from_config(scenario)
+        
+        # At tick 0, step applies the event and blackout zone is created
+        simulation.step()
+
+        simulation.send_messages(
+            [
+                Message(
+                    sender_id="u0",
+                    message_type="heartbeat",
+                    payload={},
+                    ttl=1,
+                    recipient_id="u1",
+                )
+            ]
+        )
+        
+        simulation.step()
+        
+        self.assertEqual(len(simulation.uavs["u1"].inbox), 0)
+
+    def test_visibility_degradation_reduces_sensing_radius(self) -> None:
+        scenario = ScenarioConfig(
+            method_name="static",
+            ticks=1,
+            communication_range=1,
+            sensing_radius=1,
+            heartbeat_interval=3,
+            urgent_message_ttl=2,
+            world=WorldConfig(
+                width=3, 
+                height=1,
+                sectors=[Sector(cell=(0, 0), visibility=0.4)]
+            ),
+            uavs=[
+                UavConfig(uav_id="u0", cell=(0, 0)),
+            ],
+            events=[],
+            seed=1,
+        )
+        simulation = Simulation.from_config(scenario)
+        simulation.step()
+        
+        # radius 1 means it could reach (1, 0), but visibility < 0.5 reduces radius to 0
+        self.assertEqual(simulation.world.sectors[(0, 0)].coverage, 0.4)
+        self.assertEqual(simulation.world.sectors[(1, 0)].coverage, 0.0)
+
+    def test_agentic_reaches_multiple_urgent_spots(self) -> None:
+        scenario = ScenarioConfig(
+            method_name="agentic",
+            ticks=40,
+            communication_range=5,
+            sensing_radius=0,
+            heartbeat_interval=1,
+            urgent_message_ttl=2,
+            world=WorldConfig(
+                width=5, 
+                height=5,
+                sectors=[
+                    Sector(cell=(4, 0), priority="urgent"),
+                    Sector(cell=(0, 4), priority="urgent"),
+                    Sector(cell=(4, 4), priority="urgent"),
+                    Sector(cell=(2, 2), priority="urgent"),
+                ]
+            ),
+            uavs=[
+                UavConfig(uav_id="u0", cell=(0, 0)),
+            ],
+            events=[],
+            seed=1,
+        )
+        simulation = Simulation.from_config(scenario)
+        summary = simulation.run()
+        
+        self.assertIn((4, 0), summary["urgent_targets"])
+        self.assertIn((0, 4), summary["urgent_targets"])
+        self.assertIn((4, 4), summary["urgent_targets"])
+        self.assertIn((2, 2), summary["urgent_targets"])
+        self.assertEqual(simulation.world.sectors[(4, 0)].coverage, 1.0)
+        self.assertEqual(simulation.world.sectors[(0, 4)].coverage, 1.0)
+        self.assertEqual(simulation.world.sectors[(4, 4)].coverage, 1.0)
+        self.assertEqual(simulation.world.sectors[(2, 2)].coverage, 1.0)
 
 
 if __name__ == "__main__":
