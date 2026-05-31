@@ -60,10 +60,13 @@ class EventInjector:
     def __init__(self, events: list[CommunicationEvent]) -> None:
         self.events = events
 
-    def apply(self, tick: int, world: WorldState, uavs: dict[str, UavState]) -> None:
+    def apply(self, tick: int, world: WorldState, uavs: dict[str, UavState]) -> list[CommunicationEvent]:
+        """Apply scheduled events for this tick. Returns list of events that fired."""
+        fired: list[CommunicationEvent] = []
         for event in self.events:
             if event.tick != tick:
                 continue
+            fired.append(event)
             if event.event_type == "block_sector":
                 cell = tuple(event.payload["cell"])
                 world.sectors[cell].blocked = True
@@ -75,6 +78,11 @@ class EventInjector:
             elif event.event_type == "urgent_sector":
                 cell = tuple(event.payload["cell"])
                 world.sectors[cell].priority = "urgent"
+            elif event.event_type == "visibility_degrade":
+                cell = tuple(event.payload["cell"])
+                if cell in world.sectors:
+                    world.sectors[cell].visibility = float(event.payload.get("visibility", 0.5))
+        return fired
 
 
 class Simulation:
@@ -130,7 +138,9 @@ class Simulation:
     def step(self) -> None:
         if self.is_finished:
             return
-        self.events.apply(self.tick, self.world, self.uavs)
+        fired_events = self.events.apply(self.tick, self.world, self.uavs)
+        for event in fired_events:
+            self.method.handle_event(event, self.method_state)
         for uav in self.uavs.values():
             uav.inbox.clear()
         self.network.deliver(self.uavs)

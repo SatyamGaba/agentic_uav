@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from agentic_uav.communication import Message
 from agentic_uav.models import Cell, Sector, UavState, WorldState, manhattan, neighborhood
+from agentic_uav.types import Observation
+
+if TYPE_CHECKING:
+    from agentic_uav.simulation import Simulation
 
 
 @dataclass
@@ -31,8 +35,8 @@ class ObservationBuilder:
     def __init__(self, sensing_radius: int) -> None:
         self.sensing_radius = sensing_radius
 
-    def build(self, world: WorldState, uavs: dict[str, UavState]) -> dict[str, dict[str, Any]]:
-        observations: dict[str, dict[str, Any]] = {}
+    def build(self, world: WorldState, uavs: dict[str, UavState]) -> dict[str, Observation]:
+        observations: dict[str, Observation] = {}
         urgent_cells = [
             cell for cell, sector in world.sectors.items() if sector.priority == "urgent"
         ]
@@ -52,7 +56,7 @@ class ObservationBuilder:
         return [world.sectors[cell] for cell in cells if cell in world.sectors]
 
 
-def first_uncovered(simulation: object, cells: list[Cell]) -> Cell | None:
+def first_uncovered(simulation: Simulation, cells: list[Cell]) -> Cell | None:
     for cell in cells:
         sector = simulation.world.sectors[cell]
         if not sector.blocked and sector.coverage < 1.0:
@@ -60,7 +64,7 @@ def first_uncovered(simulation: object, cells: list[Cell]) -> Cell | None:
     return None
 
 
-def nearest_open_urgent(simulation: object, observation: dict[str, object]) -> Cell | None:
+def nearest_open_urgent(simulation: Simulation, observation: Observation) -> Cell | None:
     uav = observation["self"]
     urgent_cells = observation["urgent_cells"]
     candidates = [
@@ -73,7 +77,7 @@ def nearest_open_urgent(simulation: object, observation: dict[str, object]) -> C
     return min(candidates, key=lambda cell: manhattan(uav.cell, cell))
 
 
-def nearest_uncovered(simulation: object, observation: dict[str, object]) -> Cell | None:
+def nearest_uncovered(simulation: Simulation, observation: Observation) -> Cell | None:
     uav = observation["self"]
     candidates = [
         cell

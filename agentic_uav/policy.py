@@ -1,33 +1,37 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 from agentic_uav.communication import Message
-from agentic_uav.models import Cell, Sector, manhattan, neighborhood
+from agentic_uav.models import Cell, Sector, manhattan, neighborhood, CommunicationEvent
 from agentic_uav.planning import (
     Action,
     MethodState,
     nearest_open_urgent,
     nearest_uncovered,
 )
+from agentic_uav.types import Observation
+
+if TYPE_CHECKING:
+    from agentic_uav.simulation import Simulation
 
 
 class SwarmMethod(Protocol):
     method_id: str
 
-    def initialize_mission(self, simulation: object) -> MethodState:
+    def initialize_mission(self, simulation: Simulation) -> MethodState:
         ...
 
     def decide_tick(
         self,
-        simulation: object,
-        observations: dict[str, dict[str, object]],
+        simulation: Simulation,
+        observations: dict[str, Observation],
         method_state: MethodState,
     ) -> list[Action]:
         ...
 
-    def handle_event(self, event: object, method_state: MethodState) -> None:
+    def handle_event(self, event: CommunicationEvent, method_state: MethodState) -> None:
         ...
 
 
@@ -35,7 +39,7 @@ class SwarmMethod(Protocol):
 class StaticPartitionMethod:
     method_id: str = "static"
 
-    def initialize_mission(self, simulation: object) -> MethodState:
+    def initialize_mission(self, simulation: Simulation) -> MethodState:
         uav_ids = sorted(simulation.uavs)
         if not uav_ids:
             return MethodState()
@@ -52,8 +56,8 @@ class StaticPartitionMethod:
 
     def decide_tick(
         self,
-        simulation: object,
-        observations: dict[str, dict[str, object]],
+        simulation: Simulation,
+        observations: dict[str, Observation],
         method_state: MethodState,
     ) -> list[Action]:
         actions: list[Action] = []
@@ -69,7 +73,7 @@ class StaticPartitionMethod:
             actions.append(Action(uav_id=uav_id, action_type=action_type, target_cell=target))
         return actions
 
-    def handle_event(self, event: object, method_state: MethodState) -> None:
+    def handle_event(self, event: CommunicationEvent, method_state: MethodState) -> None:
         return None
 
 
@@ -77,13 +81,13 @@ class StaticPartitionMethod:
 class RuleAdaptiveMethod:
     method_id: str = "rules"
 
-    def initialize_mission(self, simulation: object) -> MethodState:
+    def initialize_mission(self, simulation: Simulation) -> MethodState:
         return MethodState()
 
     def decide_tick(
         self,
-        simulation: object,
-        observations: dict[str, dict[str, object]],
+        simulation: Simulation,
+        observations: dict[str, Observation],
         method_state: MethodState,
     ) -> list[Action]:
         actions: list[Action] = []
@@ -135,7 +139,7 @@ class RuleAdaptiveMethod:
             )
         return actions
 
-    def handle_event(self, event: object, method_state: MethodState) -> None:
+    def handle_event(self, event: CommunicationEvent, method_state: MethodState) -> None:
         return None
 
 
@@ -143,13 +147,13 @@ class RuleAdaptiveMethod:
 class AgenticMethod:
     method_id: str = "agentic"
 
-    def initialize_mission(self, simulation: object) -> MethodState:
+    def initialize_mission(self, simulation: Simulation) -> MethodState:
         return MethodState()
 
     def decide_tick(
         self,
-        simulation: object,
-        observations: dict[str, dict[str, object]],
+        simulation: Simulation,
+        observations: dict[str, Observation],
         method_state: MethodState,
     ) -> list[Action]:
         actions: list[Action] = []
@@ -181,7 +185,7 @@ class AgenticMethod:
             )
         return actions
 
-    def handle_event(self, event: object, method_state: MethodState) -> None:
+    def handle_event(self, event: CommunicationEvent, method_state: MethodState) -> None:
         return None
 
 
@@ -189,13 +193,13 @@ class AgenticMethod:
 class TaskConsiderationMethod:
     method_id: str = "task_consideration"
 
-    def initialize_mission(self, simulation: object) -> MethodState:
+    def initialize_mission(self, simulation: Simulation) -> MethodState:
         return MethodState()
 
     def decide_tick(
         self,
-        simulation: object,
-        observations: dict[str, dict[str, object]],
+        simulation: Simulation,
+        observations: dict[str, Observation],
         method_state: MethodState,
     ) -> list[Action]:
         actions: list[Action] = []
@@ -251,7 +255,7 @@ class TaskConsiderationMethod:
             )
         return actions
 
-    def handle_event(self, event: object, method_state: MethodState) -> None:
+    def handle_event(self, event: CommunicationEvent, method_state: MethodState) -> None:
         return None
 
 
@@ -267,7 +271,7 @@ def build_method(method_name: str) -> SwarmMethod:
     return methods[method_name]
 
 
-def _serpentine_cells(simulation: object) -> list[Cell]:
+def _serpentine_cells(simulation: Simulation) -> list[Cell]:
     cells: list[Cell] = []
     for y in range(simulation.world.height):
         x_values = range(simulation.world.width)
@@ -280,23 +284,23 @@ def _serpentine_cells(simulation: object) -> list[Cell]:
     return cells
 
 
-def _is_open_cell(simulation: object, cell: Cell | None) -> bool:
+def _is_open_cell(simulation: Simulation, cell: Cell | None) -> bool:
     if cell is None or cell not in simulation.world.sectors:
         return False
     return not simulation.world.sectors[cell].blocked
 
 
-def _needs_static_visit(simulation: object, cell: Cell) -> bool:
+def _needs_static_visit(simulation: Simulation, cell: Cell) -> bool:
     return _is_open_cell(simulation, cell) and simulation.world.sectors[cell].coverage < 1.0
 
 
-def _needs_local_visit(simulation: object, cell: Cell) -> bool:
+def _needs_local_visit(simulation: Simulation, cell: Cell) -> bool:
     return _is_open_cell(simulation, cell) and simulation.world.sectors[cell].coverage < 1.0
 
 
 def _ingest_messages(
     uav_id: str,
-    observation: dict[str, object],
+    observation: Observation,
     method_state: MethodState,
 ) -> None:
     for message in observation.get("messages", []):
@@ -321,7 +325,7 @@ def _message_target(message: Message) -> Cell | None:
     return (int(raw_cell[0]), int(raw_cell[1]))
 
 
-def _local_urgent_cells(observation: dict[str, object]) -> list[Cell]:
+def _local_urgent_cells(observation: Observation) -> list[Cell]:
     return sorted(
         sector.cell
         for sector in observation.get("nearby", [])
@@ -329,7 +333,7 @@ def _local_urgent_cells(observation: dict[str, object]) -> list[Cell]:
     )
 
 
-def _local_uncovered_cells(observation: dict[str, object]) -> list[Cell]:
+def _local_uncovered_cells(observation: Observation) -> list[Cell]:
     return sorted(
         sector.cell
         for sector in observation.get("nearby", [])
@@ -354,7 +358,7 @@ def _choose_unclaimed(
     return (unclaimed or open_candidates)[0]
 
 
-def _rule_messages(simulation: object, uav_id: str, target: Cell, role: str) -> list[Message]:
+def _rule_messages(simulation: Simulation, uav_id: str, target: Cell, role: str) -> list[Message]:
     messages: list[Message] = []
     if _is_urgent_cell(simulation, target):
         messages.append(
@@ -379,7 +383,7 @@ def _rule_messages(simulation: object, uav_id: str, target: Cell, role: str) -> 
     return messages
 
 
-def _patrol_target(simulation: object, uav_id: str) -> Cell:
+def _patrol_target(simulation: Simulation, uav_id: str) -> Cell:
     cells = _serpentine_cells(simulation)
     if not cells:
         return simulation.uavs[uav_id].cell
@@ -388,12 +392,12 @@ def _patrol_target(simulation: object, uav_id: str) -> Cell:
     return cells[(simulation.tick + offset) % len(cells)]
 
 
-def _is_urgent_cell(simulation: object, cell: Cell | None) -> bool:
+def _is_urgent_cell(simulation: Simulation, cell: Cell | None) -> bool:
     return _is_open_cell(simulation, cell) and simulation.world.sectors[cell].priority == "urgent"
 
 
 def _task_consideration_rank(
-    simulation: object,
+    simulation: Simulation,
     uav_id: str,
     current_cell: Cell,
     candidate: Cell,
@@ -411,7 +415,7 @@ def _task_consideration_rank(
 
 
 def _task_consideration_score(
-    simulation: object,
+    simulation: Simulation,
     uav_id: str,
     current_cell: Cell,
     candidate: Cell,
@@ -430,7 +434,7 @@ def _task_consideration_score(
     return score
 
 
-def _uncovered_neighbor_count(simulation: object, cell: Cell) -> int:
+def _uncovered_neighbor_count(simulation: Simulation, cell: Cell) -> int:
     return sum(
         1
         for neighbor in neighborhood(cell, radius=1)
@@ -439,7 +443,7 @@ def _uncovered_neighbor_count(simulation: object, cell: Cell) -> int:
 
 
 def _peer_conflict_penalty(
-    simulation: object,
+    simulation: Simulation,
     uav_id: str,
     current_cell: Cell,
     candidate: Cell,
