@@ -73,7 +73,9 @@ class SwappableMethodsTest(unittest.TestCase):
 
     def test_static_vs_agentic_behavior_differs_on_urgent_sector(self) -> None:
         static_summary = Simulation.from_config(build_scenario("static")).run()
-        agentic_summary = Simulation.from_config(build_scenario("agentic")).run()
+        
+        agentic_scenario = build_scenario("agentic")
+        agentic_summary = Simulation.from_config(agentic_scenario).run()
 
         self.assertNotIn((3, 3), static_summary["urgent_targets"])
         self.assertIn((3, 3), agentic_summary["urgent_targets"])

@@ -65,7 +65,20 @@ class LocalWorldModel:
                 if msg.sender_id in self.peer_states:
                     self.peer_states[msg.sender_id].target_cell = tuple(msg.payload["target_cell"])
             elif msg.message_type == MSG_HAZARD_ALERT:
-                self.known_hazards.add(tuple(msg.payload["cell"]))
+                cell = tuple(msg.payload["cell"])
+                self.known_hazards.add(cell)
+                if cell not in self.known_sectors:
+                    self.known_sectors[cell] = SectorBelief(
+                        cell=cell,
+                        coverage=0.0,
+                        priority="urgent",
+                        blocked=False,
+                        visibility=1.0,
+                        last_observed_tick=current_tick,
+                        observed_by_self=False,
+                    )
+                else:
+                    self.known_sectors[cell].priority = "urgent"
             elif msg.message_type == MSG_FAILURE_NOTICE:
                 failed_id = msg.payload.get("uav_id")
                 if failed_id and failed_id in self.peer_states:
@@ -77,6 +90,8 @@ class LocalWorldModel:
                     self.known_sectors[cell].coverage = max(self.known_sectors[cell].coverage, coverage)
                     self.known_sectors[cell].last_observed_tick = current_tick
                     self.known_sectors[cell].observed_by_self = False
+                if coverage >= 1.0:
+                    self.known_hazards.discard(cell)
 
 
 @dataclass
@@ -108,7 +123,9 @@ class InboxSummary:
             elif msg.message_type == MSG_TASK_COMMITMENT:
                 summary.peer_commitments[msg.sender_id] = tuple(msg.payload["target_cell"])
             elif msg.message_type == MSG_HAZARD_ALERT:
-                summary.hazard_alerts.append(tuple(msg.payload["cell"]))
+                cell = tuple(msg.payload["cell"])
+                summary.hazard_alerts.append(cell)
+                summary.urgent_alerts.append(cell)
             elif msg.message_type == "urgent_sector":
                 summary.urgent_alerts.append(tuple(msg.payload["cell"]))
             elif msg.message_type == MSG_FAILURE_NOTICE:

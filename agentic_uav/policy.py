@@ -164,31 +164,163 @@ class AgenticMethod:
         observations: dict[str, Observation],
         method_state: MethodState,
     ) -> list[Action]:
+        from agentic_uav.agent_core import SectorBelief, InboxSummary, HealthStatus, AgentContext, MissionContext
+        from agentic_uav.tools import tool_find_best_task
+        
         actions: list[Action] = []
         for uav_id, observation in observations.items():
-            target = nearest_open_urgent(simulation, observation)
-            messages: list[Message] = []
-            role = "priority_responder"
+            uav = observation["self"]
+            lwm = simulation.local_world_models[uav_id]
+            
+            # Sense: Update LocalWorldModel from observation
+            for cell in observation.get("urgent_cells", []):
+                lwm.known_hazards.add(cell)
+                if cell not in lwm.known_sectors:
+                    lwm.known_sectors[cell] = SectorBelief(
+                        cell=cell,
+                        coverage=0.0,
+                        priority="urgent",
+                        blocked=False,
+                        visibility=1.0,
+                        last_observed_tick=0,
+                        observed_by_self=False,
+                    )
+                else:
+                    lwm.known_sectors[cell].priority = "urgent"
+
+            for sector in observation.get("nearby", []):
+                lwm.known_sectors[sector.cell] = SectorBelief(
+                    cell=sector.cell,
+                    coverage=sector.coverage,
+                    priority=sector.priority,
+                    blocked=sector.blocked,
+                    visibility=observation.get("visibility", 1.0),
+                    last_observed_tick=simulation.tick,
+                    observed_by_self=True,
+                )
+                if sector.priority == "urgent" and sector.coverage < 1.0 and not sector.blocked:
+                    lwm.known_hazards.add(sector.cell)
+                else:
+                    lwm.known_hazards.discard(sector.cell)
+
+            # Process inbox and update LWM from messages
+            messages = observation.get("messages", [])
+            inbox_summary = InboxSummary.from_messages(messages)
+            lwm.update_from_messages(messages, simulation.tick)
+
+            # Update HealthStatus
+            health = HealthStatus(
+                energy=uav.energy,
+                health=uav.health,
+                sensing_degraded=observation.get("visibility", 1.0) < 1.0,
+                comm_degraded=False,
+                availability="full" if uav.energy > 0.15 else "critical"
+            )
+
+            # Build AgentContext
+            context = AgentContext(
+                self_state=uav,
+                world_model=lwm,
+                health=health,
+                inbox_summary=inbox_summary,
+                mission_config=MissionContext(
+                    mission_type=simulation.config.mission_type,
+                    success_threshold=1.0,
+                    max_ticks=simulation.config.ticks,
+                    current_tick=simulation.tick
+                ),
+                current_tick=simulation.tick
+            )
+
+            # Think: Role assessment and Task selection
+            target = tool_find_best_task(context, previous_target=method_state.targets_by_uav.get(uav_id))
+            
+            # Fallback
+            if target is None:
+                nu = nearest_uncovered(simulation, observation)
+                if nu is not None and nu in simulation.world.sectors and simulation.world.sectors[nu].coverage < 1.0 and not simulation.world.sectors[nu].blocked:
+                    target = nu
+                else:
+                    target = _patrol_target(simulation, uav_id)
+                
+            role = "coverage"
             if target is not None:
-                messages.append(
+                sb = lwm.known_sectors.get(target)
+                if target in lwm.known_hazards or (sb is not None and sb.priority == "urgent"):
+                    role = "priority_responder"
+            if health.availability == "critical":
+                role = "retreat"
+
+            # Communication Decision
+            out_messages: list[Message] = []
+            
+            if _is_urgent_cell(simulation, target):
+                out_messages.append(
                     Message(
                         sender_id=uav_id,
-                        message_type="intent_summary",
-                        payload={"target_cell": target, "role": role},
-                        ttl=1,
-                        urgency="routine",
+                        message_type=MSG_HAZARD_ALERT,
+                        payload={"cell": target},
+                        ttl=simulation.config.urgent_message_ttl,
+                        urgency="urgent",
                     )
                 )
-            else:
-                target = nearest_uncovered(simulation, observation)
-                role = "coverage"
+
+            # Target changed check for immediate MSG_INTENT_SUMMARY
+            prev_target = method_state.targets_by_uav.get(uav_id)
+            target_changed = (target != prev_target)
+            
+            if target_changed and target is not None:
+                out_messages.append(
+                    Message(
+                        sender_id=uav_id,
+                        message_type=MSG_INTENT_SUMMARY,
+                        payload={"target_cell": target, "role": role},
+                        ttl=1,
+                    )
+                )
+
+            if simulation.tick % simulation.config.heartbeat_interval == 0:
+                out_messages.append(
+                    Message(
+                        sender_id=uav_id,
+                        message_type=MSG_HEARTBEAT,
+                        payload={
+                            "uav_id": uav_id,
+                            "role": role,
+                            "cell": uav.cell,
+                            "health": uav.health,
+                            "energy": uav.energy,
+                            "comm_quality": simulation.world.sectors[uav.cell].comm_quality if uav.cell in simulation.world.sectors else 1.0,
+                        },
+                        ttl=1,
+                    )
+                )
+                if target is not None and not target_changed:
+                    out_messages.append(
+                        Message(
+                            sender_id=uav_id,
+                            message_type=MSG_INTENT_SUMMARY,
+                            payload={"target_cell": target, "role": role},
+                            ttl=1,
+                        )
+                    )
+                out_messages.append(
+                    Message(
+                        sender_id=uav_id,
+                        message_type=MSG_COVERAGE_UPDATE,
+                        payload={"cell": uav.cell, "coverage": simulation.world.sectors[uav.cell].coverage if uav.cell in simulation.world.sectors else 1.0},
+                        ttl=1,
+                    )
+                )
+
+            method_state.targets_by_uav[uav_id] = target
             actions.append(
                 Action(
                     uav_id=uav_id,
                     action_type="switch_role",
                     target_cell=target,
                     new_role=role,
-                    messages=messages,
+                    messages=out_messages,
                 )
             )
         return actions
