@@ -24,6 +24,7 @@ class MetricsLogger:
     def __init__(self) -> None:
         self.records: list[dict[str, Any]] = []
         self.messages_sent = 0
+        self.message_counts: dict[str, int] = {}
         self.urgent_targets: set[Cell] = set()
 
     def log_tick(self, tick: int, world: WorldState, uavs: dict[str, UavState]) -> None:
@@ -60,10 +61,13 @@ class EventInjector:
     def __init__(self, events: list[CommunicationEvent]) -> None:
         self.events = events
 
-    def apply(self, tick: int, world: WorldState, uavs: dict[str, UavState]) -> None:
+    def apply(self, tick: int, world: WorldState, uavs: dict[str, UavState]) -> list[CommunicationEvent]:
+        """Apply scheduled events for this tick. Returns list of events that fired."""
+        fired: list[CommunicationEvent] = []
         for event in self.events:
             if event.tick != tick:
                 continue
+            fired.append(event)
             if event.event_type == "block_sector":
                 cell = tuple(event.payload["cell"])
                 world.sectors[cell].blocked = True
@@ -75,6 +79,11 @@ class EventInjector:
             elif event.event_type == "urgent_sector":
                 cell = tuple(event.payload["cell"])
                 world.sectors[cell].priority = "urgent"
+            elif event.event_type == "visibility_degrade":
+                cell = tuple(event.payload["cell"])
+                if cell in world.sectors:
+                    world.sectors[cell].visibility = float(event.payload.get("visibility", 0.5))
+        return fired
 
 
 class Simulation:
@@ -94,10 +103,21 @@ class Simulation:
         }
         self.tick = 0
         self.random = Random(config.seed)
-        self.network = NetworkModel(config.communication_range)
+        self.network = NetworkModel(
+            config.communication_range,
+            packet_loss_rate=config.packet_loss_rate,
+            random=self.random,
+        )
         self.events = EventInjector(config.events)
         self.observations = ObservationBuilder(config.sensing_radius)
         self.metrics = MetricsLogger()
+        
+        # Phase 3: Agentic extensions
+        from agentic_uav.agent_core import LocalWorldModel
+        from agentic_uav.safety import SafetyGovernor
+        self.local_world_models = {uav_id: LocalWorldModel() for uav_id in self.uavs}
+        self.safety_governor = SafetyGovernor()
+        
         self.method_state = self.method.initialize_mission(self)
 
     @classmethod
@@ -130,14 +150,38 @@ class Simulation:
     def step(self) -> None:
         if self.is_finished:
             return
-        self.events.apply(self.tick, self.world, self.uavs)
+        fired_events = self.events.apply(self.tick, self.world, self.uavs)
+        for event in fired_events:
+            self.method.handle_event(event, self.method_state)
+            if event.event_type == "comm_blackout":
+                from agentic_uav.environment import BlackoutZone
+                cells = {tuple(c) for c in event.payload["cells"]}
+                bz = BlackoutZone(
+                    cells=cells,
+                    start_tick=self.tick,
+                    end_tick=event.payload.get("end_tick"),
+                )
+                self.network.blackout_zones.append(bz)
+                
         for uav in self.uavs.values():
             uav.inbox.clear()
-        self.network.deliver(self.uavs)
+        self.network.deliver(self.uavs, self.world, self.tick)
+
+        initial_cells = {uav_id: uav.cell for uav_id, uav in self.uavs.items() if uav.active}
 
         observations = self.observations.build(self.world, self.uavs)
         actions = self.method.decide_tick(self, observations, self.method_state)
         self.resolve_actions(actions)
+
+        for uav_id, uav in self.uavs.items():
+            if not uav.active:
+                continue
+            moved = uav_id in initial_cells and uav.cell != initial_cells[uav_id]
+            cost = self.config.move_energy_cost if moved else self.config.energy_drain_rate
+            uav.energy = max(0.0, uav.energy - cost)
+            if uav.energy <= 0.0:
+                uav.active = False
+                uav.health = "depleted"
 
         self._apply_sensing()
         self.metrics.log_tick(self.tick, self.world, self.uavs)
@@ -145,6 +189,8 @@ class Simulation:
 
     def send_messages(self, messages: list[Message]) -> None:
         self.metrics.messages_sent += len(messages)
+        for msg in messages:
+            self.metrics.message_counts[msg.message_type] = self.metrics.message_counts.get(msg.message_type, 0) + 1
         self.network.enqueue(messages)
 
     def resolve_actions(self, actions: list[Action]) -> None:
@@ -153,6 +199,10 @@ class Simulation:
             uav = self.uavs.get(action.uav_id)
             if uav is None or not uav.active:
                 continue
+            
+            if self.config.method_name == "agentic":
+                action = self.safety_governor.validate_action(action, uav, self.world)
+                
             if action.new_role is not None:
                 uav.role = action.new_role
             if action.target_cell is not None and self._is_valid_target(action.target_cell):
@@ -184,9 +234,19 @@ class Simulation:
         for uav in self.uavs.values():
             if not uav.active:
                 continue
-            for cell in neighborhood(uav.cell, radius=self.config.sensing_radius):
+            
+            uav_visibility = 1.0
+            if uav.cell in self.world.sectors:
+                uav_visibility = self.world.sectors[uav.cell].visibility
+                
+            effective_radius = self.config.sensing_radius
+            if uav_visibility < 0.5:
+                effective_radius = max(0, effective_radius - 1)
+                
+            for cell in neighborhood(uav.cell, radius=effective_radius):
                 if cell in self.world.sectors and not self.world.sectors[cell].blocked:
-                    self.world.sectors[cell].coverage = 1.0
+                    sector = self.world.sectors[cell]
+                    sector.coverage = min(1.0, sector.coverage + sector.visibility)
 
 
 __all__ = [

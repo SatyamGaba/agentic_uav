@@ -1,11 +1,18 @@
 [project]
 name = "agentic-uav"
 version = "0.1.0"
-description = "Add your description here"
+description = "Tick-based 2D simulator for evaluating decentralized UAV swarm decision methods"
 readme = "README.md"
 requires-python = ">=3.12"
+license = {text = "MIT"}
 dependencies = [
     "matplotlib>=3.10.9",
     "solara>=1.57.3",
     "starlette<1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.10",
+    "ruff>=0.5",
 ]
