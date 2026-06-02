@@ -11,3 +11,13 @@ wheels/
 
 # Local UI state
 .agentic_uav/
+.superpowers/
+.claude/
+.codex/
+runs/
+
+# Beads / Dolt files (added by bd init)
+.beads/
+
+# macOS metadata
+.DS_Store
