@@ -11,6 +11,15 @@ if TYPE_CHECKING:
     from agentic_uav.models import WorldState
 
 
+MSG_HEARTBEAT = "heartbeat"
+MSG_TASK_BID = "task_bid"
+MSG_TASK_COMMITMENT = "task_commitment"
+MSG_INTENT_SUMMARY = "intent_summary"
+MSG_HAZARD_ALERT = "hazard_alert"
+MSG_FAILURE_NOTICE = "failure_notice"
+MSG_COVERAGE_UPDATE = "coverage_update"
+
+
 @dataclass
 class Message:
     sender_id: str

@@ -9,7 +9,7 @@ from agentic_uav.planning import Action
 @dataclass
 class SafetyGovernor:
     # Define a safety threshold for battery (e.g., 15% remaining)
-    LOW_ENERGY_THRESHOLD: float = 0.15 
+    LOW_ENERGY_THRESHOLD: float = 0.15
 
     def validate_action(self, proposed: Action, uav: UavState, world: WorldState) -> Action:
         """Check proposed action against safety rules. 

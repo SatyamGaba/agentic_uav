@@ -3,7 +3,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Protocol
 
-from agentic_uav.communication import Message
+from agentic_uav.communication import (
+    Message,
+    MSG_HEARTBEAT,
+    MSG_TASK_COMMITMENT,
+    MSG_INTENT_SUMMARY,
+    MSG_HAZARD_ALERT,
+    MSG_FAILURE_NOTICE,
+    MSG_COVERAGE_UPDATE,
+)
 from agentic_uav.models import Cell, Sector, manhattan, neighborhood, CommunicationEvent
 from agentic_uav.planning import (
     Action,
@@ -125,7 +133,7 @@ class RuleAdaptiveMethod:
             if target is None:
                 target = _patrol_target(simulation, uav_id)
 
-            messages = _rule_messages(simulation, uav_id, target, role)
+            messages = _rule_messages(simulation, uav, target, role)
             method_state.targets_by_uav[uav_id] = target
             method_state.roles_by_uav[uav_id] = role
             actions.append(
@@ -245,8 +253,15 @@ class TaskConsiderationMethod:
                     messages=[
                         Message(
                             sender_id=uav_id,
-                            message_type="task_commitment",
+                            message_type=MSG_TASK_COMMITMENT,
                             payload={"target_cell": target, "role": role, "score": score},
+                            ttl=1,
+                            urgency="routine",
+                        ),
+                        Message(
+                            sender_id=uav_id,
+                            message_type=MSG_COVERAGE_UPDATE,
+                            payload={"cell": uav.cell, "coverage": simulation.world.sectors[uav.cell].coverage if uav.cell in simulation.world.sectors else 1.0},
                             ttl=1,
                             urgency="routine",
                         )
@@ -309,13 +324,25 @@ def _ingest_messages(
         target = _message_target(message)
         if target is None:
             continue
-        if message.message_type == "urgent_sector":
+        if message.message_type == "urgent_sector" or message.message_type == MSG_HAZARD_ALERT:
             method_state.known_urgent.add(target)
-        elif message.message_type == "intent_summary":
+        elif message.message_type == MSG_INTENT_SUMMARY:
             method_state.peer_intents[message.sender_id] = target
-        elif message.message_type == "task_commitment":
+        elif message.message_type == MSG_TASK_COMMITMENT:
             method_state.task_commitments[message.sender_id] = target
             method_state.peer_intents[message.sender_id] = target
+        elif message.message_type == MSG_COVERAGE_UPDATE:
+            # We don't have a direct way to inject coverage into global observation in baseline methods,
+            # but we can remove it from known_urgent if it's covered
+            covered_cell = _message_target(message)
+            if covered_cell and message.payload.get("coverage", 0) >= 1.0:
+                method_state.known_urgent.discard(covered_cell)
+        elif message.message_type == MSG_FAILURE_NOTICE:
+            failed_id = message.payload.get("uav_id")
+            if failed_id in method_state.peer_intents:
+                del method_state.peer_intents[failed_id]
+            if failed_id in method_state.task_commitments:
+                del method_state.task_commitments[failed_id]
 
 
 def _message_target(message: Message) -> Cell | None:
@@ -358,13 +385,13 @@ def _choose_unclaimed(
     return (unclaimed or open_candidates)[0]
 
 
-def _rule_messages(simulation: Simulation, uav_id: str, target: Cell, role: str) -> list[Message]:
+def _rule_messages(simulation: Simulation, uav: UavState, target: Cell, role: str) -> list[Message]:
     messages: list[Message] = []
     if _is_urgent_cell(simulation, target):
         messages.append(
             Message(
-                sender_id=uav_id,
-                message_type="urgent_sector",
+                sender_id=uav.uav_id,
+                message_type=MSG_HAZARD_ALERT,
                 payload={"cell": target},
                 ttl=simulation.config.urgent_message_ttl,
                 urgency="urgent",
@@ -373,8 +400,24 @@ def _rule_messages(simulation: Simulation, uav_id: str, target: Cell, role: str)
     if simulation.tick % simulation.config.heartbeat_interval == 0:
         messages.append(
             Message(
-                sender_id=uav_id,
-                message_type="intent_summary",
+                sender_id=uav.uav_id,
+                message_type=MSG_HEARTBEAT,
+                payload={
+                    "uav_id": uav.uav_id,
+                    "role": role,
+                    "cell": uav.cell,
+                    "health": uav.health,
+                    "energy": uav.energy,
+                    "comm_quality": simulation.world.sectors[uav.cell].comm_quality if uav.cell in simulation.world.sectors else 1.0,
+                },
+                ttl=1,
+                urgency="routine",
+            )
+        )
+        messages.append(
+            Message(
+                sender_id=uav.uav_id,
+                message_type=MSG_INTENT_SUMMARY,
                 payload={"target_cell": target, "role": role},
                 ttl=1,
                 urgency="routine",

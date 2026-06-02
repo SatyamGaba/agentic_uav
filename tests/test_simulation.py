@@ -222,7 +222,7 @@ class RuleAdaptiveBaselineTest(unittest.TestCase):
         self.assertEqual(simulation.uavs["u0"].target_cell, (1, 0))
         self.assertEqual(simulation.uavs["u0"].role, "priority_responder")
         urgent_messages = [
-            message for message in simulation.network.pending if message.message_type == "urgent_sector"
+            message for message in simulation.network.pending if message.message_type == "hazard_alert"
         ]
         self.assertEqual([(message.payload["cell"], message.ttl) for message in urgent_messages], [((1, 0), 4)])
 
