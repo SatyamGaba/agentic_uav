@@ -24,6 +24,7 @@ class MetricsLogger:
     def __init__(self) -> None:
         self.records: list[dict[str, Any]] = []
         self.messages_sent = 0
+        self.message_counts: dict[str, int] = {}
         self.urgent_targets: set[Cell] = set()
 
     def log_tick(self, tick: int, world: WorldState, uavs: dict[str, UavState]) -> None:
@@ -188,6 +189,8 @@ class Simulation:
 
     def send_messages(self, messages: list[Message]) -> None:
         self.metrics.messages_sent += len(messages)
+        for msg in messages:
+            self.metrics.message_counts[msg.message_type] = self.metrics.message_counts.get(msg.message_type, 0) + 1
         self.network.enqueue(messages)
 
     def resolve_actions(self, actions: list[Action]) -> None:

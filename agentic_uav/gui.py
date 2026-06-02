@@ -169,6 +169,7 @@ def _GridPanel(portrayal: dict[str, object], state: dict[str, object], refresh_k
 def _MetricsPanel(state: dict[str, object], timeline: list[dict[str, object]], refresh_key: int) -> None:
     with solara.Card(title="Mission Telemetry", elevation=0, margin=0):
         _MetricSummary(state)
+        _MessageCountsPanel(state)
         _MetricChart()
         _UavStatusPanel(refresh_key)
         solara.HTML(tag="div", unsafe_innerHTML=_timeline_html(timeline), classes=["event-timeline"])
@@ -217,6 +218,29 @@ def _MetricSummary(state: dict[str, object]) -> None:
         with solara.Row(gap="10px"):
             _MetricCard("Messages", str(state["messages_sent"]), "amber")
             _MetricCard("Urgent", str(state["urgent_target_count"]), "coral")
+
+
+@solara.component
+def _MessageCountsPanel(state: dict[str, object]) -> None:
+    counts: dict[str, int] = state.get("message_counts", {})
+    if not counts:
+        return
+    
+    with solara.Column(gap="6px", classes=["uav-status-panel"]):
+        solara.HTML(tag="div", unsafe_innerHTML="<div class='timeline-title'>Message Type Breakdown</div>")
+        
+        counts_html = ""
+        for msg_type, count in sorted(counts.items()):
+            counts_html += (
+                f"<div class='uav-status-card'>"
+                f"  <div class='uav-status-row'>"
+                f"    <strong>{html.escape(msg_type)}</strong>"
+                f"    <span class='uav-status-role'>{count}</span>"
+                f"  </div>"
+                f"</div>"
+            )
+            
+        solara.HTML(tag="div", unsafe_innerHTML=f"<div>{counts_html}</div>")
 
 
 @solara.component

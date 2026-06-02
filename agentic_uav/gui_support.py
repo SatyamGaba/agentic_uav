@@ -115,6 +115,7 @@ def build_dashboard_state(simulation: Simulation) -> dict[str, Any]:
         "termination_reason": simulation.termination_reason,
         "coverage_ratio": coverage_ratio(simulation.world),
         "messages_sent": simulation.metrics.messages_sent,
+        "message_counts": dict(simulation.metrics.message_counts),
         "active_uavs": active_uavs,
         "total_uavs": total_uavs,
         "dropped_uavs": total_uavs - active_uavs,
