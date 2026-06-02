@@ -110,6 +110,13 @@ class Simulation:
         self.events = EventInjector(config.events)
         self.observations = ObservationBuilder(config.sensing_radius)
         self.metrics = MetricsLogger()
+        
+        # Phase 3: Agentic extensions
+        from agentic_uav.agent_core import LocalWorldModel
+        from agentic_uav.safety import SafetyGovernor
+        self.local_world_models = {uav_id: LocalWorldModel() for uav_id in self.uavs}
+        self.safety_governor = SafetyGovernor()
+        
         self.method_state = self.method.initialize_mission(self)
 
     @classmethod
@@ -189,6 +196,10 @@ class Simulation:
             uav = self.uavs.get(action.uav_id)
             if uav is None or not uav.active:
                 continue
+            
+            if self.config.method_name == "agentic":
+                action = self.safety_governor.validate_action(action, uav, self.world)
+                
             if action.new_role is not None:
                 uav.role = action.new_role
             if action.target_cell is not None and self._is_valid_target(action.target_cell):

@@ -493,14 +493,14 @@ class ScenarioBuilderTest(unittest.TestCase):
         self.assertEqual(scenario.mission_type, "disaster_mapping")
 
     def test_default_disaster_mapping_keeps_demo_disruptions(self) -> None:
-        scenario = build_demo_scenario()
+        scenario = build_demo_scenario(mission_type="disaster_mapping")
 
         self.assertEqual(scenario.mission_type, "disaster_mapping")
         self.assertIn("urgent", {sector.priority for sector in scenario.world.sectors})
         self.assertTrue(any(sector.blocked for sector in scenario.world.sectors))
         self.assertEqual(
             [event.event_type for event in scenario.events],
-            ["urgent_sector", "dropout"],
+            ["urgent_sector", "dropout", "comm_blackout"],
         )
 
     def test_survey_mission_has_clean_coverage_setup(self) -> None:
