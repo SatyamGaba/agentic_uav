@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>agentic_uav · Thesis-Defense Study Guide</title>
+<link rel="stylesheet" href="lesson.css">
+</head>
+<body>
+
+<div class="hero">
+  <p class="kicker">Study guide · agentic_uav</p>
+  <h1>Defending the thesis</h1>
+  <p class="lede sub">A seven-lesson walk through how this framework is built — and how each design
+  choice protects the claim that the LLM <code>agentic</code> method beats heuristic baselines on
+  recovery after disruption.</p>
+</div>
+
+<div class="mission">
+<strong>The claim you're defending.</strong> An LLM-driven, <em>decentralized</em> decision agent
+beats four heuristic baselines on recovery after disruption — while every method sees the
+<em>same</em> per-UAV observation. Each lesson below hands you one piece of that argument,
+grounded in the code.
+</div>
+
+<div class="howto">
+📱 <strong>Reading on your phone?</strong> Tap any card to open a lesson. Every lesson has
+<em>Prev / Next</em> buttons at the top and bottom, so you can swipe through the whole guide in
+order. Quizzes and defense drills work with touch — tap an answer for instant feedback.
+</div>
+
+<h2>The lessons</h2>
+<ol class="toc">
+  <li><a class="card" href="0001-whole-system-map.html">
+    <span class="n">L1</span> <span class="status ready">Ready</span>
+    <div class="ttl">The whole-system map</div>
+    <p class="win-line">The seven-beat tick loop, the five layers, and the two invariants — in one picture.</p>
+  </a></li>
+
+  <li><a class="card" href="0002-swarmmethod-seam.html">
+    <span class="n">L2</span> <span class="status ready">Ready</span>
+    <div class="ttl">The SwarmMethod seam</div>
+    <p class="win-line">How one observation becomes an action — and why the harness can't tell which method it runs.</p>
+  </a></li>
+
+  <li><a class="card" href="0003-invariants-and-the-oracle-rebuttal.html">
+    <span class="n">L3</span> <span class="status ready">Ready</span>
+    <div class="ttl">The two invariants &amp; the oracle rebuttal</div>
+    <p class="win-line">Where the global oracle was deleted, and how to answer the question that can sink the thesis.</p>
+  </a></li>
+
+  <li><a class="card" href="0004-the-llm-seam.html">
+    <span class="n">L4</span> <span class="status ready">Ready</span>
+    <div class="ttl">The LLM seam</div>
+    <p class="win-line">The decider protocol, the mock default, validate-or-fall-back-to-greedy, and event-triggered replanning.</p>
+  </a></li>
+
+  <li><a class="card" href="0005-measuring-recovery.html">
+    <span class="n">L5</span> <span class="status ready">Ready</span>
+    <div class="ttl">Measuring recovery after disruption</div>
+    <p class="win-line">Events, metrics, and sweeps: how "beats baselines on recovery" becomes an actual number.</p>
+  </a></li>
+
+  <li><a class="card" href="0006-state-of-the-thesis.html">
+    <span class="n">L6</span> <span class="status ready">Ready</span>
+    <div class="ttl">State of the thesis</div>
+    <p class="win-line">Honest gap analysis: what's proven by construction, what's still mocked, what a real result needs.</p>
+  </a></li>
+
+  <li><a class="card" href="0007-centralized-llm-alternative.html">
+    <span class="n">L7</span> <span class="status ready">Ready</span>
+    <div class="ttl">A centralized, global-info LLM layer</div>
+    <p class="win-line">What if one LLM saw everything and commanded the swarm? The contrast that sharpens the decentralized claim.</p>
+  </a></li>
+</ol>
+
+<h2>Reference &amp; primary sources</h2>
+<ul class="reflinks">
+  <li>📖 <a href="../reference/GLOSSARY.html">Glossary</a> — the canonical vocabulary; adhere to it everywhere.</li>
+  <li>📐 <a href="../docs/architecture.mmd">architecture.mmd</a> — the canonical end-to-end wiring diagram (paste into mermaid.live).</li>
+  <li>⚖️ <a href="../docs/adr/0001-decentralization-and-observation-symmetry.md">ADR-0001</a> — the fairness decision; the single most defense-relevant document.</li>
+  <li>🔁 <a href="../docs/adr/0002-negotiation-within-a-tick.md">ADR-0002</a> · <a href="../docs/adr/0003-event-triggered-cadence-and-provider-agnostic-adapter.md">ADR-0003</a> — negotiation &amp; the provider-agnostic adapter.</li>
+  <li>🧪 <a href="../docs/EXPERIMENTS.md">EXPERIMENTS.md</a> — how "recovery after disruption" is operationalized.</li>
+  <li>🎯 <a href="../MISSION.md">MISSION.md</a> — why you're learning this (the compass for every lesson).</li>
+</ul>
+
+<p class="ask">I'm your teacher for this guide — ask me follow-ups any time. "Quiz me on L3," "open
+build_method in the code," or "role-play the viva with me" all work.</p>
+
+<footer>
+agentic_uav thesis-defense study guide · 7 lessons · all pages cross-linked ·
+built for phone &amp; print.
+</footer>
+
+</body>
+</html>

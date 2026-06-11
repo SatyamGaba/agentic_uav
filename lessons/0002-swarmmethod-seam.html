@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 2 · The SwarmMethod seam</title>
+<style>
+  :root {
+    --ink: #1a1a1a; --muted: #6b6b6b; --rule: #d8d4cc; --bg: #fbfaf7;
+    --accent: #8a5a00; --code-bg: #f1eee8; --green: #1f7a3b; --red: #b42318;
+    --blue: #2f6ea5; --panel: #fff; --pink:#a6248a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    color: var(--ink); background: var(--bg); line-height: 1.6;
+    max-width: 44rem; margin: 3rem auto; padding: 0 1.5rem; font-size: 18px;
+  }
+  h1 { font-size: 2rem; line-height: 1.12; margin: 0 0 .15rem; letter-spacing: -.015em; }
+  .kicker { color: var(--accent); text-transform: uppercase; letter-spacing: .12em;
+            font-size: .72rem; font-weight: 700; margin: 0 0 .6rem; }
+  .sub { color: var(--muted); font-style: italic; margin: 0 0 1.6rem; font-size: 1.05rem; }
+  .mission { background: #fff7e6; border-left: 3px solid var(--accent);
+             padding: .7rem 1rem; border-radius: 0 6px 6px 0; font-size: .92rem; margin: 0 0 2rem; }
+  h2 { font-size: 1.05rem; text-transform: uppercase; letter-spacing: .08em;
+       color: var(--accent); border-bottom: 1px solid var(--rule);
+       padding-bottom: .3rem; margin: 2.6rem 0 1rem; }
+  p { margin: 1rem 0; }
+  code { font-family: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+         background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .82em; }
+  .loc { color: var(--muted); font-size: .82rem; font-style: italic; }
+
+  pre { background: #1f1d1a; color: #f3efe7; border-radius: 9px; padding: 1rem 1.1rem;
+        overflow-x: auto; font-size: .8rem; line-height: 1.5; margin: 1.2rem 0;
+        font-family: "SF Mono","Cascadia Code",Menlo,Consolas,monospace; }
+  pre .c { color: #9a978f; } pre .k { color: #e0a85e; } pre .s { color: #9fd29f; }
+  pre .hl { color: #f6c177; font-weight: 700; }
+
+  .contract { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px;
+              padding: .6rem 1.1rem; margin: 1.2rem 0; }
+  .contract dt { font-weight: 700; margin-top: .8rem; font-family: monospace; font-size: .92rem; }
+  .contract dt:first-child { margin-top: .4rem; }
+  .contract dd { margin: .1rem 0 0; font-size: .92rem; color:#2c2c2c; }
+
+  .trace { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px;
+           padding: 1.1rem 1rem; margin: 1.4rem 0; }
+  .trace ol { margin:0; padding-left: 1.2rem; }
+  .trace li { margin:.5rem 0; font-size:.93rem; }
+  .arrow { color: var(--accent); font-weight:700; }
+
+  .invariant { background: #eef6ff; border: 1px solid #cfe0f2; border-radius: 8px;
+               padding: .9rem 1.1rem; margin: 1.2rem 0; }
+  .invariant b { color: var(--blue); }
+  .flag { background:#fcebe9; border:1px solid #f1c7c2; border-radius:8px; padding:.9rem 1.1rem;
+          margin:1.2rem 0; font-size:.93rem; }
+  .flag b { color: var(--red); }
+  .win { background:#eef9f1; border:1px solid #cce8d4; border-radius:8px; padding:.9rem 1.1rem;
+         margin:1.2rem 0; font-size:.93rem; }
+  .win b { color: var(--green); }
+
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .88rem; }
+  th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { color: var(--accent); text-transform: uppercase; letter-spacing: .05em; font-size: .7rem; }
+  td code { font-size: .8em; }
+  .num { text-align:right; font-variant-numeric: tabular-nums; white-space:nowrap; }
+
+  /* quiz */
+  .quiz { background: var(--panel); border: 2px solid var(--accent); border-radius: 10px;
+          padding: 1.2rem 1.3rem; margin: 1.8rem 0; }
+  .quiz h3 { margin: 0 0 .2rem; font-size: 1rem; }
+  .q { margin: 1.2rem 0; }
+  .q p.stem { font-weight: 700; margin: 0 0 .5rem; }
+  .tag { font-size:.62rem; font-weight:700; letter-spacing:.06em; padding:.1rem .45rem;
+         border-radius:999px; vertical-align:middle; margin-left:.4rem; }
+  .tag.spaced { background:#f3f0ea; color:var(--muted); }
+  .opt { display: block; width: 100%; text-align: left; border: 1px solid var(--rule);
+         background: #fff; border-radius: 6px; padding: .5rem .7rem; margin: .35rem 0;
+         font: inherit; font-size: .92rem; cursor: pointer; transition: background .12s; }
+  .opt:hover { background: #f4f1ea; }
+  .opt.correct { border-color: var(--green); background: #e9f8ee; }
+  .opt.wrong { border-color: var(--red); background: #fcebe9; }
+  .fb { font-size: .86rem; margin: .4rem 0 0; min-height: 1.2em; }
+  .fb.show.correct { color: var(--green); }
+  .fb.show.wrong { color: var(--red); }
+
+  .nextup { background: #f3f0ea; border-radius: 8px; padding: .9rem 1.1rem; margin-top: 1rem; }
+  .source { border-left: 3px solid var(--green); background: #f1f8f3; padding: .7rem 1rem;
+            border-radius: 0 6px 6px 0; margin: 1.4rem 0; font-size: .92rem; }
+  .ask { text-align: center; color: var(--muted); font-style: italic; margin: 2rem 0 0; font-size: .92rem; }
+  a { color: var(--accent); }
+  footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rule);
+           color: var(--muted); font-size: .82rem; }
+  .lessonnav { display:flex; justify-content:space-between; align-items:center; gap:.5rem;
+               margin:1.6rem 0; font-size:.9rem; }
+  .lessonnav.top { margin:0 0 2rem; }
+  .lessonnav a, .lessonnav span { text-decoration:none; padding:.45rem .9rem; border-radius:8px;
+               border:1px solid var(--rule); background:#fff; color:var(--accent);
+               white-space:nowrap; transition:background .12s; }
+  .lessonnav a:hover { background:#f4f1ea; }
+  .lessonnav .disabled { color:#bdb8ae; background:#f7f5f0; cursor:default; border-style:dashed; }
+  .lessonnav .idx { border:none; background:none; color:var(--muted); font-style:italic; }
+  .lessonnav .next { font-weight:700; }
+</style>
+</head>
+<body>
+
+<nav class="lessonnav top">
+  <a href="0001-whole-system-map.html">&larr; Prev: Whole-system map</a>
+  <a class="idx" href="index.html">Contents</a>
+  <a class="next" href="0003-invariants-and-the-oracle-rebuttal.html">Next: The two invariants &rarr;</a>
+</nav>
+
+<p class="kicker">Lesson 2 — agentic_uav</p>
+<h1>The <code style="font-size:.85em">SwarmMethod</code> seam</h1>
+<p class="sub">Beat 4, up close: how one observation becomes an action — and why the harness can't tell which method it's running.</p>
+
+<div class="mission">
+<strong>Mission link.</strong> Swappability isn't a convenience feature — it's <em>evidence</em>.
+If the harness literally cannot branch on which method is active, then no reviewer can claim
+the engine was rigged to favour <code>agentic</code>. This lesson hands you that argument in code.
+</div>
+
+<h2>Recall: where we are</h2>
+<p>In <a href="0001-whole-system-map.html">Lesson 1</a>, six of the seven beats in a tick were
+identical for every method; only <b>beat 4 — decide</b> varied. That beat is a single call to a
+<code>SwarmMethod</code>. Today we open it.</p>
+
+<h2>The contract: three methods, nothing more</h2>
+<p><code>SwarmMethod</code> is a <code>Protocol</code> <span class="loc">policy.py:20</span> —
+structural typing, so there's no base class to inherit. A class <em>is</em> a method if it has
+these three members:</p>
+
+<div class="contract">
+<dl>
+  <dt>method_id: str</dt>
+  <dd>Its name (<code>"static"</code>, <code>"greedy"</code>, <code>"agentic"</code>, …).</dd>
+  <dt>initialize_mission(simulation) &rarr; MethodState</dt>
+  <dd>Build the method's private memory once, before the run. Called at construction time.</dd>
+  <dt>decide_tick(simulation, observations, method_state) &rarr; list[Action]</dt>
+  <dd>The heart of beat 4: turn the per-UAV observations into a list of <code>Action</code>s.</dd>
+  <dt>handle_event(event, method_state) &rarr; None</dt>
+  <dd>React to a fired disruption (baselines no-op; <code>agentic</code> arms a re-plan).</dd>
+</dl>
+</div>
+
+<p>Every one of the five methods implements exactly this surface — all in
+<code>policy.py</code>, not one file each. That's the whole interface a method must satisfy.</p>
+
+<h2>The single swap point</h2>
+<p>There is exactly <em>one</em> place in the entire decision path where a method <em>name</em>
+becomes a method <em>object</em>:</p>
+
+<pre><span class="c"># policy.py:468</span>
+<span class="k">def</span> build_method(method_name: str) -&gt; SwarmMethod:
+    methods = {
+        <span class="s">"static"</span>:             StaticPartitionMethod(),
+        <span class="s">"rules"</span>:              RuleAdaptiveMethod(),
+        <span class="s">"task_consideration"</span>: TaskConsiderationMethod(),
+        <span class="s">"greedy"</span>:             GreedyMethod(),
+        <span class="hl">"agentic"</span>:            AgenticMethod(decider=build_decider()),  <span class="c"># LLM wired here</span>
+    }
+    <span class="k">return</span> methods[method_name]</pre>
+
+<p>Run the proof yourself — search the harness for the string that selects a method:</p>
+<pre><span class="c">$ grep -rn "method_name" agentic_uav/simulation.py</span>
+simulation.py:149:  return cls(config, <span class="hl">build_method(config.method_name)</span>)
+<span class="c"># …and nowhere else. The simulator names a method exactly once.</span></pre>
+
+<h2>The harness is method-blind</h2>
+<p>After construction, <code>Simulation</code> holds the method as an opaque <code>self.method</code>
+and only ever calls the three contract members. It never asks <em>which</em> method it is — no
+<code>isinstance</code>, no <code>if method_name == …</code>:</p>
+
+<pre><span class="c"># simulation.py — the only three places the method is touched per run</span>
+self.method_state = self.method.<span class="hl">initialize_mission</span>(self)        <span class="c"># :143</span>
+...
+    self.method.<span class="hl">handle_event</span>(event, self.method_state)          <span class="c"># :177</span>
+...
+actions = self.method.<span class="hl">decide_tick</span>(self, observations, ...)     <span class="c"># :197</span></pre>
+
+<div class="invariant">
+<b>The swappability invariant.</b> Changing <code>config.method_name</code> is <em>sufficient</em>
+to swap the entire decision layer — and nothing else in the codebase branches on the method.
+The world, comms, sensing, and metrics can't behave differently for <code>agentic</code> because
+they never learn it's running. <span class="loc">CLAUDE.md states this as a hard invariant.</span>
+</div>
+
+<h2>Trace one observation through the seam</h2>
+<div class="trace">
+<ol>
+  <li><code>config.method_name = "agentic"</code> <span class="arrow">&rarr;</span>
+      <code>Simulation.from_config</code> calls <code>build_method("agentic")</code>
+      <span class="loc">simulation.py:149</span></li>
+  <li><span class="arrow">&rarr;</span> returns <code>AgenticMethod(decider=build_decider())</code>;
+      default decider is the deterministic <code>MockAgentDecider</code>
+      <span class="loc">policy.py:476 · llm_agent.py</span></li>
+  <li><span class="arrow">&rarr;</span> <code>initialize_mission</code> returns
+      <code>MethodState(replan_pending=True)</code> — the only method that arms a re-plan up front
+      <span class="loc">policy.py:222</span></li>
+  <li>Each tick, beat 3 builds <code>observations[uav_id] = {self, nearby, known_urgent, messages}</code>
+      <span class="arrow">&rarr;</span> handed to <code>decide_tick</code></li>
+  <li><span class="arrow">&rarr;</span> <code>decide_tick</code> returns a
+      <code>list[Action]</code>; each <code>Action</code> carries
+      <code>target_cell</code>, <code>new_role</code>, <code>messages</code>
+      <span class="loc">planning.py</span></li>
+  <li><span class="arrow">&rarr;</span> beat 5 (<code>resolve_actions</code>) consumes those actions —
+      identically, whatever method produced them.</li>
+</ol>
+</div>
+<p>Swap step 1 to <code>"greedy"</code> and <em>only</em> steps 2–3 change shape; steps 4–6 are
+byte-for-byte the same path. That is the seam doing its job.</p>
+
+<h2>Same shape, different reasoning — and different <em>memory</em></h2>
+<p>Every method receives the same <code>observations</code> and the same <code>MethodState</code>
+<em>type</em>. They diverge only in which fields of that shared memory they populate:</p>
+<table>
+  <tr><th>Method</th><th>Reasoning in one line</th><th>MethodState it leans on</th></tr>
+  <tr><td><code>static</code></td><td>pre-assigned serpentine chunks</td><td><code>assignments</code>, <code>assignment_indices</code></td></tr>
+  <tr><td><code>rules</code></td><td>urgent &gt; uncovered &gt; patrol</td><td><code>targets_by_uav</code>, <code>peer_intents</code></td></tr>
+  <tr><td><code>task_consideration</code></td><td>utility score + conflict penalty + hysteresis</td><td><code>task_commitments</code></td></tr>
+  <tr><td><code>greedy</code></td><td>nearest open urgent, else nearest uncovered</td><td>(stateless per tick)</td></tr>
+  <tr><td><code>agentic</code></td><td>replan on events &rarr; persist plan &rarr; deconflict</td><td><code>plan_by_uav</code>, <code>replan_pending</code></td></tr>
+</table>
+
+<h2 id="inversion">A defense point: the complexity inversion</h2>
+<p>An older audit (<code>report.md</code>) found the proposed method was the <em>simplest</em> of
+all — a 15-line nearest-cell picker. That finding is now stale. By line count in
+<code>policy.py</code> today:</p>
+<table>
+  <tr><th>Method</th><th class="num">≈ lines</th><th>Distinctive machinery</th></tr>
+  <tr><td><code>greedy</code></td><td class="num">18</td><td>none — it's the fallback</td></tr>
+  <tr><td><code>rules</code></td><td class="num">60</td><td>peer-conflict avoidance</td></tr>
+  <tr><td><code>task_consideration</code></td><td class="num">70</td><td>scoring, hysteresis, commitments</td></tr>
+  <tr><td><code>agentic</code></td><td class="num">180</td><td>replan/execute split, in-tick deconfliction, plan persistence</td></tr>
+</table>
+
+<div class="win">
+<b>Now the largest, most structured method.</b> <code>agentic</code> is the only one with an
+event-triggered re-plan, a persisted plan it executes between events, and synchronous
+in-tick negotiation to deconflict colliding targets. If a reviewer cites the old "it's the
+simplest method" critique, you can open <code>policy.py:211–390</code> and show the opposite.
+</div>
+
+<div class="flag">
+<b>But be precise — and honest.</b> That 180 lines is <em>orchestration</em>, not yet smarter
+per-UAV reasoning. The actual choice is delegated to the <code>decider</code>, and the default
+<code>MockAgentDecider</code> still mirrors <code>greedy</code>. So today the seam, the re-plan
+cadence, and the negotiation are real; the "intelligence" is pluggable and currently mocked.
+The honest claim is about <em>architecture</em>, not a measured win — exactly as we framed it in L1.
+</div>
+
+<div class="quiz" id="quiz">
+  <h3>Retrieval check</h3>
+  <p class="loc">From memory. Q1 revisits Lesson 1 on purpose — spacing strengthens retention.</p>
+
+  <div class="q" data-correct="b">
+    <p class="stem">1. In one tick, the only beat that differs between methods is —<span class="tag spaced">from L1</span></p>
+    <button class="opt" data-k="a">the beat that delivers messages between peers</button>
+    <button class="opt" data-k="b">the beat that turns observations into actions</button>
+    <button class="opt" data-k="c">the beat that marks nearby sectors covered</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="c">
+    <p class="stem">2. How many places in the simulator map a method name to an object?</p>
+    <button class="opt" data-k="a">one call site for each of the five methods</button>
+    <button class="opt" data-k="b">one per subsystem that needs the method</button>
+    <button class="opt" data-k="c">exactly one — inside the build_method dict</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="a">
+    <p class="stem">3. The swappability invariant supports the thesis because it shows —</p>
+    <button class="opt" data-k="a">the harness cannot be biased toward any method</button>
+    <button class="opt" data-k="b">the agentic method runs more lines of code</button>
+    <button class="opt" data-k="c">the mock decider already beats the baselines</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="c">
+    <p class="stem">4. The five methods share the same observation and the same —</p>
+    <button class="opt" data-k="a">target cell that every UAV moves toward</button>
+    <button class="opt" data-k="b">reasoning applied to that shared input</button>
+    <button class="opt" data-k="c">MethodState type, differing in fields used</button>
+    <p class="fb"></p>
+  </div>
+</div>
+
+<div class="source">
+<strong>Primary source.</strong> Read the five method classes back to back in
+<code>agentic_uav/policy.py:20–480</code> — start at the <code>Protocol</code> (line 20), end at
+<code>build_method</code> (line 468). Seeing them stacked in one file is the fastest way to feel
+the "same contract, different reasoning" point in your hands.
+</div>
+
+<div class="nextup">
+<b>Next up (L3 — ready).</b> The
+<a href="0003-invariants-and-the-oracle-rebuttal.html">two invariants up close</a> — the fairness
+ADR. We'll find the exact spot where the old global <code>urgent_cells</code> oracle was deleted,
+and rehearse the rebuttal to <em>"isn't the agentic win just a global oracle?"</em> as a defense drill.
+</div>
+
+<p class="ask">I'm your teacher — ask me anything. "Open build_method in the code," "show me where
+MethodState is defined," or "drill me on the deconfliction logic" all work.</p>
+
+<nav class="lessonnav">
+  <a href="0001-whole-system-map.html">&larr; Prev: Whole-system map</a>
+  <a class="idx" href="index.html">Contents</a>
+  <a class="next" href="0003-invariants-and-the-oracle-rebuttal.html">Next: The two invariants &rarr;</a>
+</nav>
+
+<footer>
+Lesson 2 of the agentic_uav series · prev: <a href="0001-whole-system-map.html">L1 — Whole-system map</a> ·
+glossary: <a href="../reference/GLOSSARY.html">GLOSSARY.html</a> ·
+source: <code>policy.py</code> · ties to <a href="../MISSION.md">MISSION.md</a>
+</footer>
+
+<script>
+  document.querySelectorAll('.q').forEach(function (q) {
+    var correct = q.getAttribute('data-correct');
+    var fb = q.querySelector('.fb');
+    var done = false;
+    q.querySelectorAll('.opt').forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        if (done) return;
+        done = true;
+        var k = opt.getAttribute('data-k');
+        q.querySelectorAll('.opt').forEach(function (o) {
+          if (o.getAttribute('data-k') === correct) o.classList.add('correct');
+        });
+        if (k === correct) {
+          fb.textContent = 'Correct — that’s the load-bearing idea.';
+          fb.className = 'fb show correct';
+        } else {
+          opt.classList.add('wrong');
+          fb.textContent = 'Not quite — the highlighted answer is the one to remember.';
+          fb.className = 'fb show wrong';
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

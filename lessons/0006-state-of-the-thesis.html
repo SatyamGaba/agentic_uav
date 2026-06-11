@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 6 · State of the thesis</title>
+<link rel="stylesheet" href="lesson.css">
+</head>
+<body>
+
+<nav class="lessonnav top">
+  <a href="0005-measuring-recovery.html">&larr; Prev: Measuring recovery</a>
+  <a class="idx" href="index.html">Contents</a>
+  <a class="next" href="0007-centralized-llm-alternative.html">Next: A centralized LLM layer &rarr;</a>
+</nav>
+
+<p class="kicker">Lesson 6 — agentic_uav</p>
+<h1>State of the thesis</h1>
+<p class="sub">An honest ledger: what's proven by construction, what's still mocked, and what a real
+result needs.</p>
+
+<div class="mission">
+<strong>Mission link.</strong> The strongest defense is to walk in already owning your gaps — a reviewer
+can't ambush you with a weakness you named first. This lesson is your pre-emptive gap list, paired with
+the by-construction wins so the ledger reads as <em>balanced</em>, not bleak. Know exactly where the line
+sits between "proven today" and "needs one more step."
+</div>
+
+<h2>A. Proven by construction</h2>
+<p>These five claims are airtight because they are <em>structural and tested</em> — they hold no matter
+what the decider does, and several are pinned by a regression test. They survive even the worst case
+below.</p>
+
+<div class="win">
+<b>Even if the LLM result never materialized, these claims hold.</b> They are about the harness and the
+seam, not the reasoner. None of them depends on a vendor being wired. This is the floor your defense
+stands on regardless of what the experiment eventually shows.
+</div>
+
+<div class="wrap-table">
+<table>
+  <tr><th>Claim</th><th>Why it's airtight</th><th>L</th></tr>
+  <tr>
+    <td><b>Swappability invariant</b></td>
+    <td>Only <code>config.method_name</code> selects a method; <code>build_method</code> is the single
+    name&rarr;object site; no subsystem branches on the method.</td>
+    <td class="loc">L2</td>
+  </tr>
+  <tr>
+    <td><b>Observation symmetry</b></td>
+    <td><code>ObservationBuilder</code> emits identical per-UAV obs; the global <code>urgent_cells</code>
+    key was <em>removed</em>; its absence is asserted (test_llm_agent.py:50). A far UAV is ignorant
+    without a signal (test_simulation.py:255) and informed with one (test_simulation.py:275).</td>
+    <td class="loc">L3</td>
+  </tr>
+  <tr>
+    <td><b>Decentralization</b></td>
+    <td>Belief lives on <code>MethodState</code> (not <code>UavState</code> or the world);
+    <code>known_urgent</code> grows only via local sensing or range-limited peer messages.</td>
+    <td class="loc">L3</td>
+  </tr>
+  <tr>
+    <td><b>A real, tested LLM seam</b></td>
+    <td><code>AgentDecider</code> protocol + validate-or-fallback-to-greedy + event-triggered replan +
+    in-tick deconfliction; Bedrock / QGenie adapters exist behind it; the full pipeline is exercised even
+    under the mock.</td>
+    <td class="loc">L4</td>
+  </tr>
+  <tr>
+    <td><b>Recovery harness</b></td>
+    <td>Paired, seeded sweep with recovery metrics (<code>recovery_slope</code>,
+    <code>recovery_ticks_to_target</code>) and overhead metrics, across all 5 methods on identical
+    scenarios.</td>
+    <td class="loc">L5</td>
+  </tr>
+</table>
+</div>
+
+<p>Notice the pattern: every row points at a single site, a removed key, a regression test, or a shared
+metric. None of them says "trust me." That is the difference between architecture you can defend and a
+promise you have to hope holds.</p>
+
+<h2>B. Not yet proven — the honest core gap</h2>
+
+<div class="flag">
+<b>There is no measured advantage today.</b> The <em>default</em> decider is
+<code>MockAgentDecider</code>, which deterministically <strong>mirrors</strong> <code>greedy</code>
+(llm_agent.py:180–184 docstring; <code>test_mirrors_greedy_choosing_uncovered_when_no_urgent</code> at
+test_llm_agent.py:153). So <strong>today <code>agentic</code> &asymp; <code>greedy</code></strong>. The
+headline empirical claim — "beats baselines on recovery after disruption" — is currently
+<strong>untested with a real reasoner</strong>. State this plainly: the defense today rests on
+<em>architecture + fairness</em>, not on a measured win.
+</div>
+
+<p>This is the single sentence to rehearse until it's reflexive: <em>"The thesis is currently
+unevaluated, not refuted — the default decider is a mock that mirrors greedy by design to test the
+plumbing."</em> A reviewer who hears you say it first reads it as rigour, not weakness. A reviewer who
+discovers it themselves reads it as overclaiming.</p>
+
+<h2>C. The complexity-inversion footnote</h2>
+
+<div class="win">
+<b>An earlier audit is now stale here — be precise about why.</b> <code>report.md</code> (§3) said
+<code>agentic</code> was the <em>simplest</em> method (~15 lines, "simpler than all three baselines").
+That is no longer true: in current <code>policy.py</code>, <code>AgenticMethod</code> (212–393) is the
+<em>largest, most structured</em> method — ~180 lines, with a replan/execute split, in-tick
+deconfliction, and plan persistence. But say exactly what that buys: it is <strong>orchestration, not
+yet smarter per-UAV reasoning</strong>. The reasoning is delegated to the mocked decider. Don't let the
+line count tempt you into overclaiming intelligence — the scaffolding grew; the reasoner did not.
+</div>
+
+<h2>D. Measurement refinements still open</h2>
+<p>These are the L5 gap list, restated as a ledger. They are refinements, not fatal flaws — but name
+them before a reviewer does.</p>
+
+<div class="wrap-table">
+<table>
+  <tr><th>Wanted</th><th>What the code does today</th></tr>
+  <tr><td>Time-to-first-reassignment latency after dropout</td><td>Plan changes are counted, never timed to the first change.</td></tr>
+  <tr><td>A full recovery <em>curve</em> with confidence bands</td><td>Only a single slope + a hit-time per trial.</td></tr>
+  <tr><td>Replan-trigger latency</td><td><code>log_replan</code> stores tick + reason + uavs, not the triggering event's tick.</td></tr>
+  <tr><td>Significance tests / effect sizes</td><td>Only mean + SEM across seeds (no tests).</td></tr>
+  <tr><td>A defensible word for "recovery"</td><td>Coverage is monotonic, so "recovery" = continued progress under reduced capacity — must be stated carefully.</td></tr>
+</table>
+</div>
+
+<h2>E. The path to a genuine result</h2>
+<p>Highest-leverage step first. The structural work is done; what remains is mostly config and
+analysis, not new architecture.</p>
+
+<div class="flow">
+<ol>
+<li><b>Wire a real vendor behind the adapter.</b> Set <code>AGENTIC_UAV_DECIDER=bedrock</code> or
+<code>qgenie</code>. <span class="where">The seam already exists (L4) — this is config, not new architecture. THIS IS THE UNLOCK.</span></li>
+<li><b>Run the paired seeded sweep.</b> <code>agentic</code> vs the 4 baselines on identical scenarios.
+<span class="where">The L5 command — same fairness machinery, now with a real reasoner.</span></li>
+<li><b>Add significance testing + recovery curves to aggregation.</b>
+<span class="where">Closes the L5 mean+SEM gap so "higher" can become "significantly higher."</span></li>
+<li><b>Report recovery AND overhead.</b> <code>recovery_slope</code> / <code>ticks_to_target</code>
+<em>plus</em> messages / role switches / replan count vs baselines.
+<span class="where">The claim is supported only if agentic is faster post-disruption while staying competitive on overhead.</span></li>
+</ol>
+</div>
+
+<p>Step&nbsp;1 is the unlock. Everything structural — the seam, the validator, the fallback, the paired
+sweep, the recovery metrics — is already in place. The experiment is not blocked on building anything;
+it is blocked on flipping an env var and running the sweep.</p>
+
+<h2>F. What I can claim today vs. after step 1</h2>
+
+<div class="twocol">
+  <div class="invariant">
+    <b>Today (defensible now)</b>
+    <p>"We built a fair, decentralized, swappable harness with a real LLM seam and recovery
+    instrumentation. The architecture enforces observation symmetry and decentralization
+    <em>by construction</em> — single selection site, removed global oracle with a regression test,
+    belief kept off the world model."</p>
+  </div>
+  <div class="invariant">
+    <b>After wiring a vendor + sweep</b>
+    <p>"&hellip;and the LLM agent <em>empirically</em> recovers faster than the baselines under disruption
+    while staying competitive on overhead." <span class="loc">This is the sentence the experiment is for —
+    do not say it before the sweep runs.</span></p>
+  </div>
+</div>
+
+<div class="drill">
+<h3>Defense drill — our hardest questions, answered honestly</h3>
+<p class="loc">Read the objection, say how we'd answer, then reveal the version we've been refining.
+These are the ones a sharp reviewer will ask — let's own them before they do.</p>
+
+<div class="qa">
+<p class="att">Attack 1: "Your results show agentic = greedy. Doesn't that refute your thesis?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">No result has been run with a real reasoner. The default is a <em>mock</em> that mirrors
+<code>greedy</code> <em>by design</em> — its job is to exercise the full serialize&rarr;validate&rarr;action
+pipeline, not to demonstrate a win. The thesis is currently <strong>unevaluated, not refuted</strong>.
+Wiring a vendor behind the existing adapter seam is the only missing step.</div>
+</div>
+
+<div class="qa">
+<p class="att">Attack 2: "Why should I believe the harness is fair?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">Because fairness is <strong>structural and tested</strong>, not promised: a single
+method-selection site (<code>build_method</code>), a removed global oracle (<code>urgent_cells</code>)
+with a regression test asserting its absence, belief kept off the world model, and identical observations
+emitted to all five methods. They differ in reasoning, never in what they can see. (L2 / L3.)</div>
+</div>
+
+<div class="qa">
+<p class="att">Attack 3: "Isn't a 180-line method that delegates to a mock just dressed-up greedy?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">The 180 lines are <em>real orchestration</em> a baseline lacks: event-triggered replan,
+in-tick deconfliction, and plan persistence. But the per-UAV <em>reasoning quality</em> depends on the
+decider, which is currently mocked. Honest answer: the scaffolding is the contribution-in-waiting; the
+reasoning is the experiment not yet run. I won't claim the orchestration <em>is</em> the intelligence.</div>
+</div>
+</div>
+
+<div class="quiz" id="quiz">
+  <h3>Retrieval check</h3>
+  <p class="loc">From memory. Q1 revisits an earlier lesson — spacing on purpose.</p>
+
+  <div class="q" data-correct="c">
+    <p class="stem">1. Under the default decider, the <code>agentic</code> method today behaves —<span class="tag spaced">from L4</span></p>
+    <button class="opt" data-k="a">smarter than greedy, since real model reasoning is wired here</button>
+    <button class="opt" data-k="b">randomly across the ticks, since the mock just guesses cells</button>
+    <button class="opt" data-k="c">exactly like greedy, because the mock mirrors that heuristic</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="b">
+    <p class="stem">2. The headline empirical claim is currently best described as —</p>
+    <button class="opt" data-k="a">already proven on the seeded sweep against four baselines</button>
+    <button class="opt" data-k="b">unevaluated, since no real reasoner has driven a sweep yet</button>
+    <button class="opt" data-k="c">refuted, because the runs show agentic tied with the greedy</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="a">
+    <p class="stem">3. The single highest-leverage step toward a genuine result is to —</p>
+    <button class="opt" data-k="a">wire a real vendor behind the existing adapter seam first</button>
+    <button class="opt" data-k="b">rebuild the harness so the methods stop sharing a backbone</button>
+    <button class="opt" data-k="c">give agentic a wider sensing range than the four baselines</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="c">
+    <p class="stem">4. The ~180-line agentic method is larger than baselines because of —</p>
+    <button class="opt" data-k="a">a smarter per-UAV reasoner baked right into the policy code now</button>
+    <button class="opt" data-k="b">a global oracle that lets it read each sector at once per tick</button>
+    <button class="opt" data-k="c">orchestration: a replan split, deconfliction, and plan persistence</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="b">
+    <p class="stem">5. <code>report.md</code> conflicts with the newer docs; you should trust —</p>
+    <button class="opt" data-k="a">the audit report, since it audited the whole repo most recently</button>
+    <button class="opt" data-k="b">the ADRs and CLAUDE.md, since several report gaps are now resolved</button>
+    <button class="opt" data-k="c">neither source here, because both predate the agentic rename change</button>
+    <p class="fb"></p>
+  </div>
+</div>
+
+<div class="source">
+<strong>Primary source.</strong> Read <code>report.md</code> — the audit — <em>but cross-check it against
+<a href="../CLAUDE.md">CLAUDE.md</a> and the ADRs</em>. Several of its named "gaps" are now
+<strong>resolved</strong>: <code>handle_event</code> is no longer dead code (the tick loop invokes it),
+and <code>intent_summary</code> is no longer emit-only (the agentic method ingests peer intents). Where
+<code>report.md</code> conflicts with the ADRs or <code>CLAUDE.md</code>, <strong>trust the ADRs and
+<code>CLAUDE.md</code></strong> — they are newer. Then read
+<a href="../docs/NEXT_STEPS.md">NEXT_STEPS.md</a>: its 2026-05-28 status block lists DONE vs. open, and
+item 4 of the suggested order is "wire a real vendor + run the recovery eval."
+</div>
+
+<div class="nextup">
+<b>Next up (L7) — A centralized, global-info LLM layer.</b> The deliberate contrast: a planner that
+<em>does</em> see everything. Studying it sharpens what "decentralized" actually buys you — and why the
+constraint is a feature of the thesis, not a limitation of the harness.
+</div>
+
+<p class="ask">I'm your teacher — ask me anything. "Help me draft the 'limitations' paragraph," "what
+order should I wire the vendor and add stats?", or "grill me on the weakest claim" all work. The drill
+above is most valuable spoken aloud — want to role-play the toughest reviewer?</p>
+
+<nav class="lessonnav">
+  <a href="0005-measuring-recovery.html">&larr; Prev: Measuring recovery</a>
+  <a class="idx" href="index.html">Contents</a>
+  <a class="next" href="0007-centralized-llm-alternative.html">Next: A centralized LLM layer &rarr;</a>
+</nav>
+
+<footer>
+Lesson 6 of the agentic_uav series · prev: <a href="0005-measuring-recovery.html">L5</a> ·
+sources: <code>report.md</code>, <a href="../docs/NEXT_STEPS.md">NEXT_STEPS.md</a>, ADRs ·
+ties to <a href="../MISSION.md">MISSION.md</a>
+</footer>
+
+<script>
+  document.querySelectorAll('.qa button.show').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var qa = b.closest('.qa'); qa.classList.toggle('open');
+      b.textContent = qa.classList.contains('open') ? 'Hide answer' : 'Reveal our answer';
+    });
+  });
+  document.querySelectorAll('.q').forEach(function (q) {
+    var correct = q.getAttribute('data-correct');
+    var fb = q.querySelector('.fb'); var done = false;
+    q.querySelectorAll('.opt').forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        if (done) return; done = true;
+        var k = opt.getAttribute('data-k');
+        q.querySelectorAll('.opt').forEach(function (o) { if (o.getAttribute('data-k') === correct) o.classList.add('correct'); });
+        if (k === correct) { fb.textContent = 'Correct — that’s the load-bearing idea.'; fb.className = 'fb show correct'; }
+        else { opt.classList.add('wrong'); fb.textContent = 'Not quite — the highlighted answer is the one to remember.'; fb.className = 'fb show wrong'; }
+      });
+    });
+  });
+</script>
+</body>
+</html>

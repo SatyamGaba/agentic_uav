@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 3 · The two invariants &amp; the oracle rebuttal</title>
+<style>
+  :root {
+    --ink: #1a1a1a; --muted: #6b6b6b; --rule: #d8d4cc; --bg: #fbfaf7;
+    --accent: #8a5a00; --code-bg: #f1eee8; --green: #1f7a3b; --red: #b42318;
+    --blue: #2f6ea5; --panel: #fff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    color: var(--ink); background: var(--bg); line-height: 1.6;
+    max-width: 44rem; margin: 3rem auto; padding: 0 1.5rem; font-size: 18px;
+  }
+  h1 { font-size: 2rem; line-height: 1.12; margin: 0 0 .15rem; letter-spacing: -.015em; }
+  .kicker { color: var(--accent); text-transform: uppercase; letter-spacing: .12em;
+            font-size: .72rem; font-weight: 700; margin: 0 0 .6rem; }
+  .sub { color: var(--muted); font-style: italic; margin: 0 0 1.6rem; font-size: 1.05rem; }
+  .mission { background: #fff7e6; border-left: 3px solid var(--accent);
+             padding: .7rem 1rem; border-radius: 0 6px 6px 0; font-size: .92rem; margin: 0 0 2rem; }
+  h2 { font-size: 1.05rem; text-transform: uppercase; letter-spacing: .08em;
+       color: var(--accent); border-bottom: 1px solid var(--rule);
+       padding-bottom: .3rem; margin: 2.6rem 0 1rem; }
+  p { margin: 1rem 0; }
+  code { font-family: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+         background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .82em; }
+  .loc { color: var(--muted); font-size: .82rem; font-style: italic; }
+
+  pre { background: #1f1d1a; color: #f3efe7; border-radius: 9px; padding: 1rem 1.1rem;
+        overflow-x: auto; font-size: .8rem; line-height: 1.5; margin: 1.2rem 0;
+        font-family: "SF Mono","Cascadia Code",Menlo,Consolas,monospace; }
+  pre .c { color: #9a978f; } pre .k { color: #e0a85e; } pre .s { color: #9fd29f; }
+  pre .hl { color: #f6c177; font-weight: 700; }
+  pre .del { color: #e0726b; } pre .add { color: #9fd29f; }
+
+  .invariant { background: #eef6ff; border: 1px solid #cfe0f2; border-radius: 8px;
+               padding: .9rem 1.1rem; margin: 1.2rem 0; }
+  .invariant b { color: var(--blue); }
+  .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+  @media (max-width: 640px){ .twocol { grid-template-columns: 1fr; } }
+
+  .drill { background: var(--panel); border: 2px solid var(--blue); border-radius: 10px;
+           padding: 1.1rem 1.2rem; margin: 1.6rem 0; }
+  .drill h3 { margin:0 0 .6rem; font-size:1rem; color: var(--blue); }
+  .qa { margin:.9rem 0; }
+  .qa .att { font-weight:700; }
+  .qa .reveal { display:none; margin-top:.5rem; padding:.6rem .8rem; background:#f1f8f3;
+                border-left:3px solid var(--green); border-radius:0 6px 6px 0; font-size:.92rem; }
+  .qa.open .reveal { display:block; }
+  .qa button.show { font:inherit; font-size:.82rem; cursor:pointer; border:1px solid var(--rule);
+                    background:#fff; border-radius:6px; padding:.3rem .7rem; color:var(--blue); margin-top:.3rem; }
+  .qa button.show:hover { background:#f4f1ea; }
+
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .88rem; }
+  th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { color: var(--accent); text-transform: uppercase; letter-spacing: .05em; font-size: .7rem; }
+  td code { font-size: .8em; }
+
+  .test { background:#f7f4ef; border:1px solid var(--rule); border-radius:9px;
+          padding:.9rem 1.1rem; margin:1.2rem 0; font-size:.9rem; }
+  .test b { color: var(--green); }
+
+  /* quiz */
+  .quiz { background: var(--panel); border: 2px solid var(--accent); border-radius: 10px;
+          padding: 1.2rem 1.3rem; margin: 1.8rem 0; }
+  .quiz h3 { margin: 0 0 .2rem; font-size: 1rem; }
+  .q { margin: 1.2rem 0; }
+  .q p.stem { font-weight: 700; margin: 0 0 .5rem; }
+  .tag { font-size:.62rem; font-weight:700; letter-spacing:.06em; padding:.1rem .45rem;
+         border-radius:999px; vertical-align:middle; margin-left:.4rem; }
+  .tag.spaced { background:#f3f0ea; color:var(--muted); }
+  .opt { display: block; width: 100%; text-align: left; border: 1px solid var(--rule);
+         background: #fff; border-radius: 6px; padding: .5rem .7rem; margin: .35rem 0;
+         font: inherit; font-size: .92rem; cursor: pointer; transition: background .12s; }
+  .opt:hover { background: #f4f1ea; }
+  .opt.correct { border-color: var(--green); background: #e9f8ee; }
+  .opt.wrong { border-color: var(--red); background: #fcebe9; }
+  .fb { font-size: .86rem; margin: .4rem 0 0; min-height: 1.2em; }
+  .fb.show.correct { color: var(--green); }
+  .fb.show.wrong { color: var(--red); }
+
+  .nextup { background: #f3f0ea; border-radius: 8px; padding: .9rem 1.1rem; margin-top: 1rem; }
+  .source { border-left: 3px solid var(--green); background: #f1f8f3; padding: .7rem 1rem;
+            border-radius: 0 6px 6px 0; margin: 1.4rem 0; font-size: .92rem; }
+  .ask { text-align: center; color: var(--muted); font-style: italic; margin: 2rem 0 0; font-size: .92rem; }
+  a { color: var(--accent); }
+  footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rule);
+           color: var(--muted); font-size: .82rem; }
+  .lessonnav { display:flex; justify-content:space-between; align-items:center; gap:.5rem;
+               margin:1.6rem 0; font-size:.9rem; }
+  .lessonnav.top { margin:0 0 2rem; }
+  .lessonnav a, .lessonnav span { text-decoration:none; padding:.45rem .9rem; border-radius:8px;
+               border:1px solid var(--rule); background:#fff; color:var(--accent);
+               white-space:nowrap; transition:background .12s; }
+  .lessonnav a:hover { background:#f4f1ea; }
+  .lessonnav .disabled { color:#bdb8ae; background:#f7f5f0; cursor:default; border-style:dashed; }
+  .lessonnav .idx { border:none; background:none; color:var(--muted); font-style:italic; }
+  .lessonnav .next { font-weight:700; }
+</style>
+</head>
+<body>
+
+<nav class="lessonnav top">
+  <a href="0002-swarmmethod-seam.html">&larr; Prev: The SwarmMethod seam</a>
+  <a class="idx" href="index.html">Contents</a>
+  <a class="next" href="0004-the-llm-seam.html">Next: The LLM seam &rarr;</a>
+</nav>
+
+<p class="kicker">Lesson 3 — agentic_uav</p>
+<h1>The two invariants &amp; the oracle rebuttal</h1>
+<p class="sub">The fairness ADR in code: where the global oracle was deleted, and how to answer the question that can sink the thesis.</p>
+
+<div class="mission">
+<strong>Mission link.</strong> This is the lesson that most directly arms the defense. The single
+most dangerous reviewer question is <em>"isn't the agentic advantage just a global oracle?"</em>
+If you can't answer it crisply, the headline claim is unfalsifiable — and a careful reviewer
+knows it. By the end you'll have a code-grounded, three-sentence rebuttal you can deliver cold.
+</div>
+
+<h2>Recall: the two invariants</h2>
+<p>From <a href="0001-whole-system-map.html">L1</a>, the architecture protects two properties.
+Said precisely:</p>
+<div class="twocol">
+<div class="invariant">
+<b>Observation symmetry.</b> All five methods get the <em>identical</em> per-UAV observation.
+They can differ only in reasoning, never in what they see.
+</div>
+<div class="invariant">
+<b>Decentralization.</b> Every method decides per-UAV from local view + belief + peer messages +
+onboard state. No central planner, no global oracle.
+</div>
+</div>
+<p>These two are joined at the hip: symmetry says <em>everyone sees the same thing</em>;
+decentralization says <em>that thing is local</em>. Today we see how the code guarantees the
+second half — because that's where the oracle would hide.</p>
+
+<h2>The leak that used to exist</h2>
+<p>ADR-0001 is unusually candid about a real bug in the earlier code. The old
+<code>ObservationBuilder</code> injected a global list of <em>every</em> urgent sector, and the
+planning helpers scanned the whole world map. In the ADR's own words:</p>
+<pre><span class="c"># ADR-0001, "Context"</span>
+"<span class="hl">ObservationBuilder.build injected a global urgent_cells list</span> (every urgent
+ sector, regardless of where the UAV was), and the planning helpers
+ nearest_open_urgent / nearest_uncovered scanned the entire world.sectors
+ dictionary directly. That gave every method a <span class="del">global oracle over dynamic
+ state</span>, which made the agentic-vs-baseline comparison <span class="del">invalid</span>: any
+ 'agentic' advantage could just be the oracle, not the reasoning."</pre>
+<p>Read that last clause twice. The authors identified that <em>their own headline claim was
+unfalsifiable</em> under the leaky design, and fixed it. That candor <em>is</em> the defense.</p>
+
+<h2>Where it was deleted — and what replaced it</h2>
+<p>Open <code>planning.py</code> and look at what <code>ObservationBuilder.build</code> emits today.
+The global <code>urgent_cells</code> key is gone; in its place, <code>known_urgent</code> is read
+from <em>this UAV's own belief</em>:</p>
+<pre><span class="c"># planning.py:66 — the per-UAV observation, post-fix</span>
+observations[uav_id] = {
+    <span class="s">"self"</span>:         uav,
+    <span class="s">"nearby"</span>:       nearby,              <span class="c"># only sensed neighbourhood</span>
+    <span class="add">"known_urgent"</span>: sorted(belief.known_urgent),   <span class="c"># &larr; from THIS uav's belief</span>
+    <span class="s">"messages"</span>:     list(uav.inbox),
+}
+<span class="c"># No "urgent_cells". No world-wide scan. The dict cannot leak global state.</span></pre>
+
+<p>And belief only grows two ways — both local:</p>
+<pre><span class="c"># planning.py:74 — _fold_into_belief: belief grows ONLY from sensed nearby sectors</span>
+<span class="k">for</span> sector <span class="k">in</span> nearby:
+    <span class="k">if</span> sector.coverage &gt;= 1.0: belief.covered.add(sector.cell)
+    <span class="k">if</span> sector.priority == <span class="s">"urgent"</span>: belief.known_urgent.add(sector.cell)
+
+<span class="c"># policy.py:512 — _ingest_messages: belief also grows from peer messages (range-limited)</span>
+<span class="k">if</span> message.message_type == <span class="s">"urgent_sector"</span>:
+    belief.known_urgent.add(target)</pre>
+
+<p>So a UAV knows an urgent sector exists <em>only</em> if it sensed it, or a peer's message reached
+it through the range-limited <code>NetworkModel</code>. There is no third path. That is
+decentralization made structural, not promised in a comment.</p>
+
+<h2>Why belief lives on <code>MethodState</code>, not <code>UavState</code></h2>
+<p>A subtle but defensible choice (ADR-0001, "Consequences"): belief is stored on
+<code>MethodState.beliefs</code>, <strong>not</strong> on <code>UavState</code>.</p>
+<table>
+  <tr><th>If belief were on…</th><th>Consequence</th></tr>
+  <tr><td><code>UavState</code></td><td>A decision-method concept leaks into the world model and the GUI — breaking the "simulator has no method-specific branch" invariant from <a href="0002-swarmmethod-seam.html">L2</a>.</td></tr>
+  <tr><td><code>MethodState</code> ✓</td><td>The world stays method-agnostic; ground truth lives in <code>WorldState</code> for sensing/metrics only, and <em>no decision path reads it</em>.</td></tr>
+</table>
+<p>This is how the two invariants reinforce each other: keeping belief out of the world is what
+lets the harness stay method-blind (L2) <em>and</em> keeps dynamic state local (L3).</p>
+
+<h2>It's enforced by tests, not honour</h2>
+<p>Two tests turn the principle into a tripwire. The first is a structural regression guard:</p>
+<pre><span class="c"># tests/test_llm_agent.py:45 — symmetry regression test</span>
+<span class="k">def</span> test_serialized_observation_omits_global_state(self):
+    serialized = serialize_observation(build_observation(simulation))
+    self.assertEqual(set(serialized),
+        {<span class="s">"self"</span>,<span class="s">"nearby"</span>,<span class="s">"known_urgent"</span>,<span class="s">"messages"</span>,<span class="s">"peer_intents"</span>})
+    <span class="hl">self.assertNotIn("urgent_cells", serialized)</span>   <span class="c"># the oracle stays dead</span></pre>
+
+<div class="test">
+<b>The behavioural pair — your strongest exhibit.</b> Two tests in
+<code>tests/test_simulation.py</code> bracket the whole argument:
+<ul style="margin:.5rem 0 0;">
+<li><code>test_rules_ignore_far_urgent_work_without_local_observation_or_message</code> (line 255):
+a UAV at <code>(0,0)</code> with <code>sensing_radius=1</code> and an urgent sector at
+<code>(4,4)</code> <strong>does not</strong> target it — it cannot, because it never sensed it and
+got no message. <em>(Proves: no oracle.)</em></li>
+<li><code>test_rules_use_inbox_urgent_message</code> (line 275): the same far urgent sector
+<strong>does</strong> get acted on once a peer's <code>urgent_sector</code> message arrives.
+<em>(Proves: discovery works, but only through the legitimate channel.)</em></li>
+</ul>
+Ignorant without a signal; informed with one. That pair <em>is</em> the falsifiability argument,
+executable on demand.
+</div>
+
+<div class="drill">
+<h3>Defense drill — let's rehearse our rebuttals</h3>
+<p class="loc">Read the likely objection, say how we'd answer it out loud, then reveal the version
+we've been refining. This is us pressure-testing our own argument before it meets a reviewer —
+not an exam.</p>
+
+<div class="qa">
+<p class="att">Attack 1: "Isn't the agentic advantage just a global oracle?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">The global <code>urgent_cells</code> list was removed from <code>ObservationBuilder</code>;
+each UAV's observation now carries only <code>known_urgent</code> drawn from its own
+<code>BeliefMap</code>, which grows solely by sensing its neighbourhood or by range-limited peer
+messages. A regression test asserts <code>urgent_cells</code> is absent, and a behavioural test
+shows a far UAV with no signal never targets a distant urgent sector. So no method — agentic
+included — can see global dynamic state.</div>
+</div>
+
+<div class="qa">
+<p class="att">Attack 2: "Fine, but maybe agentic gets a <em>richer</em> observation than the baselines."</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">No — the observation is built <em>once per UAV</em> by a single
+<code>ObservationBuilder</code> and handed to whichever method is running; the builder doesn't
+know the method name (see L2's swappability invariant). All five methods receive byte-identical
+observations. They differ only in the reasoning applied to that shared input.</div>
+</div>
+
+<div class="qa">
+<p class="att">Attack 3: "Storing belief sounds like you bolted state onto the UAV to help agentic."</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">Belief lives on <code>MethodState.beliefs</code>, not on <code>UavState</code> —
+precisely so the world model and GUI stay method-agnostic. Every method gets the same
+<code>BeliefMap</code> machinery; <code>greedy</code> and <code>rules</code> use it too. It's shared
+infrastructure, not an agentic-only crutch.</div>
+</div>
+
+<div class="qa">
+<p class="att">Attack 4: "A UAV missing a far urgent sector — isn't that just a bug?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">It's the intended behaviour, stated explicitly in ADR-0001: "A UAV beyond
+sensing range with no peer message will not know about a far urgent sector — that is the correct,
+intended behavior, not a bug." Perfect global awareness is exactly the oracle we removed.</div>
+</div>
+</div>
+
+<div class="quiz" id="quiz">
+  <h3>Retrieval check</h3>
+  <p class="loc">From memory. Q1 and Q2 revisit earlier lessons — spacing on purpose.</p>
+
+  <div class="q" data-correct="c">
+    <p class="stem">1. The simulator names a specific method in exactly —<span class="tag spaced">from L2</span></p>
+    <button class="opt" data-k="a">one place per subsystem that uses it</button>
+    <button class="opt" data-k="b">five places, one for each method id</button>
+    <button class="opt" data-k="c">one place — the build_method dictionary</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="b">
+    <p class="stem">2. Of a tick's seven beats, the only one that differs by method is —<span class="tag spaced">from L1</span></p>
+    <button class="opt" data-k="a">the one delivering messages between peers</button>
+    <button class="opt" data-k="b">the one turning observations into actions</button>
+    <button class="opt" data-k="c">the one marking nearby sectors covered</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="a">
+    <p class="stem">3. A UAV's <code>known_urgent</code> set can grow through exactly two paths —</p>
+    <button class="opt" data-k="a">sensing nearby cells, or peer messages arriving</button>
+    <button class="opt" data-k="b">a global scan, or the central planner pushing</button>
+    <button class="opt" data-k="c">reading WorldState, or its own onboard memory</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="c">
+    <p class="stem">4. Belief lives on <code>MethodState</code> rather than <code>UavState</code> so that —</p>
+    <button class="opt" data-k="a">the agentic method can reach more world state</button>
+    <button class="opt" data-k="b">each UAV can broadcast belief to every peer</button>
+    <button class="opt" data-k="c">the world and GUI stay free of method concepts</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="b">
+    <p class="stem">5. The test asserting <code>urgent_cells</code> is absent functions as —</p>
+    <button class="opt" data-k="a">a performance benchmark for the observation</button>
+    <button class="opt" data-k="b">a tripwire against the oracle leak returning</button>
+    <button class="opt" data-k="c">a check that messages are delivered in range</button>
+    <p class="fb"></p>
+  </div>
+</div>
+
+<div class="source">
+<strong>Primary source.</strong> Read
+<a href="../docs/adr/0001-decentralization-and-observation-symmetry.md">ADR-0001</a> end to end —
+it's short and it's the single most defense-relevant document in the repo. Then open the two
+behavioural tests in <code>tests/test_simulation.py:255</code> and <code>:275</code> and run
+<code>uv run python -m unittest tests.test_simulation</code> so you've <em>seen</em> them pass.
+</div>
+
+<div class="nextup">
+<b>Next up (L4).</b> The LLM seam itself: the <code>AgentDecider</code> protocol, the deterministic
+mock default, the validate-or-fall-back-to-greedy pipeline, and the event-triggered re-plan +
+in-tick negotiation. This is where "the contribution is pluggable" becomes concrete — and where
+the honest "currently mocked" caveat lives.
+</div>
+
+<p class="ask">I'm your teacher — ask me anything. "Show me _fold_into_belief in the code," "run
+the two fairness tests," or "throw a harder attack at me" all work. The drill above is most
+valuable spoken aloud — want to role-play the viva with me?</p>
+
+<nav class="lessonnav">
+  <a href="0002-swarmmethod-seam.html">&larr; Prev: The SwarmMethod seam</a>
+  <a class="idx" href="index.html">Contents</a>
+  <a class="next" href="0004-the-llm-seam.html">Next: The LLM seam &rarr;</a>
+</nav>
+
+<footer>
+Lesson 3 of the agentic_uav series · prev: <a href="0002-swarmmethod-seam.html">L2 — The SwarmMethod seam</a> ·
+source: <a href="../docs/adr/0001-decentralization-and-observation-symmetry.md">ADR-0001</a>,
+<code>planning.py</code> · ties to <a href="../MISSION.md">MISSION.md</a>
+</footer>
+
+<script>
+  document.querySelectorAll('.qa button.show').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var qa = b.closest('.qa');
+      qa.classList.toggle('open');
+      b.textContent = qa.classList.contains('open') ? 'Hide answer' : 'Reveal our answer';
+    });
+  });
+  document.querySelectorAll('.q').forEach(function (q) {
+    var correct = q.getAttribute('data-correct');
+    var fb = q.querySelector('.fb');
+    var done = false;
+    q.querySelectorAll('.opt').forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        if (done) return;
+        done = true;
+        var k = opt.getAttribute('data-k');
+        q.querySelectorAll('.opt').forEach(function (o) {
+          if (o.getAttribute('data-k') === correct) o.classList.add('correct');
+        });
+        if (k === correct) {
+          fb.textContent = 'Correct — that’s the load-bearing idea.';
+          fb.className = 'fb show correct';
+        } else {
+          opt.classList.add('wrong');
+          fb.textContent = 'Not quite — the highlighted answer is the one to remember.';
+          fb.className = 'fb show wrong';
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

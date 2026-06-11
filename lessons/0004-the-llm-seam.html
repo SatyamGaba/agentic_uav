@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 4 · The LLM seam</title>
+<link rel="stylesheet" href="lesson.css">
+</head>
+<body>
+
+<nav class="lessonnav top">
+  <a href="0003-invariants-and-the-oracle-rebuttal.html">&larr; Prev: The two invariants</a>
+  <a class="idx" href="index.html">Contents</a>
+  <a class="next" href="0005-measuring-recovery.html">Next: Measuring recovery &rarr;</a>
+</nav>
+
+<p class="kicker">Lesson 4 — agentic_uav</p>
+<h1>The LLM seam</h1>
+<p class="sub">Where the contribution plugs in — and why it's a swappable adapter with a deterministic mock, not a hard dependency.</p>
+
+<div class="mission">
+<strong>Mission link.</strong> The <code>agentic</code> method's intelligence is <em>pluggable</em>. The seam
+is real and tested <em>today</em>; the LLM itself is a drop-in. That single fact does double duty: it
+enables a clean, fair evaluation <em>and</em> it is the honest reason there's no measured win yet. By the
+end you can describe the contract, the fallback, and the caveat without hedging.
+</div>
+
+<h2>A. Recall: where agentic plugs in</h2>
+<p>From <a href="0002-swarmmethod-seam.html">L2</a>, <code>agentic</code> is selected in exactly one place
+(<code>build_method</code>), and <code>decide_tick</code> is the only tick beat that differs between methods.
+Everything below opens what that one beat <em>does</em> — and shows the contribution never widens the seam.</p>
+
+<h2>B. The contract: AgentDecider</h2>
+<p>The whole contribution sits behind one tiny, provider-agnostic protocol. JSON dict in, action dict out;
+the caller — not the decider — validates.</p>
+<pre><span class="c"># llm_agent.py:26 — the entire seam, in four lines</span>
+<span class="hl">@runtime_checkable</span>
+<span class="k">class</span> AgentDecider(Protocol):
+    <span class="k">def</span> decide(self, observation: dict[str, Any]) -&gt; dict[str, Any]:
+        ...</pre>
+<div class="contract">
+<dl>
+<dt>in: observation</dt><dd>A JSON-only <em>local</em> view (see D). No live objects, no world handle.</dd>
+<dt>out: action dict</dt><dd>A <code>{target_cell, role, ranked_targets}</code>-shaped dict — <em>proposed</em>, not trusted.</dd>
+<dt>who validates</dt><dd>The caller, against the world. The decider is never granted authority over the move.</dd>
+</dl>
+</div>
+
+<h2>C. Selecting a backend: build_decider</h2>
+<p>One factory chooses the backend by the <code>name</code> argument, else the <code>AGENTIC_UAV_DECIDER</code>
+env var, else the default <code>"mock"</code>. Real providers are imported <em>lazily</em>, so importing
+<code>llm_agent</code> never drags in <code>boto3</code> or <code>urllib</code>.</p>
+<pre><span class="c"># llm_agent.py:47 — default is mock; tests & sweeps stay offline</span>
+choice = (name <span class="k">or</span> os.environ.get(<span class="s">"AGENTIC_UAV_DECIDER"</span>) <span class="k">or</span> <span class="hl">"mock"</span>)...
+<span class="k">if</span> choice == <span class="s">"mock"</span>:    <span class="k">return</span> MockAgentDecider()
+<span class="k">if</span> choice == <span class="s">"bedrock"</span>: <span class="k">from</span> ... <span class="k">import</span> BedrockAgentDecider  <span class="c"># lazy</span>
+<span class="k">if</span> choice == <span class="s">"qgenie"</span>:  <span class="k">from</span> ... <span class="k">import</span> QGenieAgentDecider   <span class="c"># lazy</span></pre>
+<div class="invariant">
+<b>One branch, by design.</b> This factory is the <em>only</em> place that branches on backend.
+<code>method_name</code> still selects the method (L2); the env var only selects which decider the
+<code>agentic</code> method drives. The swappability invariant is untouched.
+</div>
+
+<h2>D. The decision pipeline</h2>
+<p>Every per-UAV decision flows through <code>decide_proposal()</code> (llm_agent.py:124). It is four steps,
+and the last one is a safety floor.</p>
+<div class="flow">
+<ol>
+<li><b>Serialize</b> the observation to a JSON-only local view.
+<span class="where">serialize_observation, llm_agent.py:63</span></li>
+<li><b>Call</b> the decider with that dict. <span class="where">decider.decide(...) — mock or vendor</span></li>
+<li><b>Validate</b> the raw output against the world. <span class="where">validate_action, llm_agent.py:105</span></li>
+<li><b>Fall back</b> to <code>greedy_decision</code> on <em>any</em> failure. <span class="where">the L2 baseline, as a floor</span></li>
+</ol>
+</div>
+<pre><span class="c"># llm_agent.py:137 — the load-bearing shape</span>
+<span class="k">try</span>:
+    raw = decider.decide(serialize_observation(observation))
+    validated = validate_action(raw, simulation)
+<span class="k">except</span> Exception:
+    validated = None
+<span class="k">if</span> validated <span class="k">is</span> None:
+    <span class="k">return</span> greedy_decision(...), []   <span class="c"># &larr; safety floor</span></pre>
+
+<p><b>Serialize emits only local keys.</b> Note what is <em>absent</em>: there is no <code>urgent_cells</code>.
+The decider literally cannot see global state — this is L3's observation symmetry, enforced at the wire.</p>
+<pre><span class="c"># llm_agent.py:63 — the ONLY keys the decider ever receives</span>
+<span class="k">return</span> {
+  <span class="s">"self"</span>: ..., <span class="s">"nearby"</span>: ..., <span class="s">"known_urgent"</span>: ...,
+  <span class="s">"messages"</span>: ..., <span class="s">"peer_intents"</span>: ...,
+}   <span class="c"># no "urgent_cells", no world scan, no oracle</span></pre>
+
+<p><b>Validate is strict</b> (llm_agent.py:105). Three checks, then normalize or reject:</p>
+<div class="trace">
+<ol>
+<li><span class="arrow">&rarr;</span> Must be a <code>dict</code>; <code>role</code> must be in <code>ALLOWED_ROLES</code> <span class="loc">(:111)</span>.</li>
+<li><span class="arrow">&rarr;</span> <code>target_cell</code> must be in-bounds <em>and not blocked</em> <span class="loc">(:114)</span>.</li>
+<li><span class="arrow">&rarr;</span> <code>ranked_targets</code> filtered to in-bounds / unblocked cells <span class="loc">(:116)</span>.</li>
+<li><span class="arrow">&rarr;</span> Returns normalized <code>{target_cell, role, ranked_targets}</code>, else <code>None</code>.</li>
+</ol>
+</div>
+<p>So three distinct failure modes — (a) the decider raises, (b) invalid / non-JSON / wrong shape,
+(c) target blocked or out of bounds — <em>all</em> route to <code>greedy_decision</code>. That is the
+"falls back to greedy on invalid output" promise, made concrete and total.</p>
+
+<h2>E. The mock: a deterministic greedy mirror</h2>
+<p>The default <code>MockAgentDecider</code> (llm_agent.py:179) is deterministic and dependency-free. Its
+core logic (:196) prefers the nearest believed-urgent cell, else the nearest uncovered, sorted by Manhattan
+distance, using <code>_prefer_unclaimed()</code> to steer off peer-claimed targets — then returns
+<code>target_cell</code>, <code>role</code>, <code>reason</code>, and <code>ranked_targets</code>. Its docstring
+states the intent plainly:</p>
+<pre><span class="c"># llm_agent.py:180 — the mock's docstring</span>
+<span class="s">"Deterministic, dependency-free decider that mirrors the greedy</span>
+<span class="s"> heuristic. Under this mock, `agentic` behaves like `greedy` while</span>
+<span class="s"> exercising the full serialize -&gt; validate -&gt; action pipeline.</span>
+<span class="s"> Swapping in a real LLM adapter is the only change needed for a</span>
+<span class="s"> genuine evaluation."</span></pre>
+<div class="win">
+<b>The plumbing is exercised today.</b> Even with the mock, the <em>full</em> pipeline —
+serialize, validate, fallback, and in-tick negotiation — runs and is tested. Swapping a vendor changes
+nothing else: same protocol, same validation, same deconfliction. The seam is proven before any API key exists.
+</div>
+
+<h2>F. Event-triggered re-plan + in-tick negotiation</h2>
+<p>The <code>AgenticMethod</code> wiring lives in <code>policy.py:211</code>. <code>__post_init__</code> defaults the
+decider to <code>MockAgentDecider</code> (:216). It is the <em>only</em> method that arms a replan up front:
+<code>initialize_mission</code> returns <code>MethodState(replan_pending=True)</code>, and
+<code>handle_event</code> (:225) sets <code>replan_pending=True</code> — that is the event-triggered hook
+(mission start, plus dropout / urgent_sector / block_sector). Re-plan cadence is event-triggered, not every
+tick (ADR-0003).</p>
+<pre><span class="c"># policy.py:241 — replan when armed, else execute the persisted plan</span>
+<span class="k">if</span> method_state.replan_pending:
+    actions = self._replan(...)        <span class="c"># decide_proposal per UAV, collect ranked, log replan</span>
+    method_state.replan_pending = False
+<span class="k">else</span>:
+    actions = self._execute_plan(...)  <span class="c"># run plan, emit intent_summary</span></pre>
+<p><b>Negotiation settles ties synchronously, in one tick</b> (ADR-0002). When two UAVs propose the same target,
+<code>_deconflict</code> (:286) gives it to the nearest (lexicographic id breaks the tie); the loser goes to
+<code>_repick</code> (:323), which tries its next-best <em>ranked</em> target, else falls back to
+<code>greedy_decision</code>. The <code>ranked_targets</code> the decider returned are what make graceful
+deconfliction possible without a central planner.</p>
+
+<h2>G. The real providers, briefly</h2>
+<p>Two vendor adapters exist behind the same protocol (<code>llm_providers.py</code>):</p>
+<div class="wrap-table">
+<table>
+  <tr><th>Adapter</th><th>Surface</th><th>Where</th></tr>
+  <tr><td><code>BedrockAgentDecider</code></td><td>AWS Bedrock Converse API, <em>forced tool use</em>; model from <code>BEDROCK_MODEL_ID</code>; lazy <code>boto3</code>.</td><td class="loc">268–352</td></tr>
+  <tr><td><code>QGenieAgentDecider</code></td><td>OpenAI-compatible chat-completions over <code>urllib</code>; <code>provider::model</code> ids; tools opt-in via <code>QGENIE_USE_TOOLS</code>.</td><td class="loc">355–452</td></tr>
+</table></div>
+<p><b>The prompt itself preserves symmetry.</b> <code>build_prompt()</code> (:120) enumerates <em>only</em> the
+candidate cells this UAV may legally target and instructs the model: "Do NOT invent coordinates." No global
+state is ever placed in the prompt, and validation is centralized in <code>validate_action</code> for every
+provider — so a vendor swap cannot quietly widen what the agent sees.</p>
+
+<div class="flag">
+<b>Honest caveat — say this out loud.</b> Because the default decider <em>is</em> the greedy mirror, today
+<code>agentic</code> &asymp; <code>greedy</code> and there is <em>no measured advantage yet</em>. The regression
+test <code>test_mirrors_greedy_choosing_uncovered_when_no_urgent</code>
+<span class="loc">(tests/test_llm_agent.py:153)</span> pins exactly this. The defense <em>today</em> is about
+<strong>architecture</strong> — a real, tested, fair, swappable seam — not a number. Wiring a vendor is the
+single remaining change for a genuine evaluation (we pick that up in <a href="0006-state-of-the-thesis.html">L6</a>).
+</div>
+
+<div class="drill">
+<h3>Defense drill — let's rehearse aloud, then check</h3>
+<p class="loc">Read the likely objection, say how we'd answer, then reveal the version we've been
+refining. Us pressure-testing our own argument before a reviewer does.</p>
+
+<div class="qa">
+<p class="att">Attack 1: "If the LLM hallucinates a blocked cell, doesn't that corrupt the comparison?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal"><code>validate_action</code> rejects any target that is out-of-bounds or blocked (and filters
+<code>ranked_targets</code> the same way). A rejected action returns <code>None</code> and the move falls back
+to <code>greedy_decision</code>. Bad output can never produce an illegal move — the world never executes an
+unvalidated proposal.</div>
+</div>
+
+<div class="qa">
+<p class="att">Attack 2: "Isn't 'agentic falls back to greedy' just admitting it's greedy?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">Fallback is a <em>safety floor</em> for invalid output. With a real decider, valid outputs
+drive behaviour and only malformed ones fall through. With the <em>mock</em>, yes — it mirrors greedy by
+design, because the mock is the plumbing test, not the experiment. Those are two different claims; don't let
+them be conflated.</div>
+</div>
+
+<div class="qa">
+<p class="att">Attack 3: "Does the LLM get more information than the baselines?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">No. <code>serialize_observation</code> emits the same local-only keys every method's observation
+exposes — <code>self, nearby, known_urgent, messages, peer_intents</code>, and notably <em>no</em>
+<code>urgent_cells</code>. The prompt then enumerates only legal candidate cells and forbids inventing
+coordinates. The agent sees strictly less, never more (ties to L3).</div>
+</div>
+</div>
+
+<div class="quiz" id="quiz">
+  <h3>Retrieval check</h3>
+  <p class="loc">From memory. Q1 spaces back to an earlier lesson — on purpose.</p>
+
+  <div class="q" data-correct="b">
+    <p class="stem">1. The simulator names a specific method in exactly —<span class="tag spaced">from L2</span></p>
+    <button class="opt" data-k="a">five places, one per registered method id</button>
+    <button class="opt" data-k="b">one place — the build_method registry alone</button>
+    <button class="opt" data-k="c">two places, the loader and the renderer</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="c">
+    <p class="stem">2. The decider's serialized observation deliberately omits the key —</p>
+    <button class="opt" data-k="a">the peer_intents list of announced targets</button>
+    <button class="opt" data-k="b">the known_urgent set from local belief</button>
+    <button class="opt" data-k="c">the global urgent_cells list of all sectors</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="a">
+    <p class="stem">3. When decider output is invalid, blocked, or raises, the action becomes —</p>
+    <button class="opt" data-k="a">the greedy_decision serving as the safety floor</button>
+    <button class="opt" data-k="b">a holding patrol fixed on the current cell</button>
+    <button class="opt" data-k="c">a fresh retry asking the decider again</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="b">
+    <p class="stem">4. The default backend chosen by build_decider when nothing is set is —</p>
+    <button class="opt" data-k="a">the bedrock adapter calling Converse remotely</button>
+    <button class="opt" data-k="b">the mock decider mirroring the greedy heuristic</button>
+    <button class="opt" data-k="c">the qgenie adapter posting chat completions out</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="c">
+    <p class="stem">5. In a target collision, deconfliction hands the cell to the UAV that is —</p>
+    <button class="opt" data-k="a">latest to announce intent in the tick</button>
+    <button class="opt" data-k="b">holding the higher priority_responder role now</button>
+    <button class="opt" data-k="c">nearest, with id breaking the tie</button>
+    <p class="fb"></p>
+  </div>
+</div>
+
+<div class="source">
+<strong>Primary source.</strong> Read <code>agentic_uav/llm_agent.py</code> end to end — the protocol at
+<code>:26</code>, <code>build_decider</code> at <code>:32</code>, the pipeline at <code>:124</code>, the mock at
+<code>:179</code>. Then skim <code>llm_providers.py:120–186</code> (<code>build_prompt</code>) to see symmetry
+preserved in the prompt. Run <code>uv run python -m unittest tests.test_llm_agent</code> so you've watched the
+seam pass.
+</div>
+
+<div class="nextup">
+<b>Next up (L5).</b> Measuring recovery after disruption: the events you inject, the metrics the logger records
+(replan and plan-change traces), and the seeded, paired sweeps that turn "beats the baselines" into a number.
+</div>
+
+<p class="ask">I'm your teacher — ask me anything. "Show me <code>decide_proposal</code> in the code," "what does
+<code>_repick</code> do exactly," or "role-play a reviewer grilling me on the fallback" all work. The drill above
+is most valuable spoken aloud — want to run the viva?</p>
+
+<nav class="lessonnav">
+  <a href="0003-invariants-and-the-oracle-rebuttal.html">&larr; Prev: The two invariants</a>
+  <a class="idx" href="index.html">Contents</a>
+  <a class="next" href="0005-measuring-recovery.html">Next: Measuring recovery &rarr;</a>
+</nav>
+
+<footer>
+Lesson 4 of the agentic_uav series · prev: <a href="0003-invariants-and-the-oracle-rebuttal.html">L3</a> ·
+source: <code>llm_agent.py</code>, <code>llm_providers.py</code> · ties to <a href="../MISSION.md">MISSION.md</a>
+</footer>
+
+<script>
+  document.querySelectorAll('.qa button.show').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var qa = b.closest('.qa'); qa.classList.toggle('open');
+      b.textContent = qa.classList.contains('open') ? 'Hide answer' : 'Reveal our answer';
+    });
+  });
+  document.querySelectorAll('.q').forEach(function (q) {
+    var correct = q.getAttribute('data-correct');
+    var fb = q.querySelector('.fb'); var done = false;
+    q.querySelectorAll('.opt').forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        if (done) return; done = true;
+        var k = opt.getAttribute('data-k');
+        q.querySelectorAll('.opt').forEach(function (o) { if (o.getAttribute('data-k') === correct) o.classList.add('correct'); });
+        if (k === correct) { fb.textContent = 'Correct — that’s the load-bearing idea.'; fb.className = 'fb show correct'; }
+        else { opt.classList.add('wrong'); fb.textContent = 'Not quite — the highlighted answer is the one to remember.'; fb.className = 'fb show wrong'; }
+      });
+    });
+  });
+</script>
+</body>
+</html>
