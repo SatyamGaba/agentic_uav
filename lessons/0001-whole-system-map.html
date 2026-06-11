@@ -83,6 +83,12 @@
   .pill { display:inline-block; font-size:.7rem; padding:.1rem .5rem; border-radius:999px;
           background:#fde8f5; color:#a6248a; font-weight:700; letter-spacing:.03em; }
   .pill.base { background:#f3f7f0; color:#4e7d3a; }
+  figure.arch { margin: 1.4rem 0; padding: 0; }
+  figure.arch a { display:block; border:1px solid var(--rule); border-radius:10px;
+                  background:#fff; padding:.7rem; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  figure.arch img { display:block; width:100%; height:auto; min-width:640px; }
+  figure.arch figcaption { color: var(--muted); font-size:.82rem; font-style:italic;
+                           margin-top:.5rem; text-align:center; }
   .lessonnav { display:flex; justify-content:space-between; align-items:center; gap:.5rem;
                margin:1.6rem 0; font-size:.9rem; }
   .lessonnav.top { margin:0 0 2rem; }
@@ -122,6 +128,14 @@ across all five methods. Only the box labelled "decide" changes. That single des
 what lets the paper say the methods <em>differ only in reasoning</em>. Hold this sentence in
 your head and the rest of the codebase falls into place.
 </p>
+
+<figure class="arch">
+  <a href="architecture.svg" target="_blank" rel="noopener" title="Open full-size diagram">
+    <img src="architecture.svg" alt="End-to-end architecture: Config feeds the Simulation backbone (events, observation builder, resolve, sensing); the per-UAV decentralized decision layer holds the SwarmMethod interface and all five methods; the agentic method drives the provider-agnostic LLM adapter; communication is the only peer-information path; metrics and outputs read world and UAV state.">
+  </a>
+  <figcaption>The canonical end-to-end wiring (rendered from <code>docs/architecture.mmd</code>).
+  Tap to open full-size. Every later lesson zooms into one box here.</figcaption>
+</figure>
 
 <h2>What one tick does</h2>
 <p>The heartbeat is <code>Simulation.step()</code> <span class="loc">simulation.py</span>. Every
@@ -169,7 +183,8 @@ on beat 4.</p>
 </table>
 <p class="loc">One surprise worth pinning: the interface and all five methods live in a single
 file, <code>policy.py</code> — not one file per method. The canonical wiring picture is
-<a href="../docs/architecture.mmd">docs/architecture.mmd</a>.</p>
+the <a href="architecture.svg" target="_blank" rel="noopener">figure above</a> (rendered from
+<code>docs/architecture.mmd</code>).</p>
 
 <h2>The two invariants you'll defend</h2>
 <p>The architecture is built to protect two properties. Almost any reviewer attack on the thesis
@@ -238,8 +253,8 @@ invariant — <em>changing only <code>method_name</code> swaps everything</em>. 
 observation through <code>build_method()</code> into an <code>Action</code>.
 </div>
 
-<p class="ask">I'm your teacher for this — ask me follow-ups any time. "Show me beat 4 in the
-code," "where exactly is urgent_cells removed," or "quiz me harder" all work.</p>
+<p class="ask">I'm your co-author here — let's dig in any time. "Show me beat 4 in the
+code," "where exactly is urgent_cells removed," or "let's pressure-test the symmetry claim" all work.</p>
 
 <nav class="lessonnav">
   <span class="disabled">&larr; Prev</span>
@@ -251,7 +266,7 @@ code," "where exactly is urgent_cells removed," or "quiz me harder" all work.</p
 Lesson 1 of the agentic_uav series · ties to
 <a href="../MISSION.md">MISSION.md</a> ·
 glossary: <a href="../reference/GLOSSARY.html">GLOSSARY.html</a> ·
-canonical diagram: <a href="../docs/architecture.mmd">architecture.mmd</a>
+canonical diagram: <a href="architecture.svg" target="_blank" rel="noopener">architecture.svg</a>
 </footer>
 
 <script>
