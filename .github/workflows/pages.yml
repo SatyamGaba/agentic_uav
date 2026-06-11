@@ -1,0 +1,77 @@
+name: Publish lessons to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lessons/**'
+      - 'reference/GLOSSARY.html'
+      - 'docs/architecture.mmd'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-publish
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Render architecture figure from Mermaid (best-effort)
+        run: |
+          set +e
+          cat > /tmp/puppeteer.json <<'JSON'
+          { "args": ["--no-sandbox", "--disable-setuid-sandbox"] }
+          JSON
+          npx -y @mermaid-js/mermaid-cli@latest -i docs/architecture.mmd -o lessons/architecture.svg -b transparent -p /tmp/puppeteer.json
+          svg_rc=$?
+          npx -y @mermaid-js/mermaid-cli@latest -i docs/architecture.mmd -o lessons/architecture.png -b white -s 2 -w 1600 -p /tmp/puppeteer.json
+          png_rc=$?
+          if [ $svg_rc -ne 0 ] || [ $png_rc -ne 0 ]; then
+            echo "::warning::Mermaid render failed (svg=$svg_rc png=$png_rc); falling back to the committed figure files."
+          fi
+          true
+
+      - name: Assemble published site
+        run: |
+          set -e
+          rm -rf _site
+          mkdir -p _site/lessons _site/reference
+          cp -r lessons/. _site/lessons/
+          cp reference/GLOSSARY.html _site/reference/GLOSSARY.html
+          cat > _site/index.html <<'HTML'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>agentic_uav · Thesis-Defense Study Guide</title>
+            <meta http-equiv="refresh" content="0; url=lessons/index.html">
+            <link rel="canonical" href="lessons/index.html">
+          </head>
+          <body>
+            <p>Redirecting to the <a href="lessons/index.html">agentic_uav study guide</a>…</p>
+          </body>
+          </html>
+          HTML
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./_site
+          keep_files: true
+          commit_message: "Auto-publish lessons site from ${{ github.sha }}"
