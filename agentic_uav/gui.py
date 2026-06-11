@@ -21,7 +21,7 @@ from agentic_uav.gui_support import (
     run_to_end,
 )
 from agentic_uav.scenarios import MISSION_TYPES, ScenarioParams, build_demo_scenario
-from agentic_uav.simulation import Simulation
+from agentic_uav.simulation import CommunicationEvent, Simulation
 from agentic_uav.ui_config import LAST_CONFIG_PATH, METHODS as UI_METHODS, load_ui_params, save_ui_params
 
 
@@ -62,6 +62,15 @@ version = solara.reactive(0)
 simulation = solara.reactive(Simulation.from_config(build_demo_scenario(params=STARTUP_PARAMS)))
 _has_loaded_persisted_config = False
 
+# Runtime event-injection controls. These drive the "Inject Event" card and are
+# intentionally NOT part of _scenario_params()/_config_dependency(): injecting an
+# event must mutate the running simulation, never trigger a reset.
+INJECT_EVENT_TYPES = ["dropout", "urgent_sector", "block_sector"]
+inject_event_type = solara.reactive("dropout")
+inject_uav_id = solara.reactive("")
+inject_cell_x = solara.reactive(0)
+inject_cell_y = solara.reactive(0)
+
 
 @solara.component
 def Page() -> None:
@@ -80,7 +89,7 @@ def Page() -> None:
         with solara.ColumnsResponsive(default=12, medium=[3, 6, 3], gutters=True, classes=["mission-layout"]):
             _Controls(state)
             _GridPanel(portrayal, state, refresh_key)
-            _MetricsPanel(state, timeline)
+            _MetricsPanel(state, timeline, refresh_key)
 
 
 @solara.component
@@ -113,6 +122,7 @@ def _Controls(state: dict[str, object]) -> None:
     with solara.Column(gap="14px"):
         _MissionSetupCard()
         _RunControlCard(state)
+        _InjectEventCard(state)
 
 
 @solara.component
@@ -154,6 +164,28 @@ def _RunControlCard(state: dict[str, object]) -> None:
 
 
 @solara.component
+def _InjectEventCard(state: dict[str, object]) -> None:
+    sim = simulation.value
+    active_ids = _active_uav_ids(sim)
+    finished = bool(state["is_finished"])
+    with solara.Card(title="Inject Event", elevation=0, margin=0):
+        solara.Select("Event type", values=INJECT_EVENT_TYPES, value=inject_event_type)
+        if inject_event_type.value == "dropout":
+            solara.Select("UAV", values=active_ids, value=inject_uav_id)
+            disabled = finished or inject_uav_id.value not in active_ids
+        else:
+            solara.SliderInt("Cell X", value=inject_cell_x, min=0, max=max(sim.world.width - 1, 0))
+            solara.SliderInt("Cell Y", value=inject_cell_y, min=0, max=max(sim.world.height - 1, 0))
+            disabled = finished
+        solara.Button("Inject", on_click=_inject_event, color="error", disabled=disabled)
+        solara.HTML(
+            tag="div",
+            unsafe_innerHTML=_inject_hint_html(sim, finished),
+            classes=["run-status"],
+        )
+
+
+@solara.component
 def _GridPanel(portrayal: dict[str, object], state: dict[str, object], refresh_key: int) -> None:
     with solara.Card(title="Operating Area", subtitle=f"Tick {state['tick']} of {simulation.value.config.ticks}", elevation=0, margin=0):
         solara.Checkbox(label="Show communication links", value=show_communication_links)
@@ -166,11 +198,47 @@ def _GridPanel(portrayal: dict[str, object], state: dict[str, object], refresh_k
 
 
 @solara.component
-def _MetricsPanel(state: dict[str, object], timeline: list[dict[str, object]]) -> None:
+def _MetricsPanel(state: dict[str, object], timeline: list[dict[str, object]], refresh_key: int) -> None:
     with solara.Card(title="Mission Telemetry", elevation=0, margin=0):
         _MetricSummary(state)
+        _MessageCountsPanel(state)
         _MetricChart()
+        _UavStatusPanel(refresh_key)
         solara.HTML(tag="div", unsafe_innerHTML=_timeline_html(timeline), classes=["event-timeline"])
+
+
+@solara.component
+def _UavStatusPanel(refresh_key: int) -> None:
+    sim = simulation.value
+    with solara.Column(gap="6px", classes=["uav-status-panel"]):
+        solara.HTML(tag="div", unsafe_innerHTML="<div class='timeline-title'>UAV Fleet Status</div>")
+        for uav_id, uav in sorted(sim.uavs.items()):
+            battery_pct = int(uav.energy * 100)
+            status_cls = uav.health.lower()
+            if not uav.active:
+                status_cls += " inactive"
+            
+            bar_width = f"{battery_pct}%"
+            bar_color = "#3DDC97"
+            if battery_pct < 20:
+                bar_color = "#FF6B4A"
+            elif battery_pct < 50:
+                bar_color = "#E7B84A"
+                
+            uav_html = (
+                f"<div class='uav-status-card {status_cls}'>"
+                f"  <div class='uav-status-row'>"
+                f"    <strong>{html.escape(uav_id)}</strong>"
+                f"    <span class='uav-status-role'>{html.escape(uav.role)}</span>"
+                f"    <span class='uav-status-health {uav.health.lower()}'>{html.escape(uav.health)}</span>"
+                f"  </div>"
+                f"  <div class='uav-battery-container'>"
+                f"    <div class='uav-battery-bar' style='width: {bar_width}; background-color: {bar_color};'></div>"
+                f"    <span class='uav-battery-text'>{battery_pct}%</span>"
+                f"  </div>"
+                f"</div>"
+            )
+            solara.HTML(tag="div", unsafe_innerHTML=uav_html)
 
 
 @solara.component
@@ -182,6 +250,29 @@ def _MetricSummary(state: dict[str, object]) -> None:
         with solara.Row(gap="10px"):
             _MetricCard("Messages", str(state["messages_sent"]), "amber")
             _MetricCard("Urgent", str(state["urgent_target_count"]), "coral")
+
+
+@solara.component
+def _MessageCountsPanel(state: dict[str, object]) -> None:
+    counts: dict[str, int] = state.get("message_counts", {})
+    if not counts:
+        return
+    
+    with solara.Column(gap="6px", classes=["uav-status-panel"]):
+        solara.HTML(tag="div", unsafe_innerHTML="<div class='timeline-title'>Message Type Breakdown</div>")
+        
+        counts_html = ""
+        for msg_type, count in sorted(counts.items()):
+            counts_html += (
+                f"<div class='uav-status-card'>"
+                f"  <div class='uav-status-row'>"
+                f"    <strong>{html.escape(msg_type)}</strong>"
+                f"    <span class='uav-status-role'>{count}</span>"
+                f"  </div>"
+                f"</div>"
+            )
+            
+        solara.HTML(tag="div", unsafe_innerHTML=f"<div>{counts_html}</div>")
 
 
 @solara.component
@@ -344,6 +435,42 @@ def _end() -> None:
     version.value += 1
 
 
+def _active_uav_ids(sim: Simulation) -> list[str]:
+    return [uav_id for uav_id, uav in sim.uavs.items() if uav.active]
+
+
+def _build_inject_event(sim: Simulation) -> CommunicationEvent | None:
+    # Schedule at the current tick so the event fires on the NEXT step() through the
+    # normal path (events.apply -> method.handle_event), preserving the agentic
+    # re-plan. Returns None for an invalid selection so the handler no-ops.
+    tick = sim.tick
+    event_type = inject_event_type.value
+    if event_type == "dropout":
+        uav_id = inject_uav_id.value
+        if not uav_id or uav_id not in sim.uavs:
+            return None
+        return CommunicationEvent(tick=tick, event_type="dropout", payload={"uav_id": uav_id})
+    cell = (inject_cell_x.value, inject_cell_y.value)
+    if not sim.world.in_bounds(cell):
+        return None
+    return CommunicationEvent(
+        tick=tick, event_type=event_type, payload={"cell": [cell[0], cell[1]]}
+    )
+
+
+def _inject_event() -> None:
+    sim = simulation.value
+    if sim.is_finished:
+        return
+    event = _build_inject_event(sim)
+    if event is None:
+        return
+    # sim.events.events is the same list object as sim.config.events, so the
+    # injected event surfaces in the timeline and metric chart automatically.
+    sim.events.events.append(event)
+    version.value += 1
+
+
 def _scenario_params() -> ScenarioParams:
     return ScenarioParams(
         method_name=method_name.value,
@@ -479,10 +606,12 @@ def _grid_cell_html(
     target_cells: set[tuple[int, int]],
 ) -> str:
     classes = ["grid-cell", str(sector["state"])]
+    if sector.get("is_blackout"):
+        classes.append("blackout")
     if cell in target_cells:
         classes.append("targeted")
     badges = "".join(_uav_badge(uav, index) for index, uav in enumerate(uavs))
-    return "<div class='{classes}' style='background:{fill}'>{badges}</div>".format(
+    return "<div class='{classes}' style='background-color:{fill}'>{badges}</div>".format(
         classes=" ".join(classes),
         fill=sector["fill"],
         badges=badges,
@@ -530,7 +659,8 @@ def _legend_html() -> str:
     target = "<span class='legend-item'><span class='target-dot'></span>Targeted sector</span>"
     communication = "<span class='legend-item'><span class='communication-dot'></span>Communication link</span>"
     path = "<span class='legend-item'><span class='path-dot'></span>Path taken</span>"
-    return cells + roles + target + communication + path
+    blackout = "<span class='legend-item'><span class='blackout-legend-dot'></span>Blackout zone</span>"
+    return cells + blackout + roles + target + communication + path
 
 
 def _run_status_html(state: dict[str, object]) -> str:
@@ -551,6 +681,15 @@ def _run_status_label(state: dict[str, object]) -> str:
     if state["termination_reason"] == "max_ticks":
         return "Unsolved"
     return "Running"
+
+
+def _inject_hint_html(sim: Simulation, finished: bool) -> str:
+    if finished:
+        return "<small>Mission finished &mdash; reset to inject events.</small>"
+    return (
+        "<small>Fires on the next step (t={tick}); shown in the event timeline now."
+        "</small>".format(tick=sim.tick)
+    )
 
 
 def _timeline_html(timeline: list[dict[str, object]]) -> str:
@@ -811,6 +950,15 @@ _CSS = """
 .grid-cell.blocked {
   background-image: repeating-linear-gradient(135deg, rgba(255,255,255,0.13) 0 4px, transparent 4px 8px);
 }
+.grid-cell.blackout {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 107, 74, 0.15),
+    rgba(255, 107, 74, 0.15) 10px,
+    transparent 10px,
+    transparent 20px
+  ) !important;
+}
 .grid-cell.targeted::after {
   content: "";
   position: absolute;
@@ -864,6 +1012,21 @@ _CSS = """
   color: #66756F;
   filter: grayscale(0.85) drop-shadow(0 5px 8px rgba(0, 0, 0, 0.32));
   opacity: 0.76;
+}
+.blackout-legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+  vertical-align: middle;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 107, 74, 0.4),
+    rgba(255, 107, 74, 0.4) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  border: 1px solid rgba(255, 107, 74, 0.6);
 }
 .uav-marker.dropped::before,
 .uav-marker.dropped::after {
@@ -1081,5 +1244,71 @@ _CSS = """
   .uav-grid-wrap {
     width: min(92vw, 620px);
   }
+}
+.uav-status-panel {
+  margin-top: 16px;
+  border-top: 1px solid #D8E1DE;
+  padding-top: 12px;
+}
+.uav-status-card {
+  padding: 8px 10px;
+  background: #F7FAF9;
+  border: 1px solid #D8E1DE;
+  border-radius: 6px;
+  margin-bottom: 2px;
+}
+.uav-status-card.inactive {
+  opacity: 0.7;
+}
+.uav-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+.uav-status-role {
+  color: #66756F;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.uav-status-health {
+  font-size: 11px;
+  font-weight: bold;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.uav-status-health.nominal {
+  background: rgba(61, 220, 151, 0.15);
+  color: #3DDC97;
+}
+.uav-status-health.depleted {
+  background: rgba(255, 107, 74, 0.15);
+  color: #FF6B4A;
+}
+.uav-status-health.dropped {
+  background: rgba(102, 117, 111, 0.15);
+  color: #66756F;
+}
+.uav-battery-container {
+  height: 12px;
+  background: #E8F0EE;
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+.uav-battery-bar {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+.uav-battery-text {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 9px;
+  font-weight: bold;
+  color: #1F2933;
 }
 """

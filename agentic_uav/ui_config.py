@@ -11,7 +11,7 @@ from agentic_uav.scenarios import MISSION_TYPES, ScenarioParams
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG_PATH = PROJECT_ROOT / "config" / "default_config.json"
 LAST_CONFIG_PATH = PROJECT_ROOT / ".agentic_uav" / "last_config.json"
-METHODS = ("static", "rules", "task_consideration", "agentic")
+METHODS = ("static", "rules", "task_consideration", "greedy", "agentic")
 
 _PARAM_FIELDS = {field.name for field in fields(ScenarioParams)}
 _INT_RANGES = {

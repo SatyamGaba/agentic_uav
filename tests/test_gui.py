@@ -284,6 +284,7 @@ class GuiSupportTest(unittest.TestCase):
     def test_grid_html_renders_uav_paths_as_svg_polylines(self) -> None:
         simulation = Simulation.from_config(build_gui_scenario())
         simulation.step()
+        simulation.step()
         portrayal = build_grid_portrayal(simulation)
 
         html = gui._grid_html(portrayal)
@@ -386,6 +387,95 @@ class GuiSupportTest(unittest.TestCase):
 
         self.assertEqual(simulation.tick, 3)
         self.assertTrue(simulation.is_finished)
+
+    def _reset_for_injection(self, method_name: str = "agentic") -> None:
+        gui.method_name.value = method_name
+        gui.mission_type.value = "disaster_mapping"
+        gui.grid_size.value = 8
+        gui.uav_count.value = 4
+        gui.seed.value = 7
+        gui.tick_horizon.value = 50
+        gui.inject_event_type.value = "dropout"
+        gui.inject_uav_id.value = ""
+        gui.inject_cell_x.value = 0
+        gui.inject_cell_y.value = 0
+        gui._reset()
+
+    def test_inject_dropout_schedules_at_current_tick_and_applies_next_step(self) -> None:
+        self._reset_for_injection()
+        target = next(iter(gui.simulation.value.uavs))
+        gui.inject_event_type.value = "dropout"
+        gui.inject_uav_id.value = target
+        before_version = gui.version.value
+
+        gui._inject_event()
+
+        injected = [
+            event
+            for event in gui.simulation.value.events.events
+            if event.event_type == "dropout" and event.payload["uav_id"] == target
+        ]
+        self.assertTrue(injected)
+        self.assertEqual(injected[-1].tick, gui.simulation.value.tick)
+        self.assertTrue(gui.simulation.value.uavs[target].active)
+        self.assertEqual(gui.version.value, before_version + 1)
+
+        gui._step_once()
+
+        self.assertFalse(gui.simulation.value.uavs[target].active)
+        self.assertEqual(gui.simulation.value.uavs[target].health, "dropped")
+
+    def test_inject_dropout_triggers_agentic_replan(self) -> None:
+        self._reset_for_injection(method_name="agentic")
+        target = next(iter(gui.simulation.value.uavs))
+        gui.inject_uav_id.value = target
+
+        gui._inject_event()
+        gui._step_once()
+
+        reasons = {replan["reason"] for replan in gui.simulation.value.metrics.replans}
+        self.assertIn("dropout", reasons)
+
+    def test_inject_event_noop_when_no_uav_selected(self) -> None:
+        self._reset_for_injection()
+        gui.inject_event_type.value = "dropout"
+        gui.inject_uav_id.value = ""
+        before_events = len(gui.simulation.value.events.events)
+        before_version = gui.version.value
+
+        gui._inject_event()
+
+        self.assertEqual(len(gui.simulation.value.events.events), before_events)
+        self.assertEqual(gui.version.value, before_version)
+
+    def test_inject_block_sector_marks_cell_after_step(self) -> None:
+        self._reset_for_injection()
+        gui.inject_event_type.value = "block_sector"
+        gui.inject_cell_x.value = 5
+        gui.inject_cell_y.value = 5
+        cell = (5, 5)
+        self.assertFalse(gui.simulation.value.world.sectors[cell].blocked)
+
+        gui._inject_event()
+        gui._step_once()
+
+        self.assertTrue(gui.simulation.value.world.sectors[cell].blocked)
+
+    def test_inject_appears_in_event_timeline_as_active(self) -> None:
+        self._reset_for_injection()
+        target = next(iter(gui.simulation.value.uavs))
+        gui.inject_uav_id.value = target
+
+        gui._inject_event()
+
+        timeline = build_event_timeline(gui.simulation.value)
+        injected = [
+            item
+            for item in timeline
+            if item["event_type"] == "dropout" and item["detail"] == target
+        ]
+        self.assertTrue(injected)
+        self.assertEqual(injected[-1]["state"], "active")
 
 
 if __name__ == "__main__":

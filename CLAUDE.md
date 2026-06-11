@@ -2,68 +2,71 @@
 
 This file provides instructions and context for AI coding agents working on this project.
 
-<!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
-## Beads Issue Tracker
-
-This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full workflow context and commands.
-
-### Quick Reference
-
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work
-bd close <id>         # Complete work
-```
-
-### Rules
-
-- Use `bd` for ALL task tracking — do NOT use TodoWrite, TaskCreate, or markdown TODO lists
-- Run `bd prime` for detailed command reference and session close protocol
-- Use `bd remember` for persistent knowledge — do NOT use MEMORY.md files
-
-## Session Completion
-
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
-
-**MANDATORY WORKFLOW:**
-
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY:
-   ```bash
-   git pull --rebase
-   bd dolt push
-   git push
-   git status  # MUST show "up to date with origin"
-   ```
-5. **Clean up** - Clear stashes, prune remote branches
-6. **Verify** - All changes committed AND pushed
-7. **Hand off** - Provide context for next session
-
-**CRITICAL RULES:**
-- Work is NOT complete until `git push` succeeds
-- NEVER stop before pushing - that leaves work stranded locally
-- NEVER say "ready to push when you are" - YOU must push
-- If push fails, resolve and retry until it succeeds
-<!-- END BEADS INTEGRATION -->
-
-
 ## Build & Test
 
-_Add your build and test commands here_
+This project uses `uv`.
 
 ```bash
-# Example:
-# npm install
-# npm test
+uv sync                          # Install dependencies
+uv run python -m unittest        # Run all tests
+uv run main.py run --method agentic   # Headless demo run (proposed LLM method, mock decider)
+uv run main.py run --method greedy    # Headless demo run (greedy heuristic baseline)
+uv run main.py experiment        # Paired baselines-vs-agentic sweeps
+uv run main.py ui                # Solara browser GUI (http://127.0.0.1:8765)
 ```
 
 ## Architecture Overview
 
-_Add a brief overview of your project architecture_
+A custom tick-based 2D simulator for evaluating decentralized UAV swarm decision
+methods for a disaster-mapping paper. There are 5 methods: four heuristic
+baselines (`static`, `rules`, `task_consideration`, `greedy`) and the proposed
+LLM-driven method (`agentic`). All five are swappable behind a single
+`SwarmMethod` interface; the world model, events, communication, metrics, and
+renderer are shared as an experiment harness.
+
+`greedy` is the renamed former `AgenticMethod` heuristic — it is a baseline, not
+the contribution. `agentic` is the proposed method and the LLM seam: an
+LLM-driven, decentralized decision agent whose thesis is that it beats the
+heuristic baselines on recovery after disruption. All five methods receive the
+**same** hybrid observation (static grid layout global; coverage/urgent
+discovered locally via a per-UAV belief or learned through range-limited peer
+messages), so they differ only in reasoning. The `agentic` LLM is
+event-triggered and sits behind a provider-agnostic adapter (deterministic mock
+decider as the default; no vendor API dependency yet), falling back to the
+`greedy` heuristic on invalid output.
+
+- `agentic_uav/simulation.py` — grid world, tick loop, events, metrics.
+- `agentic_uav/policy.py` — swappable `SwarmMethod` implementations.
+- `agentic_uav/planning.py` — `Action`, `MethodState`, `ObservationBuilder`.
+- `agentic_uav/models.py` — core dataclasses (`Sector`, `UavState`, `WorldState`).
+- `agentic_uav/communication.py` — range-limited, delayed `NetworkModel`.
+- `agentic_uav/scenarios.py` — reusable demo scenario construction.
+- `agentic_uav/experiments.py` — seeded sweeps, aggregates, paper plots.
+- `agentic_uav/gui.py` / `gui_support.py` — Solara GUI.
+- `agentic_uav/rendering.py` — static Matplotlib snapshots.
+
+See `README.md`, `docs/NEXT_STEPS.md`, and
+`docs/superpowers/specs/2026-04-26-swappable-uav-swarm-simulator-design.md`.
 
 ## Conventions & Patterns
 
-_Add your project-specific conventions here_
+- The `agentic` method (and every other method) is decentralized by design:
+  per-UAV decisions from local observation, per-UAV belief, peer messages, and
+  onboard state — no global oracle. Keep it that way (see the Decentralization
+  Principle in the design spec).
+- Observation symmetry is non-negotiable: all five methods get the same
+  per-UAV observation (layout global; coverage/urgent discovered locally). They
+  differ only in reasoning, never in what they can see.
+- Changing only `method_name` must be enough to swap methods; no other subsystem
+  should branch on the method. This invariant holds across all five methods,
+  including the LLM `agentic` method.
+- `handle_event()` is now invoked: `Simulation.step` calls it for each fired
+  event, so a method can mark a re-plan as pending. Baselines stay no-ops; the
+  `agentic` method uses it as the event-triggered re-plan hook (mission start
+  plus dropout / urgent_sector / block_sector events).
+- The `intent_summary` negotiation channel is now consumed: the `agentic`
+  method ingests peer `intent_summary` messages as negotiation priors (and still
+  emits its own) so colliding proposals deconflict synchronously within a tick.
+- Metrics now carry action/plan traces: the `MetricsLogger` records replan and
+  plan-change traces (e.g. `replan_count`, `plan_change_count`) used for the
+  recovery-after-disruption analysis.

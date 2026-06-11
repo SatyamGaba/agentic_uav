@@ -8,6 +8,8 @@ flowchart TD
     classDef comm fill:#E9FBF7,stroke:#21806F,color:#123B35
     classDef output fill:#F2F2F2,stroke:#666666,color:#222222
     classDef gap fill:#FFE8E8,stroke:#B42318,color:#3B0A0A,stroke-width:2px
+    classDef resolved fill:#E8F8EC,stroke:#1F8A3B,color:#0A3B16,stroke-width:2px
+    classDef llm fill:#FDE8F5,stroke:#A6248A,color:#3D0A30
 
     subgraph Config["Config"]
         ScenarioConfig["ScenarioConfig<br/>method_name, ticks, seed<br/>communication_range, sensing_radius<br/>heartbeat_interval, urgent_message_ttl"]:::config
@@ -20,7 +22,7 @@ flowchart TD
         Simulation["Simulation<br/>shared tick loop and runtime state"]:::backbone
         WorldState["WorldState<br/>sector grid, coverage, priority<br/>blocked, hazard, visibility, comm_quality"]:::backbone
         EventInjector["EventInjector.apply()<br/>mutates world and UAV availability"]:::backbone
-        ObservationBuilder["ObservationBuilder.build()<br/>self, urgent_cells, nearby sectors<br/>messages"]:::backbone
+        ObservationBuilder["ObservationBuilder.build()<br/>same hybrid obs for every method<br/>self, known_urgent (from belief), nearby sectors<br/>messages; layout global, coverage/urgent local"]:::backbone
         ResolveActions["resolve_actions()<br/>validates target, sets role/target<br/>moves UAVs, enqueues messages"]:::backbone
         Sensing["apply_sensing()<br/>marks non-blocked nearby sectors covered"]:::backbone
     end
@@ -30,8 +32,14 @@ flowchart TD
         StaticMethod["StaticPartitionMethod<br/>centralized pre-mission baseline<br/>sector assignments"]:::decision
         RulesMethod["RuleAdaptiveMethod<br/>decentralized fixed rules<br/>local/messaged urgent, local coverage"]:::decision
         TaskConsiderationMethod["TaskConsiderationMethod<br/>Baseline C<br/>decentralized task-consideration scheduler"]:::decision
-        AgenticMethod["AgenticMethod<br/>decentralized per-UAV role/target choice<br/>intent_summary messages"]:::decision
+        GreedyMethod["GreedyMethod<br/>Baseline D (heuristic)<br/>renamed former AgenticMethod heuristic<br/>decentralized per-UAV role/target choice<br/>intent_summary messages"]:::decision
+        AgenticMethod["AgenticMethod (LLM, proposed)<br/>event-triggered re-plan + persisted plan<br/>decentralized + in-tick negotiation<br/>consumes/emits intent_summary<br/>greedy fallback on invalid output"]:::llm
         Actions["Action list<br/>action_type, target_cell<br/>new_role, messages"]:::decision
+    end
+
+    subgraph LlmAdapter["LLM Adapter (provider-agnostic)"]
+        AgentDecider["AgentDecider protocol<br/>decide(observation) -> action JSON<br/>serialize -> call -> validate -> fallback"]:::llm
+        MockAgentDecider["MockAgentDecider (default)<br/>deterministic, dependency-free<br/>mirrors greedy; real vendor is a drop-in"]:::llm
     end
 
     subgraph PlanningState["Planning State"]
@@ -46,15 +54,15 @@ flowchart TD
     end
 
     subgraph MetricsAndOutputs["Metrics and Outputs"]
-        MetricsLogger["MetricsLogger<br/>coverage_ratio, active_uavs<br/>messages_sent, urgent_targets"]:::output
+        MetricsLogger["MetricsLogger<br/>coverage_ratio, active_uavs<br/>messages_sent, urgent_targets<br/>replan/plan-change traces"]:::output
         Renderer["Renderer / GUI<br/>reads world and UAV states"]:::output
         Summary["Run summary<br/>ticks_run, coverage_ratio<br/>messages_sent, urgent_targets"]:::output
     end
 
-    subgraph ReviewGaps["Review Gaps"]
-        GapEvents["Gap: handle_event() contract<br/>is defined but not invoked"]:::gap
-        GapMessages["Gap: agentic intent_summary messages<br/>are emitted but not consumed"]:::gap
-        GapState["Gap: metrics lack action traces<br/>needed for recovery analysis:<br/>task status, plan age,<br/>replan reason, abandoned work"]:::gap
+    subgraph ReviewGaps["Review Gaps (resolved)"]
+        GapEvents["Resolved: handle_event() is now invoked<br/>Simulation.step calls it per fired event<br/>(agentic event-triggered re-plan hook)"]:::resolved
+        GapMessages["Resolved: agentic intent_summary messages<br/>are now consumed as negotiation priors<br/>(and still emitted for peers)"]:::resolved
+        GapState["Resolved: metrics now carry action/plan traces<br/>for recovery analysis:<br/>replan_count, plan_change_count,<br/>replan reason"]:::resolved
     end
 
     ScenarioConfig --> Simulation
@@ -73,6 +81,7 @@ flowchart TD
     EventInjector --> UavState
     NetworkModel --> Inbox
     Inbox --> UavState
+    Inbox --> GreedyMethod
     Inbox --> AgenticMethod
     ObservationBuilder --> UavState
     ObservationBuilder --> WorldState
@@ -81,19 +90,27 @@ flowchart TD
     SwarmMethod --> StaticMethod
     SwarmMethod --> RulesMethod
     SwarmMethod --> TaskConsiderationMethod
+    SwarmMethod --> GreedyMethod
     SwarmMethod --> AgenticMethod
     StaticMethod --> Actions
     RulesMethod --> Actions
     TaskConsiderationMethod --> Actions
+    GreedyMethod --> Actions
     AgenticMethod --> Actions
     MethodState --> StaticMethod
     MethodState --> RulesMethod
     MethodState --> TaskConsiderationMethod
+    MethodState --> GreedyMethod
     MethodState --> AgenticMethod
     UavState --> StaticMethod
     UavState --> RulesMethod
     UavState --> TaskConsiderationMethod
+    UavState --> GreedyMethod
     UavState --> AgenticMethod
+
+    AgenticMethod --> AgentDecider
+    AgentDecider --> MockAgentDecider
+    MockAgentDecider --> Actions
 
     Actions --> ResolveActions
     ResolveActions --> UavState
@@ -109,9 +126,10 @@ flowchart TD
     WorldState --> Renderer
     UavState --> Renderer
 
-    GapEvents -. affects .-> EventInjector
-    GapEvents -. missing call .-> SwarmMethod
-    GapMessages -. affects .-> AgenticMethod
-    GapMessages -. ignored by decisions .-> Inbox
-    GapState -. affects .-> UavState
-    GapState -. affects .-> MethodState
+    GapEvents -. now invoked from .-> EventInjector
+    GapEvents -. now calls .-> SwarmMethod
+    GapMessages -. now consumed by .-> AgenticMethod
+    GapMessages -. now read from .-> Inbox
+    GapState -. now traced from .-> UavState
+    GapState -. now traced from .-> MethodState
+    MethodState --> MetricsLogger

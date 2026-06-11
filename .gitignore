@@ -6,6 +6,10 @@ dist/
 wheels/
 *.egg-info
 
+
+.claude
+
+
 # Virtual environments
 .venv
 
@@ -14,10 +18,15 @@ wheels/
 .superpowers/
 .claude/
 .codex/
+
+# Experiment run outputs
 runs/
 
-# Beads / Dolt files (added by bd init)
-.beads/
+# Reference papers (large PDFs)
+related-work/pdfs/
+
+# Playwright MCP
+.playwright-mcp/
 
 # macOS metadata
 .DS_Store
