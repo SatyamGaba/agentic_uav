@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 1 · The whole-system map</title>
+<style>
+  :root {
+    --ink: #1a1a1a; --muted: #6b6b6b; --rule: #d8d4cc; --bg: #fbfaf7;
+    --accent: #8a5a00; --code-bg: #f1eee8; --green: #1f7a3b; --red: #b42318;
+    --blue: #2f6ea5; --panel: #fff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    color: var(--ink); background: var(--bg); line-height: 1.6;
+    max-width: 44rem; margin: 3rem auto; padding: 0 1.5rem; font-size: 18px;
+  }
+  h1 { font-size: 2rem; line-height: 1.12; margin: 0 0 .15rem; letter-spacing: -.015em; }
+  .kicker { color: var(--accent); text-transform: uppercase; letter-spacing: .12em;
+            font-size: .72rem; font-weight: 700; margin: 0 0 .6rem; }
+  .sub { color: var(--muted); font-style: italic; margin: 0 0 1.6rem; font-size: 1.05rem; }
+  .mission { background: #fff7e6; border-left: 3px solid var(--accent);
+             padding: .7rem 1rem; border-radius: 0 6px 6px 0; font-size: .92rem; margin: 0 0 2rem; }
+  h2 { font-size: 1.05rem; text-transform: uppercase; letter-spacing: .08em;
+       color: var(--accent); border-bottom: 1px solid var(--rule);
+       padding-bottom: .3rem; margin: 2.6rem 0 1rem; }
+  p { margin: 1rem 0; }
+  code { font-family: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+         background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .82em; }
+  .loc { color: var(--muted); font-size: .82rem; font-style: italic; }
+
+  /* pipeline diagram */
+  .flow { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px;
+          padding: 1.2rem 1rem; margin: 1.4rem 0; }
+  .flow ol { list-style: none; counter-reset: step; margin: 0; padding: 0; }
+  .flow li { counter-increment: step; position: relative; padding: .55rem 0 .55rem 2.6rem;
+             border-left: 2px solid var(--rule); margin-left: .8rem; }
+  .flow li:last-child { border-left: 2px solid transparent; }
+  .flow li::before { content: counter(step); position: absolute; left: -.85rem; top: .5rem;
+        width: 1.7rem; height: 1.7rem; background: var(--accent); color: #fff;
+        border-radius: 50%; display: grid; place-items: center; font-family: monospace;
+        font-size: .8rem; font-weight: 700; }
+  .flow b { font-size: .98rem; }
+  .flow .where { color: var(--muted); font-size: .8rem; font-style: italic; }
+
+  /* layer table */
+  table { border-collapse: collapse; width: 100%; margin: 1.2rem 0; font-size: .9rem; }
+  th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { color: var(--accent); text-transform: uppercase; letter-spacing: .05em; font-size: .72rem; }
+  td code { font-size: .8em; }
+
+  .invariant { background: #eef6ff; border: 1px solid #cfe0f2; border-radius: 8px;
+               padding: .9rem 1.1rem; margin: 1rem 0; }
+  .invariant b { color: var(--blue); }
+  .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+  @media (max-width: 640px){ .twocol { grid-template-columns: 1fr; } }
+
+  /* quiz */
+  .quiz { background: var(--panel); border: 2px solid var(--accent); border-radius: 10px;
+          padding: 1.2rem 1.3rem; margin: 1.6rem 0; }
+  .quiz h3 { margin: 0 0 .2rem; font-size: 1rem; }
+  .q { margin: 1.2rem 0; }
+  .q p.stem { font-weight: 700; margin: 0 0 .5rem; }
+  .opt { display: block; width: 100%; text-align: left; border: 1px solid var(--rule);
+         background: #fff; border-radius: 6px; padding: .5rem .7rem; margin: .35rem 0;
+         font: inherit; font-size: .92rem; cursor: pointer; transition: background .12s; }
+  .opt:hover { background: #f4f1ea; }
+  .opt.correct { border-color: var(--green); background: #e9f8ee; }
+  .opt.wrong { border-color: var(--red); background: #fcebe9; }
+  .fb { font-size: .86rem; margin: .4rem 0 0; min-height: 1.2em; }
+  .fb.show.correct { color: var(--green); }
+  .fb.show.wrong { color: var(--red); }
+
+  .nextup { background: #f3f0ea; border-radius: 8px; padding: .9rem 1.1rem; margin-top: 1rem; }
+  .source { border-left: 3px solid var(--green); background: #f1f8f3; padding: .7rem 1rem;
+            border-radius: 0 6px 6px 0; margin: 1.4rem 0; font-size: .92rem; }
+  .ask { text-align: center; color: var(--muted); font-style: italic; margin: 2rem 0 0;
+         font-size: .92rem; }
+  a { color: var(--accent); }
+  footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--rule);
+           color: var(--muted); font-size: .82rem; }
+  .pill { display:inline-block; font-size:.7rem; padding:.1rem .5rem; border-radius:999px;
+          background:#fde8f5; color:#a6248a; font-weight:700; letter-spacing:.03em; }
+  .pill.base { background:#f3f7f0; color:#4e7d3a; }
+  figure.arch { margin: 1.4rem 0; padding: 0; }
+  figure.arch a { display:block; border:1px solid var(--rule); border-radius:10px;
+                  background:#fff; padding:.7rem; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  figure.arch img { display:block; width:100%; height:auto; min-width:640px; }
+  figure.arch figcaption { color: var(--muted); font-size:.82rem; font-style:italic;
+                           margin-top:.5rem; text-align:center; }
+  .lessonnav { display:flex; justify-content:space-between; align-items:center; gap:.5rem;
+               margin:1.6rem 0; font-size:.9rem; }
+  .lessonnav.top { margin:0 0 2rem; }
+  .lessonnav a, .lessonnav span { text-decoration:none; padding:.45rem .9rem; border-radius:8px;
+               border:1px solid var(--rule); background:#fff; color:var(--accent);
+               white-space:nowrap; transition:background .12s; }
+  .lessonnav a:hover { background:#f4f1ea; }
+  .lessonnav .disabled { color:#bdb8ae; background:#f7f5f0; cursor:default; border-style:dashed; }
+  .lessonnav .idx { border:none; background:none; color:var(--muted); font-style:italic; }
+  .lessonnav .next { font-weight:700; }
+</style>
+</head>
+<body>
+
+<nav class="lessonnav top">
+  <span class="disabled">&larr; Prev</span>
+  <a class="idx" href="index.html">Contents</a>
+  <a class="next" href="0002-swarmmethod-seam.html">Next: The SwarmMethod seam &rarr;</a>
+</nav>
+
+<p class="kicker">Lesson 1 — agentic_uav</p>
+<h1>The whole-system map</h1>
+<p class="sub">One picture of how a tick flows through the framework — and why its shape is the thesis defense.</p>
+
+<div class="mission">
+<strong>Mission link.</strong> You're learning this to <em>defend the thesis</em> — that the
+LLM <code>agentic</code> method beats heuristic baselines on recovery after disruption. This
+lesson gives you the map a reviewer's questions will move across. Every later lesson zooms
+into one box on it.
+</div>
+
+<h2>The one idea</h2>
+<p>
+The framework is a <strong>shared experiment harness wrapped around one swappable decision
+layer</strong>. Everything — world, events, communication, sensing, metrics — is held constant
+across all five methods. Only the box labelled "decide" changes. That single design choice is
+what lets the paper say the methods <em>differ only in reasoning</em>. Hold this sentence in
+your head and the rest of the codebase falls into place.
+</p>
+
+<figure class="arch">
+  <a href="architecture.svg" target="_blank" rel="noopener" title="Open full-size diagram">
+    <img src="architecture.svg" alt="End-to-end architecture: Config feeds the Simulation backbone (events, observation builder, resolve, sensing); the per-UAV decentralized decision layer holds the SwarmMethod interface and all five methods; the agentic method drives the provider-agnostic LLM adapter; communication is the only peer-information path; metrics and outputs read world and UAV state.">
+  </a>
+  <figcaption>The canonical end-to-end wiring (rendered from <code>docs/architecture.mmd</code>).
+  Tap to open full-size. Every later lesson zooms into one box here.</figcaption>
+</figure>
+
+<h2>What one tick does</h2>
+<p>The heartbeat is <code>Simulation.step()</code> <span class="loc">simulation.py</span>. Every
+tick runs the same seven beats, in order:</p>
+
+<div class="flow">
+<ol>
+  <li><b>Apply events.</b> <code>EventInjector</code> fires scheduled disruptions (dropout,
+      block_sector, urgent_sector). Each fired event also calls <code>method.handle_event()</code>.
+      <div class="where">simulation.py · communication.py</div></li>
+  <li><b>Deliver messages.</b> <code>NetworkModel</code> moves peer messages — range-limited,
+      delayed, TTL-bounded. This is the <em>only</em> way one UAV learns what another knows.
+      <div class="where">communication.py</div></li>
+  <li><b>Build observations.</b> <code>ObservationBuilder.build()</code> assembles one
+      observation <em>per UAV</em> from its local view + belief + inbox.
+      <div class="where">planning.py</div></li>
+  <li><b>Decide.</b> The selected <code>SwarmMethod.decide_tick()</code> turns observations into
+      a list of <code>Action</code>s. <span class="pill base">baselines</span> <span class="pill">agentic = LLM</span>
+      <div class="where">policy.py (+ llm_agent.py for agentic)</div></li>
+  <li><b>Resolve actions.</b> Validate targets, set roles, move one Manhattan step, enqueue
+      outgoing messages.
+      <div class="where">simulation.py</div></li>
+  <li><b>Sense.</b> Non-blocked sectors near each UAV get marked covered. <em>This</em> is what
+      writes new knowledge into a UAV's belief next tick.
+      <div class="where">simulation.py</div></li>
+  <li><b>Log.</b> <code>MetricsLogger</code> records coverage, active UAVs, messages, and the
+      replan / plan-change traces used for the recovery analysis.
+      <div class="where">simulation.py</div></li>
+</ol>
+</div>
+
+<p>Notice beats 1–3 and 5–7 are <em>identical for every method</em>. The whole experiment turns
+on beat 4.</p>
+
+<h2>The five layers, and where they live</h2>
+<table>
+  <tr><th>Layer</th><th>What it is</th><th>Module(s)</th></tr>
+  <tr><td><b>Config</b></td><td>Scenario, world, UAV, and event setup</td><td><code>scenarios.py</code>, <code>models.py</code></td></tr>
+  <tr><td><b>Harness</b></td><td>Tick loop, events, sensing, metrics</td><td><code>simulation.py</code></td></tr>
+  <tr><td><b>State</b></td><td>Ground truth + per-method memory + per-UAV belief</td><td><code>models.py</code>, <code>planning.py</code></td></tr>
+  <tr><td><b>Decision</b></td><td><code>SwarmMethod</code> + all 5 methods + <code>build_method()</code></td><td><code>policy.py</code></td></tr>
+  <tr><td><b>LLM seam</b></td><td>Decider protocol, mock default, real vendors</td><td><code>llm_agent.py</code>, <code>llm_providers.py</code></td></tr>
+  <tr><td><b>Comms</b></td><td>The only peer-information path</td><td><code>communication.py</code></td></tr>
+  <tr><td><b>Output</b></td><td>Metrics, GUI, snapshots, experiment sweeps</td><td><code>experiments.py</code>, <code>gui.py</code>, <code>rendering.py</code></td></tr>
+</table>
+<p class="loc">One surprise worth pinning: the interface and all five methods live in a single
+file, <code>policy.py</code> — not one file per method. The canonical wiring picture is
+the <a href="architecture.svg" target="_blank" rel="noopener">figure above</a> (rendered from
+<code>docs/architecture.mmd</code>).</p>
+
+<h2>The two invariants you'll defend</h2>
+<p>The architecture is built to protect two properties. Almost any reviewer attack on the thesis
+is, underneath, an attack on one of these:</p>
+
+<div class="twocol">
+<div class="invariant">
+<b>Observation symmetry.</b> All five methods receive the <em>identical</em> per-UAV observation.
+Grid <em>layout</em> is global; <em>coverage &amp; urgent</em> are discovered locally. So they can
+only differ in reasoning, never in what they can see.
+</div>
+<div class="invariant">
+<b>Decentralization.</b> Every method decides per-UAV from local observation, a per-UAV
+<code>BeliefMap</code>, peer messages, and onboard state. No global oracle, no central planner —
+the LLM method included.
+</div>
+</div>
+
+<p>The killer question is <em>"isn't the agentic win just a global oracle?"</em> The answer is
+structural: the old global <code>urgent_cells</code> list was <strong>removed</strong>, belief
+was moved onto <code>MethodState</code> (not the world), and the observation is built once and
+handed to whichever method runs. A UAV out of range with no peer message simply will not know
+about a far urgent sector — by design. <span class="loc">See ADR-0001.</span></p>
+
+<div class="quiz" id="quiz">
+  <h3>Quick retrieval check</h3>
+  <p class="loc">Answer from memory — don't scroll up. Feedback is immediate.</p>
+
+  <div class="q" data-correct="b">
+    <p class="stem">1. Across the seven beats of a tick, which beat differs between methods?</p>
+    <button class="opt" data-k="a">The beat where messages are delivered to peers</button>
+    <button class="opt" data-k="b">The beat where observations become actions</button>
+    <button class="opt" data-k="c">The beat where sensors mark sectors covered</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="c">
+    <p class="stem">2. Observation symmetry guarantees that the five methods differ only in —</p>
+    <button class="opt" data-k="a">the sensors and the range of their radios</button>
+    <button class="opt" data-k="b">the grid layout each of them is given</button>
+    <button class="opt" data-k="c">the reasoning applied to one shared input</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="a">
+    <p class="stem">3. The "agentic win is just an oracle" attack is defused because —</p>
+    <button class="opt" data-k="a">global urgent state was removed; belief is local</button>
+    <button class="opt" data-k="b">the agentic method runs faster than baselines</button>
+    <button class="opt" data-k="c">the agentic method sees the whole world state</button>
+    <p class="fb"></p>
+  </div>
+</div>
+
+<div class="source">
+<strong>Primary source.</strong> Read once, slowly:
+<a href="../docs/adr/0001-decentralization-and-observation-symmetry.md">ADR-0001 — Decentralization &amp; observation symmetry</a>.
+It is the highest-trust artifact in the repo for thesis defense, and it states the oracle argument
+in the project's own words. Keep the
+<a href="../reference/GLOSSARY.html">glossary</a> open alongside it.
+</div>
+
+<div class="nextup">
+<b>Next up (L2 — ready).</b> We zoom into beat 4: the
+<a href="0002-swarmmethod-seam.html"><code>SwarmMethod</code> seam</a> and the swappability
+invariant — <em>changing only <code>method_name</code> swaps everything</em>. You'll trace one
+observation through <code>build_method()</code> into an <code>Action</code>.
+</div>
+
+<p class="ask">I'm your co-author here — let's dig in any time. "Show me beat 4 in the
+code," "where exactly is urgent_cells removed," or "let's pressure-test the symmetry claim" all work.</p>
+
+<nav class="lessonnav">
+  <span class="disabled">&larr; Prev</span>
+  <a class="idx" href="index.html">Contents</a>
+  <a class="next" href="0002-swarmmethod-seam.html">Next: The SwarmMethod seam &rarr;</a>
+</nav>
+
+<footer>
+Lesson 1 of the agentic_uav series · ties to
+<a href="../MISSION.md">MISSION.md</a> ·
+glossary: <a href="../reference/GLOSSARY.html">GLOSSARY.html</a> ·
+canonical diagram: <a href="architecture.svg" target="_blank" rel="noopener">architecture.svg</a>
+</footer>
+
+<script>
+  document.querySelectorAll('.q').forEach(function (q) {
+    var correct = q.getAttribute('data-correct');
+    var fb = q.querySelector('.fb');
+    var done = false;
+    q.querySelectorAll('.opt').forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        if (done) return;
+        done = true;
+        var k = opt.getAttribute('data-k');
+        q.querySelectorAll('.opt').forEach(function (o) {
+          if (o.getAttribute('data-k') === correct) o.classList.add('correct');
+        });
+        if (k === correct) {
+          fb.textContent = 'Correct — that’s the load-bearing idea.';
+          fb.className = 'fb show correct';
+        } else {
+          opt.classList.add('wrong');
+          fb.textContent = 'Not quite — the highlighted answer is the one to remember.';
+          fb.className = 'fb show wrong';
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

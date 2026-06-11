@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>agentic_uav — Glossary</title>
+<style>
+  :root {
+    --ink: #1a1a1a; --muted: #6b6b6b; --rule: #d8d4cc; --bg: #fbfaf7;
+    --accent: #8a5a00; --code-bg: #f1eee8; --green: #1f7a3b; --red: #b42318;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    color: var(--ink); background: var(--bg); line-height: 1.55;
+    max-width: 46rem; margin: 3rem auto; padding: 0 1.5rem; font-size: 18px;
+  }
+  h1 { font-size: 1.9rem; line-height: 1.15; margin: 0 0 .2rem; letter-spacing: -.01em; }
+  .sub { color: var(--muted); font-style: italic; margin: 0 0 2rem; }
+  h2 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: .08em;
+       color: var(--accent); border-bottom: 1px solid var(--rule);
+       padding-bottom: .3rem; margin: 2.4rem 0 1rem; }
+  dl { margin: 0; }
+  dt { font-weight: 700; margin-top: 1.1rem; }
+  dt code { font-weight: 700; }
+  dd { margin: .15rem 0 0; color: #2c2c2c; }
+  code { font-family: "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+         background: var(--code-bg); padding: .08em .35em; border-radius: 4px;
+         font-size: .82em; }
+  .loc { color: var(--muted); font-size: .8rem; font-style: italic; }
+  .pin { background: #fff7e6; border-left: 3px solid var(--accent);
+         padding: .6rem .9rem; margin: 1.2rem 0; border-radius: 0 6px 6px 0;
+         font-size: .92rem; }
+  .ok { color: var(--green); font-weight: 700; }
+  .gap { color: var(--red); font-weight: 700; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule);
+           color: var(--muted); font-size: .85rem; }
+  a { color: var(--accent); }
+  @media print { body { background: #fff; margin: 0; max-width: 100%; } .pin { background: #fff; } }
+</style>
+</head>
+<body>
+<h1>agentic_uav — Glossary</h1>
+<p class="sub">Canonical vocabulary for the swappable UAV-swarm simulator. Adhere to these terms in every lesson.</p>
+
+<div class="pin">
+<strong>Read this first.</strong> A <em>sector</em> here is a <strong>single grid cell</strong>,
+not a region. There is no A* and no region sweep — movement is one Manhattan step per tick.
+The thesis lives or dies on two invariants defined below: <strong>observation symmetry</strong>
+and <strong>decentralization</strong>.
+</div>
+
+<h2>World &amp; State</h2>
+<dl>
+  <dt><code>Sector</code></dt>
+  <dd>One grid <em>cell</em>. Holds <code>coverage</code> (0.0–1.0), <code>priority</code>
+  (<code>"normal"</code>/<code>"urgent"</code>), <code>blocked</code>, plus
+  <code>hazard</code>/<code>visibility</code>/<code>comm_quality</code> fields.
+  <span class="loc">models.py</span></dd>
+
+  <dt><code>Cell</code></dt>
+  <dd>A <code>tuple[int, int]</code> coordinate — the key type for the sector grid.
+  <span class="loc">models.py</span></dd>
+
+  <dt><code>WorldState</code></dt>
+  <dd><code>width</code>, <code>height</code>, and <code>sectors: dict[Cell, Sector]</code>.
+  The central <em>ground truth</em> — written for sensing and metrics, but
+  <strong>no decision path reads its dynamic state</strong>. <span class="loc">models.py</span></dd>
+
+  <dt><code>UavState</code></dt>
+  <dd>Per-UAV runtime: <code>cell</code>, <code>role</code>, <code>energy</code>,
+  <code>health</code>, <code>target_cell</code>, <code>inbox</code>, <code>active</code>.
+  Method-agnostic — the world and GUI never branch on a method. <span class="loc">models.py</span></dd>
+
+  <dt>role</dt>
+  <dd>One of <code>coverage</code>, <code>priority_responder</code>, <code>relay</code>.
+  Part of the shared action schema so methods compare fairly.</dd>
+</dl>
+
+<h2>Belief &amp; Observation</h2>
+<dl>
+  <dt><code>BeliefMap</code></dt>
+  <dd>A UAV's <em>local</em> knowledge: <code>covered</code>, <code>known_urgent</code>,
+  <code>cleared_urgent</code>, <code>peer_intents</code>. Lives on
+  <code>MethodState.beliefs</code>, <strong>not</strong> on <code>UavState</code> —
+  that's what keeps the world model method-agnostic. <span class="loc">planning.py</span></dd>
+
+  <dt>Observation</dt>
+  <dd>The per-UAV input every method receives: <code>self</code>, <code>nearby</code>
+  sectors, <code>known_urgent</code> (from belief), <code>messages</code>. Built once per
+  UAV by <code>ObservationBuilder.build()</code> and handed to whatever method is running.
+  <span class="loc">planning.py · types.py</span></dd>
+
+  <dt class="ok">Observation symmetry <span class="ok">(invariant)</span></dt>
+  <dd>All five methods get the <strong>identical</strong> observation for a given UAV.
+  Layout is global ("UAVs have a map"); coverage/urgent are discovered locally. Methods
+  differ <em>only</em> in reasoning. The removal of the old global <code>urgent_cells</code>
+  list is what enforces this. <span class="loc">ADR-0001</span></dd>
+
+  <dt class="ok">Decentralization <span class="ok">(invariant)</span></dt>
+  <dd>Every method decides per-UAV from local observation + belief + peer messages +
+  onboard state. No global oracle, no central planner — including the LLM method.
+  <span class="loc">ADR-0001 · design spec</span></dd>
+</dl>
+
+<h2>Decision Layer</h2>
+<dl>
+  <dt><code>SwarmMethod</code></dt>
+  <dd>The interface every method implements: <code>initialize_mission()</code>,
+  <code>decide_tick()</code>, <code>handle_event()</code>. <span class="loc">policy.py</span></dd>
+
+  <dt>The 5 methods</dt>
+  <dd><code>static</code> (A, pre-mission partition), <code>rules</code> (B, rule-adaptive),
+  <code>task_consideration</code> (C, task-bidding; after Chen 2023), <code>greedy</code>
+  (D, nearest-urgent/uncovered heuristic), and <code>agentic</code> (the proposed LLM
+  method). All in <code>policy.py</code>; selected by <code>build_method(name)</code>.</dd>
+
+  <dt><code>greedy</code></dt>
+  <dd>A <strong>baseline</strong> — the renamed former <code>AgenticMethod</code> heuristic.
+  Also the universal <em>fallback</em> when LLM output is invalid. Not the contribution.</dd>
+
+  <dt><code>agentic</code></dt>
+  <dd>The <strong>proposed method</strong>. LLM-driven, event-triggered re-plan, consumes
+  and emits <code>intent_summary</code>, falls back to <code>greedy</code> on invalid output.</dd>
+
+  <dt><code>Action</code> / <code>MethodState</code></dt>
+  <dd>An <code>Action</code> bundles <code>target_cell</code>, <code>new_role</code>,
+  <code>messages</code>. <code>MethodState</code> carries per-method memory (assignments,
+  beliefs, peer intents, replan flags). <span class="loc">planning.py</span></dd>
+</dl>
+
+<h2>LLM Seam</h2>
+<dl>
+  <dt><code>AgentDecider</code></dt>
+  <dd>Provider-agnostic protocol: <code>decide(observation) -> action JSON</code>. The
+  pipeline is serialize → call → validate → fallback. <span class="loc">llm_agent.py</span></dd>
+
+  <dt><code>MockAgentDecider</code></dt>
+  <dd>Default, deterministic, dependency-free. Currently <em>mirrors greedy</em>, so a real
+  agentic-vs-baseline number needs a vendor. <span class="loc">llm_agent.py</span></dd>
+
+  <dt>Provider adapters</dt>
+  <dd>Real Bedrock / QGenie deciders, opt-in via the <code>llm</code> extra (boto3).
+  <span class="loc">llm_providers.py</span></dd>
+
+  <dt><code>build_decider(name)</code></dt>
+  <dd>Factory selecting <code>mock</code> (default) / <code>bedrock</code> / <code>qgenie</code>,
+  via arg or <code>AGENTIC_UAV_DECIDER</code> env var. <span class="loc">llm_agent.py</span></dd>
+</dl>
+
+<h2>Harness</h2>
+<dl>
+  <dt><code>Simulation.step()</code></dt>
+  <dd>One tick: apply events (→ <code>handle_event</code>) → deliver messages → build
+  observations → <code>decide_tick</code> → resolve actions → drain energy → sense → log.
+  <span class="loc">simulation.py</span></dd>
+
+  <dt><code>NetworkModel</code></dt>
+  <dd>The <em>only</em> peer-information path: range-limited, delayed, TTL-bounded message
+  delivery. <span class="loc">communication.py</span></dd>
+
+  <dt><code>EventInjector</code> / event</dt>
+  <dd>Scheduled disruptions (<code>dropout</code>, <code>block_sector</code>,
+  <code>urgent_sector</code>, …) that mutate the world and trigger re-plans.
+  <span class="loc">simulation.py</span></dd>
+
+  <dt><code>MetricsLogger</code></dt>
+  <dd>Records coverage ratio, active UAVs, messages, and the <code>replan_count</code> /
+  <code>plan_change_count</code> traces used for the recovery analysis. <span class="loc">simulation.py</span></dd>
+</dl>
+
+<h2>New / WIP modules (on disk, not all wired)</h2>
+<dl>
+  <dt><code>agent_core.py</code></dt>
+  <dd>Richer per-UAV context (<code>LocalWorldModel</code>, <code>SectorBelief</code>,
+  <code>HealthStatus</code>, …) — groundwork toward the spec's full agent.</dd>
+  <dt><code>tools.py</code></dt>
+  <dd>Tool functions for agent reasoning (<code>tool_find_best_task</code>,
+  <code>tool_assess_hazards</code>, …).</dd>
+  <dt><code>safety.py</code></dt>
+  <dd><code>SafetyGovernor</code>: energy/geofence checks, failsafe fallback.</dd>
+  <dt><code>environment.py</code></dt>
+  <dd><code>BlackoutZone</code> for comm-blackout scenarios.</dd>
+</dl>
+
+<footer>
+agentic_uav teaching workspace · glossary reference · cross-check terms against the
+<a href="../docs/adr/0001-decentralization-and-observation-symmetry.md">ADRs</a> and
+<a href="../docs/architecture.mmd">architecture.mmd</a>, which are canonical.
+</footer>
+</body>
+</html>

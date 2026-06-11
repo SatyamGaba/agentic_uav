@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 5 · Measuring recovery</title>
+<link rel="stylesheet" href="lesson.css">
+</head>
+<body>
+
+<nav class="lessonnav top">
+  <a href="0004-the-llm-seam.html">&larr; Prev: The LLM seam</a>
+  <a class="idx" href="index.html">Contents</a>
+  <a class="next" href="0006-state-of-the-thesis.html">Next: State of the thesis &rarr;</a>
+</nav>
+
+<p class="kicker">Lesson 5 — agentic_uav</p>
+<h1>Measuring recovery after disruption</h1>
+<p class="sub">How "beats the baselines on recovery" becomes an actual, paired, seeded number.</p>
+
+<div class="mission">
+<strong>Mission link.</strong> Your thesis isn't "the LLM is smart" — it's a <em>measurable claim about
+behaviour after a disruption</em>. This lesson is the operational definition you must be able to
+defend cold: what counts as recovery, what gets logged, and what the sweep actually compares. If you
+can't state these crisply, a reviewer will define them for you — unfavourably.
+</div>
+
+<h2>A. The disruptions you inject</h2>
+<p>Recovery is only meaningful relative to a shock. The shocks are scheduled events fired at a fixed
+tick by <code>EventInjector.apply</code> <span class="loc">(simulation.py:87–115)</span>. Five types:</p>
+
+<div class="wrap-table">
+<table>
+  <tr><th>Event</th><th>Effect</th><th>Where</th></tr>
+  <tr><td><code>dropout</code></td><td>Deactivates a UAV: <code>active=False</code>, <code>health="dropped"</code>. Payload <code>{"uav_id": …}</code>.</td><td class="loc">103–107</td></tr>
+  <tr><td><code>block_sector</code></td><td>Marks a sector <code>blocked=True</code>.</td><td class="loc">100–102</td></tr>
+  <tr><td><code>urgent_sector</code></td><td>Sets a sector's <code>priority="urgent"</code>.</td><td class="loc">108–110</td></tr>
+  <tr><td><code>visibility_degrade</code></td><td>Drops a sector's <code>visibility</code> (default 0.5).</td><td class="loc">111–114</td></tr>
+  <tr><td><code>comm_blackout</code></td><td>Adds a <code>BlackoutZone</code> to the network (handled in <code>step()</code>).</td><td class="loc">~178</td></tr>
+</table>
+</div>
+
+<p>The headline metric keys off <code>dropout</code>: it removes a UAV mid-mission and forces the
+remaining swarm to keep covering ground with less capacity. That's the moment the thesis is about.</p>
+
+<h2>B. What "recovery" actually means here</h2>
+
+<div class="flag">
+<b>Read this before a reviewer does.</b> Coverage in this simulator is <strong>monotonic</strong> —
+a dropout does <em>not</em> un-cover already-covered sectors. So <code>recovery_slope</code> does
+<strong>NOT</strong> measure "regaining lost coverage." Quoting the protocol verbatim
+<span class="loc">(EXPERIMENTS.md:19–26)</span>: "<em>recovery_slope does <strong>not</strong> measure
+'regaining lost coverage.' It measures continued progress under reduced swarm capacity.</em>" Say it
+that way every time. "Recovery" = sustained forward progress despite the loss, not clawing back
+something that decreased.
+</div>
+
+<p>This is the single most important caveat in the whole evaluation. If you let a listener assume
+coverage drops and is "recovered," every number you quote is misread. State the monotonicity first,
+then the metric.</p>
+
+<h2>C. The two headline recovery metrics</h2>
+<p>Both live in <code>experiments.py</code> and key off the <code>dropout_tick</code>:</p>
+
+<div class="contract">
+<dt>recovery_slope()</dt>
+<dd>Coverage gain per tick over a 20%-of-mission window after the dropout
+<span class="loc">(experiments.py:306–330)</span>. Higher = the survivors kept making progress
+through the shock. Its own docstring repeats the monotonicity caveat.</dd>
+<dt>ticks_to_reach_coverage() &rarr; recovery_ticks_to_target</dt>
+<dd>Ticks elapsed <em>after</em> the dropout until coverage first re-reaches the success threshold
+(default 0.9) <span class="loc">(experiments.py:333–353)</span>. Returns <code>None</code> if the
+target is never hit. This is the "how fast did the swarm get back to target" number.</dd>
+</div>
+
+<p>The claim rests on these two. <code>recovery_slope</code> is the <em>rate</em>; <code>recovery_ticks_to_target</code>
+is the <em>time</em>. One can move without the other, which is why both are reported.</p>
+
+<h2>D. Overhead metrics — so a "win" isn't just thrashing</h2>
+<p><code>run_trial</code> returns ~25 metrics per trial <span class="loc">(experiments.py:154–194)</span>.
+Alongside the two recovery numbers it logs the <em>cost</em> of the activity:
+<code>replan_count</code>, <code>plan_change_count</code>, <code>role_switches</code>,
+<code>target_changes</code>, <code>messages_sent</code>, <code>urgent_response_time</code>, and
+<code>completion_tick</code>.</p>
+
+<div class="win">
+<b>The "beats" definition has two halves</b> <span class="loc">(EXPERIMENTS.md:49–61)</span>. Against
+the <em>best</em> baseline on the same pinned scenario, agentic must (1) sustain faster
+post-disruption progress <strong>and/or</strong> re-reach target sooner — <strong>while staying
+competitive on overhead</strong> (messages, role switches, replan count). That clause is what makes
+it a real result. A recovery win bought with a blow-up in communication or constant role-thrashing is
+explicitly <em>not</em> a clean win.
+</div>
+
+<p>Emphasise the "while staying competitive on overhead" clause when you present. It pre-empts the
+obvious rebuttal — "couldn't it just do more?" — by showing the activity is already on the table.</p>
+
+<h2>E. The metrics plumbing</h2>
+<p><code>MetricsLogger</code> <span class="loc">(simulation.py:23–84)</span> records a per-tick log plus
+two persistent traces:</p>
+
+<ul>
+<li><b>Per-tick log</b> <span class="loc">(57–69)</span>: <code>coverage_ratio</code>,
+<code>active_uavs</code>, <code>messages_sent</code>, plus per-UAV <code>uav_cells</code> /
+<code>uav_roles</code> / <code>uav_targets</code>, and <code>urgent_targets</code>. This is what the
+recovery metrics replay over.</li>
+<li><b>self.replans</b> &amp; <b>self.plan_changes</b> <span class="loc">(init 25–30)</span>: the
+disruption-response traces.</li>
+</ul>
+
+<pre><span class="c"># simulation.py:32 — agentic calls this when it re-plans (the L4 event-triggered hook)</span>
+<span class="k">def</span> log_replan(self, tick: int, reason: str, uav_ids: list[str]) -&gt; None:
+    self.replans.append(
+        {<span class="s">"tick"</span>: tick, <span class="s">"reason"</span>: reason, <span class="s">"uav_ids"</span>: sorted(uav_ids)}
+    )</pre>
+
+<p><code>log_plan_change(tick, uav_id, old/new target, old/new role)</code>
+<span class="loc">(37–55)</span> is the per-tick, per-UAV change log, called from
+<code>resolve_actions</code> <span class="loc">(~236)</span>. <code>summary()</code>
+<span class="loc">(71–84)</span> returns <code>ticks_run</code>, <code>coverage_ratio</code>,
+<code>messages_sent</code>, <code>urgent_targets</code>, <code>is_solved</code>,
+<code>termination_reason</code>. Tie this back to <a href="0004-the-llm-seam.html">L4</a>: the
+event-triggered re-plan is what populates <code>self.replans</code>, so the trace and the metric come
+from the same hook.</p>
+
+<h2>F. The paired, seeded sweep</h2>
+<p>The fairness lives in one line:
+<code>METHODS = ("static","rules","task_consideration","greedy","agentic")</code>
+<span class="loc">(experiments.py:17)</span>. All five run on the <em>same seeded scenarios</em> — the
+seed pins identical dropouts and urgent events for every method. That's the "paired" comparison, the
+same fairness machinery you saw in <a href="0002-swarmmethod-seam.html">L2</a>/<a href="0003-invariants-and-the-oracle-rebuttal.html">L3</a>.</p>
+
+<p><code>ExperimentSuiteConfig</code> defaults <span class="loc">(experiments.py:22–36)</span>:
+<code>swarm_sizes=(5,10,15)</code>, <code>dropout_fractions=(0,0.1,0.25,0.4)</code>,
+<code>seed_count=20</code>, <code>ticks=500</code>. Two families <span class="loc">(69–74)</span>:
+<code>survey_dropout</code> and <code>disaster_urgent_dropout</code>.</p>
+
+<div class="flow">
+<ol>
+<li><b>Configure sweep</b> <span class="where">ExperimentSuiteConfig: sizes × dropout fractions × seeds × methods</span></li>
+<li><b>Run paired seeded trials</b> <span class="where">same seed &rarr; same world &rarr; all 5 methods (experiments.py:412–469)</span></li>
+<li><b>Per-tick metrics + replan / plan-change traces</b> <span class="where">MetricsLogger (simulation.py:23–84)</span></li>
+<li><b>Aggregate mean + SEM across seeds</b> <span class="where">aggregate_trials, grouped 5-tuple (experiments.py:197–240)</span></li>
+<li><b>Write CSV / JSON / plots</b> <span class="where">trials &amp; aggregates + dropout / success / timeline plots (243–290)</span></li>
+</ol>
+</div>
+
+<p><code>aggregate_trials</code> <span class="loc">(197–240)</span> groups by
+<code>(family, method, mission_type, swarm_size, dropout_fraction)</code> and computes
+<code>mean()</code> and <code>sem()</code> across seeds. Outputs
+<span class="loc">(write_experiment_outputs 243–258)</span>: <code>trials.csv/json</code>,
+<code>aggregates.csv/json</code>, plus plots <span class="loc">(261–290)</span> —
+dropout-vs-final-coverage, dropout-vs-success-rate, and a representative coverage(tick) timeline.</p>
+
+<div class="flag">
+<b>Aggregation gap.</b> The aggregate computes <strong>only mean and SEM</strong> — there are no
+confidence intervals and no significance tests (<code>sem()</code> at experiments.py:565 is the whole
+of it). You can report "agentic's mean recovery slope is higher, ± SEM," but you cannot yet say
+"significantly higher." Flag this yourself before anyone asks.
+</div>
+
+<h2>G. Running it — the CLI</h2>
+<p>The <code>experiment</code> subcommand <span class="loc">(main.py:297–314)</span> exposes:
+<code>--output-dir</code> (default <code>runs/experiments</code>), <code>--seed-count</code> (20),
+<code>--base-seed</code> (0), <code>--swarm-sizes</code> ("5,10,15"),
+<code>--dropout-fractions</code> ("0,0.1,0.25,0.4"), <code>--ticks</code> (500),
+<code>--grid-size</code> (25), <code>--success-threshold</code> (0.9), <code>--family</code>
+(all | survey_dropout | disaster_urgent_dropout), <code>--no-plots</code>.</p>
+
+<p>The fast smoke command <span class="loc">(EXPERIMENTS.md:82–87)</span>:</p>
+<pre><span class="k">uv</span> run main.py experiment --family disaster_urgent_dropout \
+  --seed-count 1 --swarm-sizes 6 --ticks 120 --grid-size 12 \
+  --no-plots --output-dir runs/smoke</pre>
+
+<div class="flag">
+<b>Smoke ≠ result.</b> The default <code>MockAgentDecider</code> mirrors <code>greedy</code>
+<span class="loc">(EXPERIMENTS.md:71–78)</span>, so under the mock, agentic <em>behaves like</em> greedy.
+A smoke run verifies <strong>plumbing</strong> — the event-triggered re-plan fires, negotiation
+resolves, traces and the new recovery columns are written — <strong>not</strong> an agentic advantage.
+Do not read mock numbers as a finding (ties to <a href="0004-the-llm-seam.html">L4</a>; the real-LLM
+result is <a href="0006-state-of-the-thesis.html">L6</a>'s subject).
+</div>
+
+<h2>H. Honest gaps in the measurement</h2>
+<p>Be precise and fair: these are refinements, not fatal flaws. The headline metrics exist, and they're
+paired and seeded. But a recovery claim would ideally also have things the code does <em>not</em>
+compute:</p>
+
+<div class="wrap-table">
+<table>
+  <tr><th>Wanted</th><th>What the code does instead</th></tr>
+  <tr><td>Time-to-first-reassignment after dropout</td><td>Plan changes are <em>counted</em>, never timed to the first change.</td></tr>
+  <tr><td>A full recovery <em>curve</em> with confidence bands</td><td>Only a single slope + a hit-time.</td></tr>
+  <tr><td>Replan-trigger latency</td><td><code>log_replan</code> stores tick + reason + uavs, not the triggering event's tick.</td></tr>
+  <tr><td>Coordination / negotiation traces over time</td><td>Not captured as a timeseries.</td></tr>
+  <tr><td>Statistical significance / effect size</td><td>Only mean + SEM (no tests).</td></tr>
+</table>
+</div>
+
+<div class="drill">
+<h3>Defense drill — let's rehearse aloud</h3>
+<p class="loc">Read the likely objection, say how we'd answer, then reveal the version we've been
+refining. Us pressure-testing our own argument before a reviewer does.</p>
+
+<div class="qa">
+<p class="att">Attack 1: "If coverage never decreases, what does 'recovery' even mean?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">Coverage is monotonic, so recovery is <em>continued progress under reduced swarm
+capacity</em>, not regaining lost ground (EXPERIMENTS.md:19–26). I measure it two ways:
+<code>recovery_slope</code> is the post-dropout coverage gain rate over a 20% window, and
+<code>recovery_ticks_to_target</code> is how many ticks after the dropout the swarm takes to re-reach
+0.9 coverage.</div>
+</div>
+
+<div class="qa">
+<p class="att">Attack 2: "Couldn't agentic 'win' just by spamming messages or switching roles constantly?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">No — the "beats" definition (EXPERIMENTS.md:49–61) requires <em>competitive overhead</em>.
+<code>messages_sent</code>, <code>role_switches</code>, and <code>replan_count</code> are all logged and
+reported per trial, so thrashing shows up directly in the numbers. A recovery win bought with a comms
+blow-up is explicitly not counted as a clean win.</div>
+</div>
+
+<div class="qa">
+<p class="att">Attack 3: "Is the comparison even fair across methods?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">Yes — same seeded scenarios, same injected events, all five methods, fully paired
+(the seed pins identical dropouts and urgent events). Results aggregate over <code>seed_count=20</code>
+seeds with mean + SEM. The honest caveat: there's no significance test yet, only mean ± SEM — a known
+gap, not a fairness flaw.</div>
+</div>
+</div>
+
+<div class="quiz" id="quiz">
+  <h3>Retrieval check</h3>
+  <p class="loc">From memory. Q1 revisits an earlier lesson — spacing on purpose.</p>
+
+  <div class="q" data-correct="b">
+    <p class="stem">1. A UAV's <code>known_urgent</code> set can grow through exactly —<span class="tag spaced">from L3</span></p>
+    <button class="opt" data-k="a">a global world scan, or the planner pushing it</button>
+    <button class="opt" data-k="b">sensing nearby cells, or peer messages arriving</button>
+    <button class="opt" data-k="c">reading world state, or its own onboard memory</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="c">
+    <p class="stem">2. Because coverage is monotonic, <code>recovery_slope</code> measures —</p>
+    <button class="opt" data-k="a">how much covered ground was lost to the dropout</button>
+    <button class="opt" data-k="b">the count of sectors that flipped back to covered</button>
+    <button class="opt" data-k="c">continued coverage progress under reduced capacity</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="a">
+    <p class="stem">3. A clean "beats" requires faster recovery <em>plus</em> —</p>
+    <button class="opt" data-k="a">overhead staying competitive with the baseline</button>
+    <button class="opt" data-k="b">a brand-new sensing range wider than baseline</button>
+    <button class="opt" data-k="c">a separate observation richer than the baseline</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="b">
+    <p class="stem">4. The sweep aggregates across seeds using only —</p>
+    <button class="opt" data-k="a">a paired two-sided test with effect sizes</button>
+    <button class="opt" data-k="b">the mean and the standard error of the mean</button>
+    <button class="opt" data-k="c">a bootstrap interval with ninety-five bands</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="c">
+    <p class="stem">5. The smoke run with the mock decider verifies —</p>
+    <button class="opt" data-k="a">that agentic clearly beats the greedy baseline</button>
+    <button class="opt" data-k="b">that the LLM reasoning improves the slope a lot</button>
+    <button class="opt" data-k="c">the plumbing: traces and recovery columns are written</button>
+    <p class="fb"></p>
+  </div>
+</div>
+
+<div class="source">
+<strong>Primary source.</strong> Read <a href="../docs/EXPERIMENTS.md">EXPERIMENTS.md</a> end to end —
+it <em>is</em> the operational definition of the claim. Then skim <code>experiments.py</code>:
+<code>run_trial</code> (154–194), <code>recovery_slope</code> (306–330), and
+<code>aggregate_trials</code> (197–240). Finally, run the smoke command above and open
+<code>runs/smoke/trials.csv</code> so you've <em>seen</em> the recovery columns appear.
+</div>
+
+<div class="nextup">
+<b>Next up (L6) — State of the thesis.</b> An honest gap analysis: what's proven by construction vs.
+what's still mocked, and exactly what's needed for a real result. This lesson gave you the ruler; L6
+asks whether you've measured anything with it yet.
+</div>
+
+<p class="ask">I'm your co-author here — let's dig in any time. "Run the smoke experiment with me," "show me
+<code>recovery_slope</code> in the code," or "what's the weakest part of our measurement?" all work.
+The drill above is best spoken aloud — want to run it together?</p>
+
+<nav class="lessonnav">
+  <a href="0004-the-llm-seam.html">&larr; Prev: The LLM seam</a>
+  <a class="idx" href="index.html">Contents</a>
+  <a class="next" href="0006-state-of-the-thesis.html">Next: State of the thesis &rarr;</a>
+</nav>
+
+<footer>
+Lesson 5 of the agentic_uav series · prev: <a href="0004-the-llm-seam.html">L4</a> ·
+source: <code>experiments.py</code>, <code>simulation.py</code>,
+<a href="../docs/EXPERIMENTS.md">EXPERIMENTS.md</a> · ties to <a href="../MISSION.md">MISSION.md</a>
+</footer>
+
+<script>
+  document.querySelectorAll('.qa button.show').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var qa = b.closest('.qa'); qa.classList.toggle('open');
+      b.textContent = qa.classList.contains('open') ? 'Hide answer' : 'Reveal our answer';
+    });
+  });
+  document.querySelectorAll('.q').forEach(function (q) {
+    var correct = q.getAttribute('data-correct');
+    var fb = q.querySelector('.fb'); var done = false;
+    q.querySelectorAll('.opt').forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        if (done) return; done = true;
+        var k = opt.getAttribute('data-k');
+        q.querySelectorAll('.opt').forEach(function (o) { if (o.getAttribute('data-k') === correct) o.classList.add('correct'); });
+        if (k === correct) { fb.textContent = 'Correct — that’s the load-bearing idea.'; fb.className = 'fb show correct'; }
+        else { opt.classList.add('wrong'); fb.textContent = 'Not quite — the highlighted answer is the one to remember.'; fb.className = 'fb show wrong'; }
+      });
+    });
+  });
+</script>
+</body>
+</html>

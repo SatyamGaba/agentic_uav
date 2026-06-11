@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 7 · A centralized, global-info LLM layer</title>
+<link rel="stylesheet" href="lesson.css">
+</head>
+<body>
+
+<nav class="lessonnav top">
+  <a href="0006-state-of-the-thesis.html">&larr; Prev: State of the thesis</a>
+  <a class="idx" href="index.html">Contents</a>
+  <span class="disabled">Next &rarr;</span>
+</nav>
+
+<p class="kicker">Lesson 7 — agentic_uav</p>
+<h1>A centralized, global-info LLM layer</h1>
+<p class="sub">The contrast that sharpens "decentralized" — re-introducing the oracle on purpose, as an upper bound.</p>
+
+<div class="mission">
+<strong>Mission link.</strong> Every claim about decentralization is stronger when you can name what
+you gave up and why. A centralized global-info LLM is the natural ceiling; defining it explicitly lets
+you say exactly what the decentralized <code>agentic</code> method is trying to approach — and what it
+protects that the central one can't.
+</div>
+
+<h2>A. The idea, stated plainly</h2>
+<p>Imagine a single LLM "swarm commander." Every tick it ingests the <em>full global state</em>: every
+UAV's position, health, and energy; the <em>true</em> coverage of every sector; the complete list of
+urgent sectors; and the full communication graph. It reasons once, then emits <em>one joint
+assignment</em> for the entire swarm — a target and role for each UAV. One brain, total information,
+central command. No belief maps, no negotiation, no range limits: the commander simply sees everything
+and tells each drone where to go.</p>
+
+<p>This is the obvious "smart" design, and a reviewer will ask why you didn't build it. The honest,
+useful answer is the whole point of this lesson.</p>
+
+<h2>B. It does not exist — read this first</h2>
+
+<div class="flag">
+<b>Not in the codebase.</b> There is <strong>no</strong> <code>CentralLLMMethod</code> in this repo
+today. This entire lesson describes a <em>proposed contrast / extension</em>, not something
+implemented. Treat every sketch below as a design on paper. By construction it <em>would</em> fit the
+existing <code>SwarmMethod</code> seam (it's still just a method:
+<code>initialize_mission</code> / <code>decide_tick</code> / <code>handle_event</code> returning a
+<code>list[Action]</code>) — but it would <em>deliberately violate</em> the two invariants:
+<strong>observation symmetry</strong> and <strong>decentralization</strong>. So it must
+<strong>never</strong> be mixed into the fair baseline comparison. It is reported on its own as a
+clearly-labelled <em>centralized upper-bound reference</em>.
+</div>
+
+<p>If you take one thing from this page: the centralized layer is a <em>yardstick</em>, not a
+contender in the paired sweep. Say "proposed" and "upper-bound reference" out loud whenever you mention
+it, so no listener ever thinks it already runs.</p>
+
+<h2>C. This is exactly the oracle ADR-0001 removed</h2>
+<p>The centralized commander is, almost line for line, the <strong>global oracle that
+<a href="../docs/adr/0001-decentralization-and-observation-symmetry.md">ADR-0001</a> deleted</strong>:
+the old global <code>urgent_cells</code> list plus the full <code>world.sectors</code> scans that let
+every method see all dynamic state at once.</p>
+
+<p>Recall <em>why</em> the ADR removed it <span class="loc">(ADR-0001, Context)</span>: that oracle was
+<strong>baked invisibly into every method</strong>, so "any 'agentic' advantage could just be the
+oracle, not the reasoning." It made the agentic-vs-baseline comparison <strong>invalid</strong> — the
+headline claim was unfalsifiable. The leak had to go for all methods at once.</p>
+
+<div class="invariant">
+<b>The crisp distinction.</b> The sin ADR-0001 banned was a <em>hidden, unfair</em> oracle smuggled
+into every baseline. It did <strong>not</strong> ban the <em>concept</em> of a centralized planner
+studied on its own. Re-introducing the oracle <em>on purpose</em>, as one explicit, separately-reported
+condition that you label loudly, is legitimate science. The difference is everything: smuggled in, it
+corrupts the comparison; declared and isolated, it becomes a measuring stick.
+</div>
+
+<h2>D. How it would plug in (sketch, not in repo)</h2>
+<p>Because it satisfies the <code>SwarmMethod</code> contract from <a href="0002-swarmmethod-seam.html">L2</a>,
+wiring it would look familiar — only the <em>information</em> it reads changes. The flow it would
+follow:</p>
+
+<div class="flow">
+<ol>
+<li><b>Gather global truth.</b> Read every UAV's pose/health/energy, true per-sector coverage, all
+urgent sectors, full comms graph. <span class="where">a deliberately GLOBAL serialization — the opposite of serialize_observation</span></li>
+<li><b>Build one prompt.</b> Serialize the <em>whole</em> world into a single commander prompt.
+<span class="where">proposed; no such builder exists in the repo</span></li>
+<li><b>Call the same adapter.</b> Reuse L4's provider seam — an <code>AgentDecider</code>-style
+<code>decide()</code>. <span class="where">the one piece that genuinely reuses existing code</span></li>
+<li><b>Emit a joint plan.</b> Return one coordinated <code>Action</code> per UAV; validate each against
+the world. <span class="where">still returns list[Action], so the harness is unchanged</span></li>
+</ol>
+</div>
+
+<p>A minimal shape — to show the <em>seam fit</em>, not an implementation:</p>
+
+<pre><span class="c"># SKETCH — NOT IN REPO. Illustrative only; proposed future work.</span>
+<span class="k">class</span> CentralLLMMethod:  <span class="c"># would satisfy the SwarmMethod protocol</span>
+    <span class="k">def</span> decide_tick(self, observations, state, simulation):
+        <span class="c"># IGNORES the symmetric per-UAV observations on purpose:</span>
+        global_state = <span class="hl">serialize_global(simulation.world)</span>  <span class="c"># the deliberate oracle</span>
+        raw = self.decider.decide(global_state)              <span class="c"># reuse L4's AgentDecider</span>
+        <span class="k">return</span> [validate_action(a, simulation) <span class="k">for</span> a <span class="k">in</span> raw[<span class="s">"assignments"</span>]]</pre>
+
+<div class="flag">
+<b>Re-stating the obvious so it can't be misread.</b> The <code>serialize_global</code> above is
+imaginary and intentionally the <em>opposite</em> of the real <code>serialize_observation</code>
+(L4), which emits only local keys. There is no <code>CentralLLMMethod</code>, no
+<code>serialize_global</code>, and no commander prompt in the codebase. This is a design sketch.
+</div>
+
+<h2>E. The trade-off — centralized vs decentralized</h2>
+<p>This is the table to internalize. The left column buys optimality; the right column buys the
+properties a real disaster deployment actually needs. The decentralized advantages are what the thesis
+is genuinely defending.</p>
+
+<div class="wrap-table">
+<table>
+  <tr><th>Dimension</th><th>Centralized global-info LLM <span class="pill">proposed</span></th><th>Decentralized agentic <span class="pill base">the thesis</span></th></tr>
+  <tr><td>Information</td><td>Global ground truth, every tick</td><td>Local belief + range-limited peer messages</td></tr>
+  <tr><td>Coordination quality</td><td>Potentially optimal joint plan</td><td>Negotiated, approximate (in-tick deconfliction)</td></tr>
+  <tr><td>Single point of failure</td><td><b>Yes</b> — lose the commander, lose the swarm</td><td><b>No</b> — degrades gracefully, UAVs keep acting</td></tr>
+  <tr><td>Comms dependence</td><td>Needs reliable uplink of all state + downlink of commands</td><td>Range-limited, tolerant of loss / blackout</td></tr>
+  <tr><td>Scalability</td><td>Prompt &amp; compute grow with swarm &times; grid</td><td>Per-UAV, local — scales with the swarm</td></tr>
+  <tr><td>Under dropout / blackout</td><td>Commander may be blind or severed; swarm stalls</td><td>Each UAV keeps acting on its own local belief</td></tr>
+  <tr><td>Realism for real UAVs</td><td>Often impractical to field</td><td>The motivating use case</td></tr>
+</table>
+</div>
+
+<p>Read the bottom four rows aloud when you present. A central commander is only as good as the link
+that feeds it and the link that carries its orders. Sever either — exactly what a disaster does — and
+the "optimal" plan never arrives. The decentralized swarm has no such single thread to cut.</p>
+
+<h2>F. Why this strengthens the defense</h2>
+
+<div class="win">
+<b>The contrast does three jobs for you.</b>
+<ol>
+<li><b>It gives an upper-bound reference.</b> Your headline becomes quantitative: "the decentralized
+agent reaches <em>X%</em> of the centralized planner's recovery <em>while tolerating comm loss the
+centralized one cannot.</em>" A ceiling makes "good" mean something.</li>
+<li><b>It makes the contribution legible.</b> The point was never "LLMs are good." It is "an LLM can
+reason <em>well from local information, decentralized</em>" — and the ceiling is precisely what isolates
+that claim.</li>
+<li><b>It pre-empts the obvious reviewer.</b> "Why not just centralize?" now has a principled, measured
+answer instead of a hand-wave: you considered it, defined it, and chose resilience.</li>
+</ol>
+</div>
+
+<p>Naming the thing you deliberately did <em>not</em> build is a stronger position than pretending it
+wasn't an option. The ceiling is your friend.</p>
+
+<h2>G. How you'd evaluate it fairly</h2>
+<p>You already have the machinery — the seeded scenarios and recovery metrics from
+<a href="0005-measuring-recovery.html">L5</a>. The evaluation would simply add a third tier:</p>
+
+<div class="trace">
+<ol>
+<li>Run the <b>same seeded scenarios</b> and the <b>same recovery metrics</b> (recovery_slope,
+recovery_ticks_to_target) as L5 — no new ruler.</li>
+<li>Report <b>three tiers</b>, kept separate: heuristic baselines <span class="arrow">&rarr;</span>
+decentralized agentic <span class="arrow">&rarr;</span> centralized upper bound.</li>
+<li>Make the <b>gap</b> between decentralized agentic and the centralized bound the headline story —
+especially under <code>dropout</code> and <code>comm_blackout</code>.</li>
+<li>Test the centralized layer <b>precisely in the comms-degraded scenarios</b>, where centralization
+should suffer most — that exposes its fragility instead of flattering it.</li>
+</ol>
+</div>
+
+<p>The interesting number is not "the commander wins on a perfect link" (it should). It's "how close
+does decentralized agentic get <em>without</em> the oracle — and how far does the commander fall when
+the link drops?" That comparison is the thesis in one chart.</p>
+
+<div class="drill">
+<h3>Defense drill — let's say it before we reveal it</h3>
+<p class="loc">Read the likely objection, say how we'd answer, then reveal the version we've been
+refining. Us pressure-testing our own argument before a reviewer does.</p>
+
+<div class="qa">
+<p class="att">Attack 1: "If a central LLM with global info does better, why bother with decentralization?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">Because the central planner needs an oracle and a reliable uplink/command channel
+that real disaster deployments lack. Under <code>dropout</code> or <code>comm_blackout</code> it
+degrades or fails outright, while decentralized agents keep acting on local belief. The thesis values
+<em>resilience and graceful degradation</em>, not just peak coverage on a perfect link.</div>
+</div>
+
+<div class="qa">
+<p class="att">Attack 2: "Isn't adding a centralized method just bringing back the oracle ADR-0001 banned?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">No. The ban was on a <em>hidden</em> oracle baked into every method, which made the
+comparison unfair and the claim unfalsifiable. An <em>explicit, separately-reported</em> centralized
+reference is legitimate science — it's labelled and isolated, not smuggled into the baselines. The sin
+was the concealment, not the concept.</div>
+</div>
+
+<div class="qa">
+<p class="att">Attack 3: "Could the centralized layer reuse your existing code?"</p>
+<button class="show">Reveal our answer</button>
+<div class="reveal">Yes for the seam (the <code>SwarmMethod</code> contract plus the
+<code>AgentDecider</code> adapter from L4) and for metrics/sweeps (L5). <em>No</em> for
+observation-building: it would need a deliberately <strong>global</strong> serialization — the exact
+opposite of the symmetric per-UAV <code>serialize_observation</code>. That one piece is where it
+breaks the invariant on purpose.</div>
+</div>
+</div>
+
+<div class="quiz" id="quiz">
+  <h3>Retrieval check</h3>
+  <p class="loc">From memory. Q1 revisits an earlier lesson — spacing on purpose.</p>
+
+  <div class="q" data-correct="b">
+    <p class="stem">1. ADR-0001 removed the global <code>urgent_cells</code> list because it —<span class="tag spaced">from L3</span></p>
+    <button class="opt" data-k="a">slowed the per-tick decision loop down across the larger swarms</button>
+    <button class="opt" data-k="b">made the comparison unfair and the headline claim unfalsifiable</button>
+    <button class="opt" data-k="c">stored urgent sectors inside the world model instead of belief</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="c">
+    <p class="stem">2. The proposed centralized commander, relative to this repo, is —</p>
+    <button class="opt" data-k="a">an implemented fifth baseline inside the paired seeded sweep</button>
+    <button class="opt" data-k="b">a running method selected by setting the method_name string</button>
+    <button class="opt" data-k="c">a design on paper, reported as a separate upper-bound reference</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="a">
+    <p class="stem">3. Centralization buys a potentially optimal joint plan but sacrifices —</p>
+    <button class="opt" data-k="a">resilience: it adds a single point of failure and a comms dependence</button>
+    <button class="opt" data-k="b">accuracy: its global view is noisier than each drone's local belief</button>
+    <button class="opt" data-k="c">fairness: it must read fewer sectors than the heuristic baselines do</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="b">
+    <p class="stem">4. The piece the centralized layer could <em>not</em> reuse from the repo is —</p>
+    <button class="opt" data-k="a">the metrics logger and the seeded paired experiment sweep harness</button>
+    <button class="opt" data-k="b">observation-building: it needs a deliberately global serialization path</button>
+    <button class="opt" data-k="c">the SwarmMethod seam and the swappable AgentDecider adapter contract</button>
+    <p class="fb"></p>
+  </div>
+
+  <div class="q" data-correct="c">
+    <p class="stem">5. The headline of a three-tier evaluation should be —</p>
+    <button class="opt" data-k="a">that the central commander wins outright on a perfectly reliable link</button>
+    <button class="opt" data-k="b">that every heuristic baseline finally beats the decentralized agentic</button>
+    <button class="opt" data-k="c">the gap to the bound under dropout, where centralization should suffer</button>
+    <p class="fb"></p>
+  </div>
+</div>
+
+<div class="source">
+<strong>Primary source.</strong> Re-read
+<a href="../docs/adr/0001-decentralization-and-observation-symmetry.md">ADR-0001</a> (the oracle
+removal) — it is the conceptual basis for why this must be a <em>separate</em> condition. Then skim
+<code>docs/superpowers/specs/2026-04-26-swappable-uav-swarm-simulator-design.md</code> for the
+<code>SwarmMethod</code> contract this would implement. Note carefully: this lesson describes
+<em>proposed future work</em>, so the "source" is the <em>design rationale</em>, not existing code —
+there is nothing in the repo to read for the centralized layer because it isn't built.
+</div>
+
+<div class="nextup">
+<b>That's the guide.</b> Between us we can now (a) draw the system, (b) state and defend the two invariants,
+(c) explain the LLM seam and its honest caveat, (d) define recovery and how it's measured, (e) own the
+gaps, and (f) position the work against a centralized ceiling. Loop back to
+<a href="index.html">the contents</a> any time, or let's run the drills together when you want to rehearse.
+</div>
+
+<p class="ask">I'm your co-author here — let's dig in any time. "Help me design the <code>CentralLLMMethod</code> for
+real," "what scenarios best expose centralized fragility?", or "let's sharpen how we'd argue for
+decentralization" all work. The drill above is best spoken aloud — want to run it together?</p>
+
+<nav class="lessonnav">
+  <a href="0006-state-of-the-thesis.html">&larr; Prev: State of the thesis</a>
+  <a class="idx" href="index.html">Contents</a>
+  <a class="next" href="index.html">Back to start &rarr;</a>
+</nav>
+
+<footer>
+Lesson 7 of the agentic_uav series · prev: <a href="0006-state-of-the-thesis.html">L6</a> ·
+basis: <a href="../docs/adr/0001-decentralization-and-observation-symmetry.md">ADR-0001</a> + design
+spec (this lesson is proposed future work) · ties to <a href="../MISSION.md">MISSION.md</a>
+</footer>
+
+<script>
+  document.querySelectorAll('.qa button.show').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var qa = b.closest('.qa'); qa.classList.toggle('open');
+      b.textContent = qa.classList.contains('open') ? 'Hide answer' : 'Reveal our answer';
+    });
+  });
+  document.querySelectorAll('.q').forEach(function (q) {
+    var correct = q.getAttribute('data-correct');
+    var fb = q.querySelector('.fb'); var done = false;
+    q.querySelectorAll('.opt').forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        if (done) return; done = true;
+        var k = opt.getAttribute('data-k');
+        q.querySelectorAll('.opt').forEach(function (o) { if (o.getAttribute('data-k') === correct) o.classList.add('correct'); });
+        if (k === correct) { fb.textContent = 'Correct — that’s the load-bearing idea.'; fb.className = 'fb show correct'; }
+        else { opt.classList.add('wrong'); fb.textContent = 'Not quite — the highlighted answer is the one to remember.'; fb.className = 'fb show wrong'; }
+      });
+    });
+  });
+</script>
+</body>
+</html>
