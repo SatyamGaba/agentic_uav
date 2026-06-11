@@ -9,3 +9,11 @@ dependencies = [
     "solara>=1.57.3",
     "starlette<1.0",
 ]
+
+[project.optional-dependencies]
+# Real LLM backends for the `agentic` method (opt-in; base install stays
+# offline). QGenie uses the stdlib urllib, so only boto3 is needed here.
+# Install with: uv sync --extra llm
+llm = [
+    "boto3>=1.35",
+]

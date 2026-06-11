@@ -466,14 +466,14 @@ class TaskConsiderationMethod:
 
 
 def build_method(method_name: str) -> SwarmMethod:
-    from agentic_uav.llm_agent import MockAgentDecider
+    from agentic_uav.llm_agent import build_decider
 
     methods: dict[str, SwarmMethod] = {
         "static": StaticPartitionMethod(),
         "rules": RuleAdaptiveMethod(),
         "task_consideration": TaskConsiderationMethod(),
         "greedy": GreedyMethod(),
-        "agentic": AgenticMethod(decider=MockAgentDecider()),
+        "agentic": AgenticMethod(decider=build_decider()),
     }
     if method_name not in methods:
         raise ValueError(f"Unknown swarm method: {method_name}")

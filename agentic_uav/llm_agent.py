@@ -12,6 +12,7 @@ and falls back to the deterministic greedy heuristic on any failure.
 
 from __future__ import annotations
 
+import os
 from typing import Any, Protocol, runtime_checkable
 
 from agentic_uav.communication import Message
@@ -28,12 +29,43 @@ class AgentDecider(Protocol):
         ...
 
 
+def build_decider(name: str | None = None) -> AgentDecider:
+    """Select the agentic decider backend.
+
+    The explicit ``name`` argument overrides the ``AGENTIC_UAV_DECIDER`` env
+    var; the default (neither set) is the dependency-free ``MockAgentDecider``,
+    so tests, CI, and the experiment sweeps stay offline unless a real backend
+    is opted into. This factory is the ONLY place that branches on backend:
+    ``method_name`` still selects the method, the env only selects which decider
+    the ``agentic`` method drives.
+
+    Real providers are imported lazily so importing this module never requires
+    ``boto3`` and so no import cycle is introduced (``llm_providers`` imports
+    back from this module).
+    """
+
+    choice = (name or os.environ.get("AGENTIC_UAV_DECIDER") or "mock").strip().lower()
+    if choice == "mock":
+        return MockAgentDecider()
+    if choice == "bedrock":
+        from agentic_uav.llm_providers import BedrockAgentDecider
+
+        return BedrockAgentDecider()
+    if choice == "qgenie":
+        from agentic_uav.llm_providers import QGenieAgentDecider
+
+        return QGenieAgentDecider()
+    raise ValueError(
+        f"Unknown decider backend: {choice!r}; choose from 'mock', 'bedrock', 'qgenie'"
+    )
+
+
 def serialize_observation(observation: dict[str, Any]) -> dict[str, Any]:
     """Project a UAV's observation into the JSON-only LOCAL view for the LLM.
 
     Emits only locally-knowable fields: self, sensed nearby sectors, the UAV's
-    believed urgent cells, inbox messages, peer intents, and grid bounds. It
-    NEVER emits global coverage or a global urgent list (observation symmetry).
+    believed urgent cells, inbox messages, and peer intents. It NEVER emits
+    global coverage or a global urgent list (observation symmetry).
     """
 
     uav = observation["self"]
@@ -239,6 +271,7 @@ __all__ = [
     "ALLOWED_ROLES",
     "AgentDecider",
     "MockAgentDecider",
+    "build_decider",
     "decide_action",
     "decide_proposal",
     "serialize_observation",

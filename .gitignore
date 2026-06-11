@@ -18,3 +18,6 @@ wheels/
 
 # Experiment run outputs
 runs/
+
+# Playwright MCP
+.playwright-mcp/
