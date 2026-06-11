@@ -15,9 +15,18 @@ wheels/
 
 # Local UI state
 .agentic_uav/
+.superpowers/
+.claude/
+.codex/
 
 # Experiment run outputs
 runs/
 
+# Reference papers (large PDFs)
+related-work/pdfs/
+
 # Playwright MCP
 .playwright-mcp/
+
+# macOS metadata
+.DS_Store

@@ -284,6 +284,7 @@ class GuiSupportTest(unittest.TestCase):
     def test_grid_html_renders_uav_paths_as_svg_polylines(self) -> None:
         simulation = Simulation.from_config(build_gui_scenario())
         simulation.step()
+        simulation.step()
         portrayal = build_grid_portrayal(simulation)
 
         html = gui._grid_html(portrayal)

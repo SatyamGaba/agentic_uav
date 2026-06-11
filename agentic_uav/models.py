@@ -57,6 +57,9 @@ class ScenarioConfig:
     events: list[CommunicationEvent] = field(default_factory=list)
     seed: int = 0
     mission_type: str = "disaster_mapping"
+    energy_drain_rate: float = 0.001
+    move_energy_cost: float = 0.002
+    packet_loss_rate: float = 0.0
 
 
 @dataclass
@@ -68,7 +71,6 @@ class UavState:
     health: str = "nominal"
     target_cell: Cell | None = None
     inbox: list[Message] = field(default_factory=list)
-    outbox: list[Message] = field(default_factory=list)
     active: bool = True
 
 
