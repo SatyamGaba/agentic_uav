@@ -1,0 +1,208 @@
+{
+  "num_episodes": 20,
+  "success_rate": 1.0,
+  "spl": 1.0,
+  "mean_steps": 30.35,
+  "episodes": [
+    {
+      "episode_id": 7,
+      "scene": "x8F5xyUWy9e",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 10.452263832092285,
+      "path_travelled_m": 7.50009685754776,
+      "final_distance_to_goal_m": 2.952118158340454,
+      "steps_taken": 30
+    },
+    {
+      "episode_id": 11,
+      "scene": "2azQ1b91cZZ",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 7.112969875335693,
+      "path_travelled_m": 4.2500009983778,
+      "final_distance_to_goal_m": 2.862968921661377,
+      "steps_taken": 17
+    },
+    {
+      "episode_id": 13,
+      "scene": "zsNo4HB9uLZ",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 12.037668228149414,
+      "path_travelled_m": 9.26515206694603,
+      "final_distance_to_goal_m": 2.7631049156188965,
+      "steps_taken": 37
+    },
+    {
+      "episode_id": 40,
+      "scene": "zsNo4HB9uLZ",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 14.96241569519043,
+      "path_travelled_m": 12.008234739303589,
+      "final_distance_to_goal_m": 2.9351143836975098,
+      "steps_taken": 48
+    },
+    {
+      "episode_id": 42,
+      "scene": "zsNo4HB9uLZ",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 14.96241569519043,
+      "path_travelled_m": 12.008234739303589,
+      "final_distance_to_goal_m": 2.9351143836975098,
+      "steps_taken": 48
+    },
+    {
+      "episode_id": 52,
+      "scene": "zsNo4HB9uLZ",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 14.436294555664062,
+      "path_travelled_m": 11.411805808544159,
+      "final_distance_to_goal_m": 2.8961551189422607,
+      "steps_taken": 46
+    },
+    {
+      "episode_id": 70,
+      "scene": "2azQ1b91cZZ",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 15.644170761108398,
+      "path_travelled_m": 12.726871863007545,
+      "final_distance_to_goal_m": 2.856935501098633,
+      "steps_taken": 51
+    },
+    {
+      "episode_id": 94,
+      "scene": "QUCTc6BB5sX",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 13.925666809082031,
+      "path_travelled_m": 11.010441094636917,
+      "final_distance_to_goal_m": 2.905611515045166,
+      "steps_taken": 44
+    },
+    {
+      "episode_id": 116,
+      "scene": "2azQ1b91cZZ",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 5.625521659851074,
+      "path_travelled_m": 0.7500001043081284,
+      "final_distance_to_goal_m": 2.835752487182617,
+      "steps_taken": 3
+    },
+    {
+      "episode_id": 140,
+      "scene": "2azQ1b91cZZ",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 13.368412017822266,
+      "path_travelled_m": 10.511065304279327,
+      "final_distance_to_goal_m": 2.8520939350128174,
+      "steps_taken": 42
+    },
+    {
+      "episode_id": 150,
+      "scene": "QUCTc6BB5sX",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 8.754947662353516,
+      "path_travelled_m": 5.790927976369858,
+      "final_distance_to_goal_m": 2.9350504875183105,
+      "steps_taken": 23
+    },
+    {
+      "episode_id": 156,
+      "scene": "zsNo4HB9uLZ",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 11.977021217346191,
+      "path_travelled_m": 7.749998137354851,
+      "final_distance_to_goal_m": 2.9838624000549316,
+      "steps_taken": 31
+    },
+    {
+      "episode_id": 166,
+      "scene": "2azQ1b91cZZ",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 6.009511947631836,
+      "path_travelled_m": 3.251526400446892,
+      "final_distance_to_goal_m": 2.757431983947754,
+      "steps_taken": 13
+    },
+    {
+      "episode_id": 171,
+      "scene": "TbHJrupSAjP",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 11.207633972167969,
+      "path_travelled_m": 7.448898658156395,
+      "final_distance_to_goal_m": 2.934096097946167,
+      "steps_taken": 26
+    },
+    {
+      "episode_id": 176,
+      "scene": "QUCTc6BB5sX",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 6.969550132751465,
+      "path_travelled_m": 3.7623066157102585,
+      "final_distance_to_goal_m": 2.9255964756011963,
+      "steps_taken": 15
+    },
+    {
+      "episode_id": 181,
+      "scene": "TbHJrupSAjP",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 9.0089693069458,
+      "path_travelled_m": 5.159455806016922,
+      "final_distance_to_goal_m": 2.9313511848449707,
+      "steps_taken": 17
+    },
+    {
+      "episode_id": 187,
+      "scene": "x8F5xyUWy9e",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 8.79658317565918,
+      "path_travelled_m": 5.885173320770264,
+      "final_distance_to_goal_m": 2.9978761672973633,
+      "steps_taken": 23
+    },
+    {
+      "episode_id": 190,
+      "scene": "QUCTc6BB5sX",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 10.154659271240234,
+      "path_travelled_m": 7.31656987965107,
+      "final_distance_to_goal_m": 2.8730034828186035,
+      "steps_taken": 29
+    },
+    {
+      "episode_id": 191,
+      "scene": "QUCTc6BB5sX",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 10.154659271240234,
+      "path_travelled_m": 7.31656987965107,
+      "final_distance_to_goal_m": 2.8730034828186035,
+      "steps_taken": 29
+    },
+    {
+      "episode_id": 207,
+      "scene": "Z6MFQCViBuw",
+      "success": true,
+      "spl": 1.0,
+      "initial_geodesic_m": 11.509464263916016,
+      "path_travelled_m": 8.805884689092636,
+      "final_distance_to_goal_m": 2.7594616413116455,
+      "steps_taken": 35
+    }
+  ]
+}

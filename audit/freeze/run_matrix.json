@@ -1,0 +1,67 @@
+{
+  "stage": "Stage D Freeze Run Matrix",
+  "created_at": "2026-11-07T11:15:00Z",
+  "dataset": {
+    "file": "agenticnav_paper_replica/data/opennav_r2rce_100.json",
+    "sha256": "92a590e9a6ff4bdc31d6d2a45a16ddae8f4ad64a85fa0d3f255767c9cbe7cf80",
+    "total_episodes": 100,
+    "pristine_unexposed_episodes": 78,
+    "exposed_episodes": 22,
+    "scenes": 10
+  },
+  "experimental_arms": {
+    "arm_l": {
+      "status": "PRIMARY_DEPLOYMENT_ARM",
+      "description": "Local Aids Arm: N_thresh=5, floor-grounding prompt (v in [0.65, 0.85]), arrival verification active",
+      "rationale": "Quadrupled OSR (5.0% -> 20.0%), reduced deadlocks by 33%, 0 protocol violations, lower navigation error"
+    },
+    "arm_p": {
+      "status": "PAPER_FAITHFUL_ABLATION_ARM",
+      "description": "Paper-Faithful Arm: N_thresh=1 (any point), floor guidance disabled, arrival verification disabled",
+      "rationale": "Pure replication baseline matching literal paper text v1"
+    }
+  },
+  "seeds_and_sampling": {
+    "temperature": 0.0,
+    "inference_seed": 42,
+    "max_steps": 25,
+    "max_simulator_actions": 25,
+    "stuck_step_threshold": 5
+  },
+  "pre_registered_acceptance_criteria": {
+    "wilson_interval_coverage": "Pass if target model's published SR lies within the empirical Wilson 95% confidence interval on the 100 episodes",
+    "spl_tolerance": "Empirical SPL within +/- 0.10 of published backbone SPL",
+    "dual_reporting_mandate": "Both full 100-episode set and 78-episode unexposed set MUST be reported alongside each other",
+    "failure_audit_rule": "Audit at least 20 failures across taxonomy; do not tune harness parameters on locked-set failures"
+  },
+  "baselines_and_controls_reference": {
+    "stop_immediately_control": {
+      "sr": 0.0,
+      "osr": 0.0,
+      "spl": 0.0,
+      "ne_m": 8.98,
+      "status": "VERIFIED_CLEAN"
+    },
+    "random_walk_control": {
+      "sr": 0.0,
+      "osr": 2.0,
+      "spl": 0.0,
+      "ne_m": 9.01,
+      "status": "VERIFIED_CLEAN"
+    },
+    "blind_image_sensory_ablation": {
+      "sr": 0.0,
+      "osr": 80.0,
+      "spl": 0.0,
+      "ne_m": 4.59,
+      "status": "VERIFIED_CLEAN"
+    },
+    "goal_reaching_oracle": {
+      "sr": 100.0,
+      "osr": 100.0,
+      "spl": 0.9995,
+      "ne_m": 0.079,
+      "status": "VERIFIED_CLEAN"
+    }
+  }
+}

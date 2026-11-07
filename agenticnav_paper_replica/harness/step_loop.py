@@ -9,6 +9,7 @@ from agenticnav_paper_replica.harness.tools import get_available_tools
 from agenticnav_paper_replica.harness.executor import ToolExecutor
 from agenticnav_paper_replica.harness.prompts import (
     SYSTEM_PROMPT,
+    build_system_prompt,
     build_step_user_prompt,
     build_arrival_verification_prompt,
 )
@@ -64,6 +65,8 @@ class StepDecisionLoop:
         max_malformed_calls: int = 3,    # M_max [I]
         enable_depth: bool = True,
         enable_recall: bool = True,
+        enable_arrival_verification: bool = True,
+        floor_grounding_prompt: bool = True,
     ):
         self.executor = executor
         self.max_evidence_queries = max_evidence_queries
@@ -71,6 +74,8 @@ class StepDecisionLoop:
         self.max_malformed_calls = max_malformed_calls
         self.enable_depth = enable_depth
         self.enable_recall = enable_recall
+        self.enable_arrival_verification = enable_arrival_verification
+        self.floor_grounding_prompt = floor_grounding_prompt
 
     def run_step(
         self,
@@ -103,8 +108,9 @@ class StepDecisionLoop:
             reselect_feedback=None,
         )
 
+        system_prompt = build_system_prompt(floor_grounding=self.floor_grounding_prompt)
         messages: List[Dict[str, Any]] = [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": system_prompt},
             {
                 "role": "user",
                 "content": initial_user_prompt,
@@ -342,7 +348,7 @@ class StepDecisionLoop:
                             consecutive_reselects += 1
 
                         should_verify = False
-                        if not verification_triggered:
+                        if self.enable_arrival_verification and not verification_triggered:
                             if duplicate_target_repeats >= 2:
                                 should_verify = True
                             elif consecutive_reselects >= max(1, self.max_consecutive_reselects - 1):

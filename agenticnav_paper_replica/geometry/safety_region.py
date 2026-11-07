@@ -45,7 +45,7 @@ class GroundCorridorChecker:
 
     def __init__(
         self,
-        robot_radius: float = 0.18,          # r_a in meters [P]
+        robot_radius: float = 0.10,          # r_a in meters [Calibrated to simulator agent radius 0.10m]
         base_margin: float = 0.30,           # m in meters [?]
         rho_max: float = 2.5,                # max forward step in meters [?]
         turn_step_deg: float = 15.0,         # discrete simulator turn increment [P]
@@ -54,6 +54,7 @@ class GroundCorridorChecker:
         allow_adjacent_bin_snap: bool = False, # default off in v7 (ablation only)
         max_snap_deg: float = 9.0,
         max_snap_drift_m: float = 0.35,
+        obstacle_point_threshold: int = 1,
     ):
         self.r_a = robot_radius
         self.base_margin = base_margin
@@ -64,6 +65,7 @@ class GroundCorridorChecker:
         self.allow_adjacent_bin_snap = allow_adjacent_bin_snap
         self.max_snap_deg = max_snap_deg
         self.max_snap_drift_m = max_snap_drift_m
+        self.obstacle_point_threshold = obstacle_point_threshold
 
     def compute_kinematics(
         self,
@@ -122,7 +124,7 @@ class GroundCorridorChecker:
             dists_sq = obstacles_2d[:, 0] ** 2 + obstacles_2d[:, 1] ** 2
             in_circle = dists_sq < (self.r_a ** 2)
             coll_count = int(np.sum(in_circle))
-            return (coll_count > 0), coll_count
+            return (coll_count >= self.obstacle_point_threshold), coll_count
 
         theta_rad = math.radians(theta_deg)
         sin_th = math.sin(theta_rad)
@@ -139,7 +141,7 @@ class GroundCorridorChecker:
 
         colliding_mask = in_s & in_h
         collision_count = int(np.sum(colliding_mask))
-        return (collision_count > 0), collision_count
+        return (collision_count >= self.obstacle_point_threshold), collision_count
 
     def evaluate(
         self,

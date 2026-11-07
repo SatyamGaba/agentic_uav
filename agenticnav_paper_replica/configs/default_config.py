@@ -14,8 +14,8 @@ class ReplicaConfig:
     d_max: float = 5.0   # meters
     camera_height: float = 1.25  # meters above floor contact datum (y=0)
 
-    # Robot geometry & Kinematics [P / I / ?]
-    robot_radius: float = 0.18        # r_a (m) [P]
+    # Robot geometry & Kinematics [Calibrated]
+    robot_radius: float = 0.10        # r_a (m) - calibrated to match Habitat-Sim agent physical radius (0.10m)
     base_margin: float = 0.30         # m (m) [?]
     rho_max: float = 2.5              # max forward displacement (m) [?]
     turn_step_deg: float = 15.0       # turn_increment_deg (deg) [P]
@@ -33,8 +33,8 @@ class ReplicaConfig:
     # Obstacle source (Section 5.3.1)
     obstacle_source: str = "current_frame"  # "current_frame" (default), "accumulated_grid", "current_plus_near_cache"
 
-    # Obstacle height filter [?]
-    chassis_y_min: float = 0.10       # y_min (m)
+    # Obstacle height filter [Calibrated]
+    chassis_y_min: float = 0.15       # y_min (m) - calibrated to reject floor grazing noise
     chassis_y_max: float = 1.25       # y_max (m)
 
     # BEV Mapping [P / ?]
@@ -56,6 +56,11 @@ class ReplicaConfig:
     vlm_thinking: bool = False
     inference_seed: int = 42
     temperature: float = 0.0
+
+    # Local aids and prompt scaffolding (Arm L defaults; Arm P sets False/1)
+    obstacle_point_threshold: int = 5
+    floor_grounding_prompt: bool = True
+    arrival_verification: bool = True
 
     # Ablation toggles (Section 11)
     depth_tool: str = "on"                 # "on", "off", "depth_image"

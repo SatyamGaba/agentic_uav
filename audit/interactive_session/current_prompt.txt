@@ -1,0 +1,17 @@
+### Active Goal Instruction:
+"Walk next to the first white chair on its right side, walk straight towards the older floral chair, take a right towards the stairs and stop."
+
+### Current Decision Node: 1
+- Accumulated Actions Taken: 0
+- Geodesic Distance to Goal: 7.71 m
+- Shortest Path Length: 7.71 m
+
+### Perception Frames Saved:
+- Front: audit/interactive_session/view_0.png
+- Right: audit/interactive_session/view_1.png
+- Back:  audit/interactive_session/view_2.png
+- Left:  audit/interactive_session/view_3.png
+- BEV:   audit/interactive_session/bev_map.png
+
+### Next Action Required:
+Inspect views and issue move_to or stop.

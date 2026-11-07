@@ -1,0 +1,60 @@
+{
+  "control": "Blind-Image Sensory Ablation",
+  "episodes_tested": 5,
+  "success_rate": 0.0,
+  "oracle_success_rate": 0.8,
+  "mean_navigation_error_m": 4.588811910152435,
+  "mean_actions": 30.2,
+  "episodes": [
+    {
+      "episode_id": "2022",
+      "success": false,
+      "oracle_success": true,
+      "spl": 0.0,
+      "navigation_error_m": 1.634263038635254,
+      "trajectory_length_m": 7.570796242501202,
+      "actions": 30,
+      "failure_category": "missed_stop"
+    },
+    {
+      "episode_id": "2021",
+      "success": false,
+      "oracle_success": true,
+      "spl": 0.0,
+      "navigation_error_m": 1.634263038635254,
+      "trajectory_length_m": 7.570796242501202,
+      "actions": 30,
+      "failure_category": "missed_stop"
+    },
+    {
+      "episode_id": "2023",
+      "success": false,
+      "oracle_success": true,
+      "spl": 0.0,
+      "navigation_error_m": 1.634263038635254,
+      "trajectory_length_m": 7.570796242501202,
+      "actions": 30,
+      "failure_category": "missed_stop"
+    },
+    {
+      "episode_id": "1876",
+      "success": false,
+      "oracle_success": true,
+      "spl": 0.0,
+      "navigation_error_m": 0.9204723238945007,
+      "trajectory_length_m": 8.356198067346215,
+      "actions": 33,
+      "failure_category": "missed_stop"
+    },
+    {
+      "episode_id": "259",
+      "success": false,
+      "oracle_success": false,
+      "spl": 0.0,
+      "navigation_error_m": 17.120798110961914,
+      "trajectory_length_m": 7.141591944908905,
+      "actions": 28,
+      "failure_category": "budget_exceeded"
+    }
+  ]
+}

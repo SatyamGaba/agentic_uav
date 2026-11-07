@@ -9,7 +9,8 @@ TOOL_SCHEMAS: List[Dict[str, Any]] = [
             "name": "query_depth",
             "description": (
                 "Query metric depth at one or more normalized pixel coordinates across current camera views. "
-                "Returns center depth (d_center) and 5x5 spatial statistics (min, mean, median) in meters. "
+                "Returns center depth (depth_m), 5x5 spatial statistics (min, mean, median), and an action preview "
+                "(preview_theta_deg, preview_rho_m) indicating the exact turn angle and forward displacement move_to would execute. "
                 "Use this to inspect candidate path clearance, doorway openings, or obstacle distances before moving."
             ),
             "parameters": {

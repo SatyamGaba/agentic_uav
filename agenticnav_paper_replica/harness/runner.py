@@ -76,6 +76,7 @@ def run_episode(
         allow_adjacent_bin_snap=config.adjacent_bin_snap,
         max_snap_deg=config.max_snap_deg,
         max_snap_drift_m=config.max_snap_drift_m,
+        obstacle_point_threshold=getattr(config, "obstacle_point_threshold", 5),
     )
 
     # Memory, mapping, and harness
@@ -93,6 +94,8 @@ def run_episode(
         max_malformed_calls=config.max_malformed_calls_per_step,
         enable_depth=(config.depth_tool != "off"),
         enable_recall=config.recall_tool,
+        enable_arrival_verification=getattr(config, "arrival_verification", True),
+        floor_grounding_prompt=getattr(config, "floor_grounding_prompt", True),
     )
 
     # 2. Reset simulator to start pose

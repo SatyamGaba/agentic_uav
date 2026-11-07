@@ -356,9 +356,13 @@ class OllamaNavClient:
         if tools:
             payload["tools"] = tools
 
+        payload_json = json.dumps(payload)
+        from agenticnav_paper_replica.vlm.firewall import assert_firewall_integrity
+        assert_firewall_integrity(payload_json)
+
         req = urllib.request.Request(
             f"{self.base_url}/api/chat",
-            data=json.dumps(payload).encode("utf-8"),
+            data=payload_json.encode("utf-8"),
             headers={"Content-Type": "application/json"},
             method="POST",
         )

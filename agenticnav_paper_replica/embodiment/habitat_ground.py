@@ -16,10 +16,18 @@ except ImportError:
 
 
 def resolve_scene_path(scene_id: str, search_roots: Optional[List[str]] = None) -> str:
-    """Resolves raw scene ID (e.g. 'gZ6f7yhEvPG') to a valid .glb file path."""
+    """Resolves raw scene ID (e.g. 'gZ6f7yhEvPG' or 'mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb') to a valid .glb file path."""
     if os.path.isfile(scene_id):
-        return scene_id
+        return os.path.abspath(scene_id)
 
+    # Clean raw id if in format "mp3d/SCENE/SCENE.glb"
+    base_id = scene_id
+    if "/" in base_id:
+        for part in base_id.split("/"):
+            if part and not part.endswith(".glb") and part != "mp3d":
+                base_id = part
+                break
+    base_id = base_id.replace(".glb", "")
     roots = search_roots or [
         "/home/krutik/data/scene_datasets/mp3d",
         "data/scene_datasets/mp3d",
@@ -31,10 +39,10 @@ def resolve_scene_path(scene_id: str, search_roots: Optional[List[str]] = None) 
         "/datasets/scene_datasets/mp3d",
     ]
     for r in roots:
-        p1 = os.path.join(r, scene_id, f"{scene_id}.glb")
+        p1 = os.path.join(r, base_id, f"{base_id}.glb")
         if os.path.isfile(p1):
             return p1
-        p2 = os.path.join(r, f"{scene_id}.glb")
+        p2 = os.path.join(r, f"{base_id}.glb")
         if os.path.isfile(p2):
             return p2
     return scene_id
@@ -345,7 +353,14 @@ class HabitatGroundEmbodiment(EmbodimentBase):
 
         start_pos = episode_data.get("start_position", [0.0, 0.0, 0.0])
         start_rot = episode_data.get("start_rotation", [0.0, 0.0, 0.0, 1.0])
-        goal_pos = episode_data.get("goal_position", [0.0, 0.0, -10.0])
+        if "goals" in episode_data and len(episode_data["goals"]) > 0:
+            goal_pos = episode_data["goals"][0]["position"]
+        elif "goal_position" in episode_data:
+            goal_pos = episode_data["goal_position"]
+        elif "reference_path" in episode_data and len(episode_data["reference_path"]) > 0:
+            goal_pos = episode_data["reference_path"][-1]
+        else:
+            goal_pos = [0.0, 0.0, -10.0]
 
         # Robust snapping to navmesh
         if pf.is_loaded:

@@ -1,7 +1,8 @@
 {
   "check": "G0.1",
-  "total_config_fields": 35,
-  "total_ledger_params": 49,
+  "total_config_fields": 40,
+  "total_ledger_params": 54,
   "unmapped_fields": [],
+  "value_mismatches": {},
   "status": "PASS"
 }

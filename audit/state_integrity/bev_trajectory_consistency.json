@@ -1,0 +1,13 @@
+{
+  "task": "T-B2 BEV Map & Trajectory Consistency",
+  "steps_evaluated": 30,
+  "max_trajectory_alignment_error_m": 0.0,
+  "mean_trajectory_alignment_error_m": 0.0,
+  "bev_image_shape": [
+    256,
+    256,
+    3
+  ],
+  "pass_criterion": "alignment error <= 1e-4 m across all steps",
+  "status": "PASS"
+}

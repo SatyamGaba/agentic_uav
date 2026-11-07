@@ -113,6 +113,11 @@ class ToolExecutor:
                     if ok:
                         valid_patch_depths.append(d_met)
 
+            # Compute action preview (theta, rho) that move_to would execute
+            p_c_prev = deproject_pixel(x0, y0, z_center, self.config, is_normalized=False)
+            p_ag_prev = camera_to_agent_frame(p_c_prev, view, self.config)
+            _, _, rho_q_prev, th_q_prev = self.checker.compute_kinematics(float(p_ag_prev[0]), float(p_ag_prev[2]))
+
             if len(valid_patch_depths) >= 3:
                 min_m = float(np.min(valid_patch_depths))
                 mean_m = float(np.mean(valid_patch_depths))
@@ -125,6 +130,8 @@ class ToolExecutor:
                     "min_m": round(min_m, 2),
                     "mean_m": round(mean_m, 2),
                     "median_m": round(median_m, 2),
+                    "preview_theta_deg": round(th_q_prev, 1),
+                    "preview_rho_m": round(rho_q_prev, 2),
                 })
             else:
                 results.append({
@@ -136,6 +143,8 @@ class ToolExecutor:
                     "mean_m": None,
                     "median_m": None,
                     "sparse_patch": True,
+                    "preview_theta_deg": round(th_q_prev, 1),
+                    "preview_rho_m": round(rho_q_prev, 2),
                 })
 
         return {"query_results": results}

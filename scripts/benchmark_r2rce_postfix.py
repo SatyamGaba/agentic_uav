@@ -131,6 +131,7 @@ def run_one(
     vlm_fn: Any,
     trace_logger: TraceLogger,
     model_name: str,
+    embodiment: Optional[HabitatGroundEmbodiment] = None,
 ) -> Dict[str, Any]:
     episode_id = str(episode["episode_id"])
     scene_id = str(episode["scene_id"])
@@ -138,11 +139,14 @@ def run_one(
     if not os.path.isfile(resolved_scene):
         raise FileNotFoundError(f"Scene '{scene_id}' not found ({resolved_scene}).")
 
-    embodiment = HabitatGroundEmbodiment(
-        scene_id=resolved_scene,
-        max_actions=config.max_simulator_actions,
-        gpu_device_id=-1,
-    )
+    own_embodiment = False
+    if embodiment is None:
+        embodiment = HabitatGroundEmbodiment(
+            scene_id=resolved_scene,
+            max_actions=config.max_simulator_actions,
+            gpu_device_id=-1,
+        )
+        own_embodiment = True
     try:
         result = run_episode(
             episode_data=episode,
@@ -152,7 +156,8 @@ def run_one(
             trace_logger=trace_logger,
         )
     finally:
-        embodiment.close()
+        if own_embodiment:
+            embodiment.close()
 
     metrics = result.metrics
     return {
@@ -237,6 +242,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Post-fix R2R-CE benchmark")
     parser.add_argument("--episodes", type=Path, default=DEFAULT_EPISODES)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--arm", type=str, choices=["P", "L"], default="L",
+                        help="Experimental arm: 'P' (Paper-faithful: N_th=1, no arrival verify, no floor guidance) or 'L' (Local aids: N_th=5, arrival verify, floor guidance).")
     parser.add_argument("--model", type=str, default="qwen3.5:4b")
     parser.add_argument("--max-episodes", type=int, default=None)
     parser.add_argument("--max-actions", type=int, default=25)
@@ -281,17 +288,35 @@ def main() -> int:
     config.inference_seed = 42
     config.vlm_model = args.model
 
-    ollama_client = OllamaNavClient(
-        model_name=args.model,
-        temperature=config.temperature,
-        seed=config.inference_seed,
-        thinking=False,
-    )
-    if not ollama_client.is_configured():
-        raise RuntimeError(f"Ollama is not reachable at {ollama_client.base_url}.")
+    if args.arm == "P":
+        config.obstacle_point_threshold = 1
+        config.floor_grounding_prompt = False
+        config.arrival_verification = False
+    else:  # Arm L
+        config.obstacle_point_threshold = 5
+        config.floor_grounding_prompt = True
+        config.arrival_verification = True
+
+    # Sort episodes by scene to eliminate repetitive simulator reload overhead
+    episodes = sorted(episodes, key=lambda e: resolve_scene_path(str(e.get("scene_id", ""))))
+
+    if not args.baseline_only:
+        ollama_client = OllamaNavClient(
+            model_name=args.model,
+            temperature=config.temperature,
+            seed=config.inference_seed,
+            thinking=False,
+        )
+        if not ollama_client.is_configured():
+            raise RuntimeError(f"Ollama is not reachable at {ollama_client.base_url}.")
+        model_name = ollama_client.model_name
+        ollama_url = ollama_client.base_url
+    else:
+        ollama_client = None
+        model_name = "stop_immediately_control"
+        ollama_url = "none"
 
     trace_logger = TraceLogger(output_dir / "traces")
-    model_name = ollama_client.model_name
 
     manifest = {
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
@@ -300,10 +325,14 @@ def main() -> int:
         "platform": platform.platform(),
         "habitat_sim_available": HABITAT_AVAILABLE,
         "model": model_name,
-        "ollama_base_url": ollama_client.base_url,
+        "ollama_base_url": ollama_url,
         "dataset": metadata,
         "episode_ids": [e["episode_id"] for e in episodes],
         "config": {
+            "arm": args.arm,
+            "obstacle_point_threshold": config.obstacle_point_threshold,
+            "floor_grounding_prompt": config.floor_grounding_prompt,
+            "arrival_verification": config.arrival_verification,
             "max_simulator_actions": config.max_simulator_actions,
             "max_evidence_queries_per_step": config.max_evidence_queries_per_step,
             "max_consecutive_reselects": config.max_consecutive_reselects,
@@ -332,28 +361,46 @@ def main() -> int:
     if args.baseline_only:
         baseline_logger = TraceLogger(output_dir / "baseline_stop/traces")
         baseline_results: List[Dict[str, Any]] = []
-        for idx, episode in enumerate(episodes, start=1):
-            print(f"[baseline {idx}/{len(episodes)}] {episode['episode_id']}", flush=True)
+        cur_scene = None
+        cur_emb = None
+        # Group episodes by scene to minimize simulator re-initialization (10 loads total instead of 100)
+        scene_grouped_episodes = sorted(episodes, key=lambda e: resolve_scene_path(str(e.get("scene_id", ""))))
+        ep_result_map = {}
+        for idx, episode in enumerate(scene_grouped_episodes, start=1):
+            print(f"[baseline {idx}/{len(episodes)}] ep_id={episode['episode_id']} ({episode.get('scene_id')})", flush=True)
+            res_scene = resolve_scene_path(str(episode.get("scene_id", "")))
+            if res_scene != cur_scene:
+                if cur_emb is not None:
+                    cur_emb.close()
+                cur_scene = res_scene
+                cur_emb = HabitatGroundEmbodiment(
+                    scene_id=res_scene,
+                    max_actions=config.max_simulator_actions,
+                    gpu_device_id=-1,
+                )
             try:
                 result = run_one(
-                    episode, config, stop_immediately_policy, baseline_logger, "stop_immediately"
+                    episode, config, stop_immediately_policy, baseline_logger, "stop_immediately", embodiment=cur_emb
                 )
             except Exception as exc:
-                baseline_results.append({
+                result = {
                     "episode_id": episode["episode_id"],
                     "scene_id": episode.get("scene_id"),
                     "failure_category": "infrastructure_failure",
                     "error_type": type(exc).__name__,
                     "error": str(exc),
-                })
-                continue
-            baseline_results.append(result)
+                }
+            ep_result_map[str(episode["episode_id"])] = result
             with open(
                 output_dir / "baseline_stop/episodes" / f"{episode['episode_id']}.json",
                 "w",
                 encoding="utf-8",
             ) as f:
                 json.dump(result, f, indent=2, default=str)
+        if cur_emb is not None:
+            cur_emb.close()
+        # Restore original episode ordering
+        baseline_results = [ep_result_map[str(e["episode_id"])] for e in episodes]
         baseline_summary = summarize(episodes, baseline_results, config, "stop_immediately")
         with open(output_dir / "baseline_stop_summary.json", "w", encoding="utf-8") as f:
             json.dump(baseline_summary, f, indent=2, default=str)
@@ -363,11 +410,23 @@ def main() -> int:
 
     results: List[Dict[str, Any]] = []
     errors: List[Dict[str, Any]] = []
+    cur_scene = None
+    cur_emb = None
     for idx, episode in enumerate(episodes, start=1):
         episode_id = episode["episode_id"]
         print(f"[{idx}/{len(episodes)}] {episode_id} ({episode['scene_id']})", flush=True)
+        res_scene = resolve_scene_path(str(episode.get("scene_id", "")))
+        if res_scene != cur_scene:
+            if cur_emb is not None:
+                cur_emb.close()
+            cur_scene = res_scene
+            cur_emb = HabitatGroundEmbodiment(
+                scene_id=res_scene,
+                max_actions=config.max_simulator_actions,
+                gpu_device_id=-1,
+            )
         try:
-            result = run_one(episode, config, ollama_client, trace_logger, model_name)
+            result = run_one(episode, config, ollama_client, trace_logger, model_name, embodiment=cur_emb)
         except Exception as exc:
             error_record = {
                 "episode_id": episode_id,
@@ -393,6 +452,8 @@ def main() -> int:
             f"category={result['failure_category']}",
             flush=True,
         )
+    if cur_emb is not None:
+        cur_emb.close()
 
     summary = summarize(episodes, results, config, model_name)
     summary["infrastructure_errors"] = errors
@@ -400,12 +461,24 @@ def main() -> int:
     baseline_summary: Optional[Dict[str, Any]] = None
     if not args.no_baseline:
         baseline_logger = TraceLogger(output_dir / "baseline_stop/traces")
-        baseline_results: List[Dict[str, Any]] = []
+        baseline_results = []
+        cur_scene = None
+        cur_emb = None
         for idx, episode in enumerate(episodes, start=1):
             print(f"[baseline {idx}/{len(episodes)}] {episode['episode_id']}", flush=True)
+            res_scene = resolve_scene_path(str(episode.get("scene_id", "")))
+            if res_scene != cur_scene:
+                if cur_emb is not None:
+                    cur_emb.close()
+                cur_scene = res_scene
+                cur_emb = HabitatGroundEmbodiment(
+                    scene_id=res_scene,
+                    max_actions=config.max_simulator_actions,
+                    gpu_device_id=-1,
+                )
             try:
                 result = run_one(
-                    episode, config, stop_immediately_policy, baseline_logger, "stop_immediately"
+                    episode, config, stop_immediately_policy, baseline_logger, "stop_immediately", embodiment=cur_emb
                 )
             except Exception as exc:
                 baseline_results.append({
@@ -423,6 +496,8 @@ def main() -> int:
                 encoding="utf-8",
             ) as f:
                 json.dump(result, f, indent=2, default=str)
+        if cur_emb is not None:
+            cur_emb.close()
         baseline_summary = summarize(episodes, baseline_results, config, "stop_immediately")
 
     with open(output_dir / "benchmark_summary.json", "w", encoding="utf-8") as f:
@@ -446,7 +521,7 @@ def main() -> int:
             count == 0 or key in {"success", *FAILURE_TAXONOMY}
             for key, count in summary["failure_taxonomy"].items()
         ),
-        "deadlocks_have_verification": all(
+        "deadlocks_have_verification": (not config.arrival_verification) or all(
             r.get("arrival_verification_steps", 0) > 0
             for r in results
             if r["failure_category"] == "safety_deadlock"

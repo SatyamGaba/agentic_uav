@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "checks": {
+    "all_episodes_attempted": true,
+    "all_episodes_completed": true,
+    "trace_count_matches": true,
+    "unique_episode_ids": true,
+    "taxonomy_valid": true,
+    "deadlocks_have_verification": true
+  },
+  "trace_count": 20,
+  "result_count": 20,
+  "error_count": 0
+}

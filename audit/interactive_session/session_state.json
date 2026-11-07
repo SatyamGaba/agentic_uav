@@ -1,0 +1,21 @@
+{
+  "episode_idx": 4,
+  "episode_id": "r2r_ce_val_unseen_0389",
+  "scene_id": "EU6Fwq7SyZv",
+  "instruction": "Walk next to the first white chair on its right side, walk straight towards the older floral chair, take a right towards the stairs and stop.",
+  "current_node": 1,
+  "actions_taken": 0,
+  "initial_distance_m": 7.706804275512695,
+  "shortest_path_m": 7.706804275512695,
+  "current_distance_m": 7.706804275512695,
+  "allocentric_pose": [
+    4.898630142211914,
+    1.4939299821853638,
+    4.71238898038469
+  ],
+  "history": [],
+  "action_history": [],
+  "consecutive_reselects": 0,
+  "is_done": false,
+  "called_stop": false
+}

@@ -1,0 +1,59 @@
+{
+  "episode_id": "2023",
+  "scene_id": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
+  "instruction": {
+    "instruction_text": "Walk around the pews and towards the front of the room with the paintings of religious figures and a stage area. ",
+    "instruction_tokens": [
+      2584,
+      159,
+      2389,
+      1764,
+      119,
+      2452,
+      2389,
+      1019,
+      1605,
+      2389,
+      1994,
+      2661,
+      2389,
+      1689,
+      1605,
+      1951,
+      931,
+      119,
+      73,
+      2216,
+      150,
+      15
+    ]
+  },
+  "model": "qwen3.5:4b",
+  "called_stop": false,
+  "terminated_deadlock": false,
+  "terminated_protocol_violation": false,
+  "total_steps": 4,
+  "arrival_verification_steps": 0,
+  "failure_category": "missed_stop",
+  "metrics": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": true,
+    "navigation_error_m": 1.634263038635254,
+    "trajectory_length_m": 7.570796242501202,
+    "simulator_action_count": 30
+  },
+  "metrics_dataclass": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": true,
+    "navigation_error_m": 1.634263038635254,
+    "trajectory_length_m": 7.570796242501202,
+    "shortest_path_distance_m": 4.841162204742432,
+    "total_steps": 31,
+    "simulator_action_count": 30,
+    "ndtw": 0.0
+  },
+  "shortest_path_distance_m": 0.0,
+  "goal_radius_m": 3.0
+}

@@ -1,0 +1,76 @@
+{
+  "stage": "Stage D Freeze Manifest",
+  "total_files_locked": 14,
+  "files": {
+    "spec_ledger": {
+      "path": "spec/spec_ledger.yaml",
+      "sha256": "d398be490b550cd7373e9fde161c824699b0eac7147bdb3244337a68f3e586cb",
+      "size_bytes": 14777
+    },
+    "config": {
+      "path": "agenticnav_paper_replica/configs/default_config.py",
+      "sha256": "ecf1145606c650f484500b31ffda38ce1f1e0b1f5d3e149a96c40f54efc57bc2",
+      "size_bytes": 2896
+    },
+    "prompts": {
+      "path": "agenticnav_paper_replica/harness/prompts.py",
+      "sha256": "607528c3876ac5739ddeb1c6c8397786237694ff9802836287b6140bdc821528",
+      "size_bytes": 7337
+    },
+    "step_loop": {
+      "path": "agenticnav_paper_replica/harness/step_loop.py",
+      "sha256": "98d4ac539fc041a09bd5d0ad07b66e6c8a386b83fc5ccb035f9b328c408da8d9",
+      "size_bytes": 18868
+    },
+    "runner": {
+      "path": "agenticnav_paper_replica/harness/runner.py",
+      "sha256": "750c1a4eeaefbdb169ce674971a3b154b342a3aa1a2d6fd5d0ed5739acde9680",
+      "size_bytes": 17213
+    },
+    "executor": {
+      "path": "agenticnav_paper_replica/harness/executor.py",
+      "sha256": "59965900fa5e704a5afc4ea66431110e1c906da866b3d249e91126515a78a340",
+      "size_bytes": 9065
+    },
+    "safety_region": {
+      "path": "agenticnav_paper_replica/geometry/safety_region.py",
+      "sha256": "0e1b5e79563b260ef268fbfda106007a2fbb259e12a75569ffe13dc36b6ef094",
+      "size_bytes": 9358
+    },
+    "pinhole": {
+      "path": "agenticnav_paper_replica/geometry/pinhole.py",
+      "sha256": "335449d90bb26805e7aaabf70c1c244cddb02e340a89a59434b38428ace2e2e4",
+      "size_bytes": 13865
+    },
+    "occupancy_grid": {
+      "path": "agenticnav_paper_replica/mapping/occupancy_grid.py",
+      "sha256": "8e739a8a0d28989802adcc9c1fc34f95b36c470753c82eb4f23f79e4bbfff90e",
+      "size_bytes": 8810
+    },
+    "bev_renderer": {
+      "path": "agenticnav_paper_replica/mapping/bev_renderer.py",
+      "sha256": "4313dabd629ae769b9d52567d43ceb965313091c3e6d32b525a9fa4e10f630cc",
+      "size_bytes": 5796
+    },
+    "locked_100_dataset": {
+      "path": "agenticnav_paper_replica/data/opennav_r2rce_100.json",
+      "sha256": "92a590e9a6ff4bdc94af2b6dcec74f71d7b81f058afd38b1adbdbd0c40fdb4c0",
+      "size_bytes": 271328
+    },
+    "scene_manifest": {
+      "path": "audit/interactive_session/mp3d_val_unseen_11_scenes_hashes.json",
+      "sha256": "6b214673dd4e1e9454747a6413b5840bf90336216798f65889e69e4d37497773",
+      "size_bytes": 3196
+    },
+    "exposure_audit": {
+      "path": "audit/freeze/exposure.json",
+      "sha256": "ed0450f2eca17fa4f13a65a7e14d80a89f031efb5534cbd453aa0ee6e186d0fc",
+      "size_bytes": 78183
+    },
+    "run_matrix": {
+      "path": "audit/freeze/run_matrix.json",
+      "sha256": "959cc9eb834ec6d6d60fe51041763b2af2cae2b45b87b6d445ea9cc33e0562cd",
+      "size_bytes": 2304
+    }
+  }
+}

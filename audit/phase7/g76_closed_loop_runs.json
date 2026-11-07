@@ -2,20 +2,20 @@
   "check": "G7.6",
   "mock_run": {
     "episode_id": "g76_mock_dev_01",
-    "total_steps": 3,
-    "success": false,
-    "spl": 0.0,
-    "navigation_error_m": 1.6008,
+    "total_steps": 2,
+    "success": true,
+    "spl": 1.0,
+    "navigation_error_m": 1.0,
     "deadlock": false,
     "passed": true
   },
   "habitat_run": {
     "episode_id": "g76_habitat_dev_01",
     "scene": "gZ6f7yhEvPG",
-    "total_steps": 3,
-    "simulator_action_count": 32,
-    "trajectory_length_m": 8.1416,
-    "deadlock": false,
+    "total_steps": 2,
+    "simulator_action_count": 10,
+    "trajectory_length_m": 2.5,
+    "deadlock": true,
     "protocol_violation": false,
     "passed": true
   },

@@ -1,22 +1,21 @@
 {
   "check": "G0.3",
-  "file_path": "agenticnav_paper_replica/data/episode_list_100.json",
-  "sha256": "98b980704a701458eef01441771642e724ac3f9d5a12429b1e9d2144a27cc24e",
+  "file_path": "agenticnav_paper_replica/data/opennav_r2rce_100.json",
+  "sha256": "92a590e9a6ff4bdc94af2b6dcec74f71d7b81f058afd38b1adbdbd0c40fdb4c0",
   "total_episodes": 100,
-  "total_unique_scenes": 11,
+  "total_unique_scenes": 10,
   "scenes": [
+    "2azQ1b91cZZ",
+    "8194nk5LbLH",
     "EU6Fwq7SyZv",
-    "JF19kD82Mey",
-    "X7NsGo2t5Ab",
-    "Z6R7ygndpVU",
-    "cVre9nv62Rh",
-    "dhjEzFoEJ8e",
-    "gZ6f7yhEvPG",
+    "QUCTc6BB5sX",
+    "TbHJrupSAjP",
+    "X7HyMhZNoso",
+    "Z6MFQCViBuw",
     "oLBMNvg9in8",
-    "pLe4wQe7qrG",
-    "r1Q1Z4BcVte",
-    "sT4fr6TAbpF"
+    "x8F5xyUWy9e",
+    "zsNo4HB9uLZ"
   ],
-  "scenes_match_expected_11": true,
+  "scenes_match_expected_val_unseen": true,
   "status": "PASS"
 }

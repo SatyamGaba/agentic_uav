@@ -93,13 +93,12 @@ def convert_raw_depth(
     val: float,
     config: CameraConfig,
     is_raw_normalized: Optional[bool] = None,
+    eps: float = 1e-3,
 ) -> Tuple[bool, float, Optional[str]]:
     """Convert depth value to metric depth in meters.
 
-    Formula from Blueprint v7 Review Item 3 & Section 5.1:
-        invalid_depth: NaN, Inf, or 0.
-        out_of_range: finite z-depth outside [d_min, d_max].
-        When raw normalized: d = d_min + raw * (d_max - d_min). Raw 0 and raw >= 1 are invalid.
+    Rejects invalid depth: NaN, Inf, non-positive, near-clipping clamp (<= d_min + eps),
+    and far saturation (>= d_max - eps).
 
     Returns:
         (is_valid, depth_m, error_cause)
@@ -115,9 +114,9 @@ def convert_raw_depth(
         d_metric = config.d_min + val * (config.d_max - config.d_min)
         return True, float(d_metric), None
     else:
-        # Metric depth in meters
-        if val < config.d_min or val > config.d_max:
-            return False, float(val), "out_of_range"
+        # Metric depth in meters: mask near clamp and far saturation as invalid
+        if val <= (config.d_min + eps) or val >= (config.d_max - eps):
+            return False, float(val), "invalid_depth"
         return True, float(val), None
 
 
@@ -179,6 +178,37 @@ def camera_to_agent_frame(
     p_z = -sin_psi * x_v + cos_psi * z_v
 
     return np.array([p_x, p_y, p_z], dtype=np.float64)
+
+
+def agent_to_camera_frame(
+    p_agent: np.ndarray,
+    view_idx: int,
+    config: CameraConfig,
+) -> np.ndarray:
+    """Transform canonical agent coordinates [p_x, p_y, p_z] back to camera optical coordinates [x_c, y_c, z_c].
+
+    Exact mathematical inverse of camera_to_agent_frame.
+    """
+    if view_idx not in VIEW_AZIMUTHS_DEG:
+        raise ValueError(f"Invalid view_idx={view_idx}. Must be in {list(VIEW_AZIMUTHS_DEG.keys())}.")
+
+    psi_rad = math.radians(VIEW_AZIMUTHS_DEG[view_idx])
+    cos_psi = math.cos(psi_rad)
+    sin_psi = math.sin(psi_rad)
+
+    p_x = float(p_agent[0])
+    p_y = float(p_agent[1])
+    p_z = float(p_agent[2])
+
+    x_v = cos_psi * p_x - sin_psi * p_z
+    y_v = p_y
+    z_v = sin_psi * p_x + cos_psi * p_z
+
+    x_c = x_v
+    y_c = config.camera_height - y_v
+    z_c = -z_v
+
+    return np.array([x_c, y_c, z_c], dtype=np.float64)
 
 
 def extract_depth_patch(
@@ -293,8 +323,12 @@ def unproject_depth_image(
     stride: int = 4,
     y_min: float = 0.10,
     y_max: float = 1.25,
+    eps: float = 1e-3,
 ) -> np.ndarray:
-    """Deproject full 2D depth image into 3D obstacle pointcloud in canonical agent frame."""
+    """Deproject full 2D depth image into 3D obstacle pointcloud in canonical agent frame.
+
+    Masks near-clipping clamp (<= d_min + eps) and far-saturation (>= d_max - eps).
+    """
     h, w = depth_image.shape
     ys = np.arange(0, h, stride)
     xs = np.arange(0, w, stride)
@@ -302,7 +336,12 @@ def unproject_depth_image(
 
     z_vals = depth_image[grid_y, grid_x].astype(np.float64)
 
-    valid_mask = (z_vals >= config.d_min) & (z_vals <= config.d_max) & (~np.isnan(z_vals))
+    valid_mask = (
+        (z_vals > config.d_min + eps)
+        & (z_vals < config.d_max - eps)
+        & (~np.isnan(z_vals))
+        & (~np.isinf(z_vals))
+    )
     if not np.any(valid_mask):
         return np.empty((0, 3), dtype=np.float64)
 
@@ -344,8 +383,12 @@ def extract_view_obstacle_and_free_points(
     stride: int = 4,
     y_min: float = 0.10,
     y_max: float = 1.25,
+    eps: float = 1e-3,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """Deproject depth image into both 3D chassis obstacles and 2D free-space ray endpoints.
+
+    Rejects invalid depth: near-clipping clamp (<= d_min + eps), NaN, Inf, non-positive.
+    Classifies far-saturation (>= d_max - eps) as free-space endpoints, not chassis obstacles.
 
     Returns:
         (obstacle_pts_3d, free_endpoints_2d):
@@ -362,7 +405,8 @@ def extract_view_obstacle_and_free_points(
     gy_flat = grid_y.flatten()
     z_flat = z_vals.flatten()
 
-    valid_mask = (~np.isnan(z_flat)) & (z_flat >= config.d_min)
+    # Mask invalid depth: NaN, Inf, non-positive, and near-clipping clamp <= d_min + eps
+    valid_mask = (~np.isnan(z_flat)) & (~np.isinf(z_flat)) & (z_flat > (config.d_min + eps))
     if not np.any(valid_mask):
         return np.empty((0, 3), dtype=np.float64), np.empty((0, 2), dtype=np.float64)
 
@@ -371,7 +415,7 @@ def extract_view_obstacle_and_free_points(
     z_v_raw = z_flat[valid_mask]
 
     # Clip to d_max for projection
-    z_c = np.clip(z_v_raw, config.d_min, config.d_max)
+    z_c = np.clip(z_v_raw, config.d_min + eps, config.d_max)
     x_c = (gx_v + 0.5 - config.cx) * z_c / config.fx
     y_c = (gy_v + 0.5 - config.cy) * z_c / config.fy
 
@@ -388,9 +432,9 @@ def extract_view_obstacle_and_free_points(
     p_z = -sin_psi * x_v + cos_psi * z_v
 
     # Classify:
-    # 1. Saturated max range: free ray endpoint
-    is_max_range = (z_v_raw >= config.d_max)
-    # 2. Obstacles: inside chassis height band and not saturated
+    # 1. Saturated max range (>= d_max - eps): free ray endpoint
+    is_max_range = (z_v_raw >= (config.d_max - eps))
+    # 2. Obstacles: inside chassis height band and within valid sensor linear range
     is_obstacle = (~is_max_range) & (p_y >= y_min) & (p_y <= y_max)
     # 3. Floor hits: below chassis height and not saturated
     is_floor = (~is_max_range) & (p_y < y_min)

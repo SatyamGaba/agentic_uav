@@ -1,0 +1,18 @@
+{
+  "task": "T-B1 Localization Drift & State Integrity Verification",
+  "total_forced_moves": 210,
+  "sliding_collisions_detected": 126,
+  "collision_shortfall_rate": 0.6,
+  "open_loop_dead_reckoning": {
+    "mean_error_m": 6.184302278065819,
+    "max_error_m": 21.121624409231288,
+    "conclusion": "Severe drift when integrating commanded motion open-loop across collisions"
+  },
+  "embodiment_state_binding": {
+    "max_position_error_m": 0.0,
+    "max_yaw_error_deg": 0.0,
+    "pass_criterion_position": "<= 0.02 m",
+    "pass_criterion_yaw": "<= 1.0 deg",
+    "status": "PASS"
+  }
+}

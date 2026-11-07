@@ -24,18 +24,34 @@ AUDIT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def check_g01(ledger_data):
-    """G0.1: Check that every config parameter in ReplicaConfig maps to a ledger line."""
-    print("Running G0.1: Config to Ledger Mapping Check...")
+    """G0.1: Check that every config parameter in ReplicaConfig maps to a ledger line and has exact matching values."""
+    print("Running G0.1: Config to Ledger Mapping & Value Parity Check...")
+    default_config = ReplicaConfig()
     config_fields = set(ReplicaConfig.__dataclass_fields__.keys())
-    ledger_params = set(ledger_data.get("parameters", {}).keys())
+    ledger_params = ledger_data.get("parameters", {})
+    ledger_keys = set(ledger_params.keys())
 
-    unmapped = config_fields - ledger_params
+    unmapped = config_fields - ledger_keys
+    value_mismatches = {}
+
+    for field_name in config_fields:
+        if field_name in ledger_params:
+            config_val = getattr(default_config, field_name)
+            ledger_val = ledger_params[field_name].get("value")
+            if config_val != ledger_val:
+                value_mismatches[field_name] = {
+                    "config_value": config_val,
+                    "ledger_value": ledger_val,
+                }
+
+    passed = (len(unmapped) == 0) and (len(value_mismatches) == 0)
     evidence = {
         "check": "G0.1",
         "total_config_fields": len(config_fields),
-        "total_ledger_params": len(ledger_params),
+        "total_ledger_params": len(ledger_keys),
         "unmapped_fields": list(unmapped),
-        "status": "PASS" if len(unmapped) == 0 else "FAIL"
+        "value_mismatches": value_mismatches,
+        "status": "PASS" if passed else "FAIL"
     }
 
     out_file = AUDIT_DIR / "g01_config_ledger_mapping.json"
@@ -44,9 +60,11 @@ def check_g01(ledger_data):
 
     if unmapped:
         print(f" [FAIL] G0.1: Unmapped config fields: {unmapped}")
-        return False
-    print(f" [PASS] G0.1: All {len(config_fields)} config fields map to ledger lines.")
-    return True
+    if value_mismatches:
+        print(f" [FAIL] G0.1: Value mismatches between ReplicaConfig and ledger: {value_mismatches}")
+    if passed:
+        print(f" [PASS] G0.1: All {len(config_fields)} config fields map to ledger lines with exact value equality.")
+    return passed
 
 
 def check_g02(ledger_data):
@@ -98,15 +116,16 @@ def check_g03(ledger_data):
         data = json.load(f)
 
     episodes = data.get("episodes", [])
-    scenes = sorted(list(set(ep.get("scene_id") for ep in episodes if ep.get("scene_id"))))
+    raw_scenes = sorted(list(set(ep.get("scene_id") for ep in episodes if ep.get("scene_id"))))
+    scenes = sorted(list(set(s.split("/")[1] if "/" in s else s.split(".")[0] for s in raw_scenes)))
 
-    EXPECTED_11_SCENES = sorted([
-        'EU6Fwq7SyZv', 'JF19kD82Mey', 'X7NsGo2t5Ab', 'Z6R7ygndpVU',
-        'cVre9nv62Rh', 'dhjEzFoEJ8e', 'gZ6f7yhEvPG', 'oLBMNvg9in8',
-        'pLe4wQe7qrG', 'r1Q1Z4BcVte', 'sT4fr6TAbpF'
+    EXPECTED_10_VAL_UNSEEN_SCENES = sorted([
+        '2azQ1b91cZZ', '8194nk5LbLH', 'EU6Fwq7SyZv', 'QUCTc6BB5sX',
+        'TbHJrupSAjP', 'X7HyMhZNoso', 'Z6MFQCViBuw', 'oLBMNvg9in8',
+        'x8F5xyUWy9e', 'zsNo4HB9uLZ'
     ])
 
-    scenes_match = (scenes == EXPECTED_11_SCENES)
+    scenes_match = (scenes == EXPECTED_10_VAL_UNSEEN_SCENES)
 
     evidence = {
         "check": "G0.3",
@@ -115,7 +134,7 @@ def check_g03(ledger_data):
         "total_episodes": len(episodes),
         "total_unique_scenes": len(scenes),
         "scenes": scenes,
-        "scenes_match_expected_11": scenes_match,
+        "scenes_match_expected_val_unseen": scenes_match,
         "status": "PASS" if (len(episodes) == 100 and scenes_match) else "FAIL"
     }
 

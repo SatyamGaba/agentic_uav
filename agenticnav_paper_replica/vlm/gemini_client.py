@@ -152,6 +152,16 @@ class GeminiNavClient:
         # 2. Convert function schemas
         gemini_tools = convert_tools_to_gemini_format(tools)
 
+        # Privilege Firewall Check
+        from agenticnav_paper_replica.vlm.firewall import assert_firewall_integrity
+        full_text = (system_instruction or "") + "\n"
+        for c in contents:
+            for p in getattr(c, "parts", []):
+                t = getattr(p, "text", None)
+                if t:
+                    full_text += t + "\n"
+        assert_firewall_integrity(full_text)
+
         # 3. Call API
         config = types.GenerateContentConfig(
             temperature=self.temperature,

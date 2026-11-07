@@ -1,6 +1,7 @@
-"""Standard VLN-CE evaluation metrics: SR, SPL, OSR, TL, NE (v7 Specification)."""
+"""Standard VLN-CE evaluation metrics: SR, SPL, OSR, TL, NE, nDTW (v7 Specification)."""
 
 from dataclasses import dataclass
+import math
 from typing import Dict, List, Optional, Tuple
 import numpy as np
 
@@ -15,6 +16,7 @@ class EpisodeMetrics:
     shortest_path_distance_m: float
     total_steps: int
     simulator_action_count: int
+    ndtw: float = 0.0
 
 
 def compute_trajectory_length(trajectory: List[Tuple[float, float, float]]) -> float:
@@ -27,6 +29,55 @@ def compute_trajectory_length(trajectory: List[Tuple[float, float, float]]) -> f
     return float(np.sum(dists))
 
 
+def compute_dtw(p: np.ndarray, q: np.ndarray) -> float:
+    """Compute Dynamic Time Warping distance between trajectory p (N, D) and reference q (M, D)."""
+    n, m = len(p), len(q)
+    if n == 0 or m == 0:
+        return float("inf")
+
+    dtw_matrix = np.full((n + 1, m + 1), np.inf, dtype=np.float64)
+    dtw_matrix[0, 0] = 0.0
+
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            cost = float(np.linalg.norm(p[i - 1] - q[j - 1]))
+            dtw_matrix[i, j] = cost + min(
+                dtw_matrix[i - 1, j],      # insertion
+                dtw_matrix[i, j - 1],      # deletion
+                dtw_matrix[i - 1, j - 1],  # match
+            )
+    return float(dtw_matrix[n, m])
+
+
+def compute_ndtw(
+    trajectory: List[Tuple[float, float, float]],
+    reference_path: Optional[List[List[float]]],
+    success_threshold: float = 3.0,
+) -> float:
+    """Compute normalized Dynamic Time Warping (nDTW) score in [0.0, 1.0].
+
+    Formula (Ilharco et al., 2019):
+        nDTW = exp(-DTW(P, Q) / (|Q| * threshold))
+    """
+    if not trajectory or not reference_path or len(reference_path) == 0:
+        return 0.0
+
+    # Project trajectory to (x, z) ground plane or 3D
+    p = np.array([[pt[0], pt[1] if len(pt) > 2 else 0.0, pt[2] if len(pt) > 2 else pt[1]] for pt in trajectory], dtype=np.float64)
+    q = np.array(reference_path, dtype=np.float64)
+    if q.shape[1] == 2 and p.shape[1] == 3:
+        p = p[:, [0, 2]]  # match dimensions to 2D
+    elif q.shape[1] == 3 and p.shape[1] == 2:
+        q = q[:, [0, 2]]
+
+    dtw_dist = compute_dtw(p, q)
+    if np.isinf(dtw_dist):
+        return 0.0
+
+    ndtw = math.exp(-dtw_dist / (len(q) * success_threshold))
+    return float(np.clip(ndtw, 0.0, 1.0))
+
+
 def compute_episode_metrics(
     trajectory: List[Tuple[float, float, float]],
     distances_to_goal: List[float],
@@ -34,6 +85,7 @@ def compute_episode_metrics(
     simulator_action_count: int,
     called_stop: bool = True,
     success_distance_threshold: float = 3.0,
+    reference_path: Optional[List[List[float]]] = None,
 ) -> EpisodeMetrics:
     """Compute standard VLN-CE evaluation metrics for an episode (Blueprint v7 Section 10.1).
 
@@ -44,6 +96,7 @@ def compute_episode_metrics(
         simulator_action_count: Total low-level simulator actions executed.
         called_stop: Whether stop was called by the agent (SR requires stop called [I]).
         success_distance_threshold: Distance threshold for success (default 3.0m [P]).
+        reference_path: Ground-truth reference path for nDTW evaluation.
 
     Returns:
         EpisodeMetrics dataclass.
@@ -68,6 +121,9 @@ def compute_episode_metrics(
     else:
         spl = 0.0
 
+    # nDTW
+    ndtw = compute_ndtw(trajectory, reference_path, success_distance_threshold)
+
     return EpisodeMetrics(
         success=success,
         spl=spl,
@@ -77,4 +133,5 @@ def compute_episode_metrics(
         shortest_path_distance_m=shortest_path_length,
         total_steps=len(trajectory),
         simulator_action_count=simulator_action_count,
+        ndtw=ndtw,
     )

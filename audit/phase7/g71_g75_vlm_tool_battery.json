@@ -9,30 +9,30 @@
       "points": [
         {
           "u": 0.5,
-          "v": 0.5,
-          "view": 0
-        },
-        {
-          "u": 0.4,
           "v": 0.6,
           "view": 0
         },
         {
-          "u": 0.6,
+          "u": 0.3,
+          "v": 0.6,
+          "view": 0
+        },
+        {
+          "u": 0.7,
           "v": 0.6,
           "view": 0
         }
       ]
     }
   },
-  "nav_latency_s": 2.304,
+  "nav_latency_s": 7.431,
   "arrival_tool_call": {
     "name": "stop",
     "arguments": {
-      "reason": "All instruction milestones fulfilled; robot is positioned directly in front of the front desk counter as the final destination."
+      "reason": "All instruction milestones fulfilled; positioned directly in front of the front desk counter as specified in the goal."
     }
   },
-  "arrival_latency_s": 3.147,
+  "arrival_latency_s": 2.637,
   "g71_valid_schema": true,
   "g72_bounded_args": true,
   "g73_active_nav": true,

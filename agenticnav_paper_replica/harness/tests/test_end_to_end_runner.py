@@ -114,3 +114,76 @@ class TestEndToEndRunner:
         assert res.failure_category == "safety_deadlock"
         assert res.metrics.success is False
 
+    def test_privilege_sentinel_canary_g68b(self, tmp_path):
+        """Privilege Sentinel Canary (G6.8b): Verify that oracle distances, shortest paths,
+        and goal radii never leak into prompt templates, context buffers, or LLM inputs.
+        """
+        config = ReplicaConfig(max_consecutive_reselects=2)
+        embodiment = MockGroundEmbodiment()
+        logger = TraceLogger(tmp_path / "traces")
+
+        # Sentinel canaries attached to oracle state
+        CANARY_GEODESIC = "CANARY_GEOD_987654"
+        CANARY_SHORTEST = "CANARY_SHORT_456789"
+        CANARY_RADIUS = "CANARY_RAD_123456"
+
+        class CanaryEmbodiment(MockGroundEmbodiment):
+            def get_geodesic_distance_to_goal(self) -> float:
+                return 4.523819  # Unique float to check
+            def get_shortest_path_distance(self) -> float:
+                return 6.789123
+
+        canary_emb = CanaryEmbodiment()
+        episode_data = {
+            "episode_id": "test_canary_g68b",
+            "scene_id": "test_scene",
+            "instruction": "Walk to the brown wooden dining table and stop.",
+            "goal_x": 1.234567,
+            "goal_z": -7.890123,
+            "canary_field": CANARY_GEODESIC,
+        }
+
+        inspected_prompts = []
+
+        def canary_auditing_vlm(messages, tools):
+            prompt_str = str(messages)
+            tools_str = str(tools)
+            inspected_prompts.append((prompt_str, tools_str))
+
+            # Strictly enforce zero oracle leakage
+            forbidden_tokens = [
+                CANARY_GEODESIC,
+                CANARY_SHORTEST,
+                CANARY_RADIUS,
+                "4.523819",
+                "6.789123",
+                "1.234567",
+                "-7.890123",
+                "geodesic",
+                "shortest_path",
+                "goal_distance",
+                "goal_radius",
+                "pathfinder",
+            ]
+            for token in forbidden_tokens:
+                assert token.lower() not in prompt_str.lower(), f"Privilege Firewall Leak detected: '{token}' found in prompt: {prompt_str}"
+                assert token.lower() not in tools_str.lower(), f"Privilege Firewall Leak detected: '{token}' found in tool definition: {tools_str}"
+
+            # Return a move_to that will trigger obstacle reselect then arrival verification
+            return {
+                "content": "Searching for table",
+                "tool_calls": [{"name": "move_to", "arguments": {"view": 0, "u": 0.5, "v": 0.5, "reason": "Advance forward"}}],
+            }
+
+        res = run_episode(
+            episode_data=episode_data,
+            embodiment=canary_emb,
+            config=config,
+            vlm_client_fn=canary_auditing_vlm,
+            trace_logger=logger,
+        )
+
+        assert len(inspected_prompts) >= 2, "Canary auditor must inspect multiple decision turns."
+        assert res.metrics.success is False
+        assert res.terminated_deadlock is True
+

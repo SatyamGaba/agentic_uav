@@ -12,6 +12,7 @@ from agenticnav_paper_replica.geometry.pinhole import (
     deproject_pixel,
     reproject_point,
     camera_to_agent_frame,
+    agent_to_camera_frame,
     estimate_corridor_surface_slope,
     compute_effective_margin,
     unproject_depth_image,
@@ -215,6 +216,109 @@ class TestRequiredSection44UnitTests:
         d_raw, th_deg, rho_q, th_q_deg = self.checker.compute_kinematics(p_obj_agent[0], p_obj_agent[2])
         assert abs(th_deg) < 1e-4
         assert abs(d_raw - 2.5) < 1e-4
+
+    def test_10_unproject_depth_image_vs_deproject_pixel_consistency(self):
+        """Test 10: Verify that vectorized unproject_depth_image and single-point
+        camera_to_agent_frame(deproject_pixel(...)) produce identical coordinates for any pixel and view.
+        """
+        # Create synthetic depth map with variable depths
+        H, W = self.config.image_height, self.config.image_width
+        np.random.seed(42)
+        depth_img = np.random.uniform(1.0, 4.0, size=(H, W)).astype(np.float32)
+
+        # Ensure known points in height band [0.10, 1.25]
+        # At center y=240, y_c=0 -> y_agent = 1.25m
+        depth_img[240, 320] = 2.0  # (0.0, 1.25, -2.0)
+        # Below center y=280: y_c = (280.5-240)*2.0/320 = 0.253m -> y_agent = 1.25 - 0.253 = 0.997m
+        depth_img[280, 400] = 2.0
+
+        for vi in range(4):
+            pts_cloud = unproject_depth_image(
+                depth_img,
+                view_idx=vi,
+                config=self.config,
+                stride=8,
+                y_min=0.10,
+                y_max=1.25,
+            )
+            assert len(pts_cloud) > 0
+
+            # Test a random sample of stride grid points
+            grid_y, grid_x = np.meshgrid(np.arange(0, H, 8), np.arange(0, W, 8), indexing="ij")
+            gy_flat = grid_y.flatten()
+            gx_flat = grid_x.flatten()
+
+            for idx in np.random.choice(len(gy_flat), size=25, replace=False):
+                r = gy_flat[idx]
+                c = gx_flat[idx]
+                z_val = float(depth_img[r, c])
+                p_c = deproject_pixel(c, r, z_val, self.config, is_normalized=False)
+                p_agent_pt = camera_to_agent_frame(p_c, view_idx=vi, config=self.config)
+
+                # Check height band filter
+                if 0.10 <= p_agent_pt[1] <= 1.25 and self.config.d_min <= z_val <= self.config.d_max:
+                    # Point must exist in pointcloud
+                    dists = np.linalg.norm(pts_cloud - p_agent_pt, axis=1)
+                    assert np.min(dists) < 1e-5
+
+    def test_11_camera_to_agent_round_trip(self):
+        """Test 11: Verify exact mathematical round-trip consistency:
+        agent_to_camera_frame(camera_to_agent_frame(p_c)) == p_c.
+        """
+        np.random.seed(1337)
+        for vi in range(4):
+            for _ in range(50):
+                # Random optical point with z_c > 0
+                x_c = np.random.uniform(-3.0, 3.0)
+                y_c = np.random.uniform(-2.0, 2.0)
+                z_c = np.random.uniform(0.5, 5.0)
+                p_c = np.array([x_c, y_c, z_c], dtype=np.float64)
+
+                p_agent = camera_to_agent_frame(p_c, view_idx=vi, config=self.config)
+                p_c_recovered = agent_to_camera_frame(p_agent, view_idx=vi, config=self.config)
+
+                assert np.allclose(p_c, p_c_recovered, atol=1e-10)
+
+    def test_12_invalid_clamped_depth_rejection(self):
+        """Test 12: Verify that near-clipping clamped depth (<= d_min + eps),
+        far-saturation (>= d_max - eps), zero, negative, and NaN are rejected as invalid depth.
+        """
+        # Near clamp (e.g. 0.500m when d_min=0.5m)
+        ok, d_val, cause = convert_raw_depth(0.500, self.config)
+        assert ok is False
+        assert cause == "invalid_depth"
+
+        # Near clamp with epsilon
+        ok, d_val, cause = convert_raw_depth(0.5005, self.config)
+        assert ok is False
+
+        # Valid in-range depth
+        ok, d_val, cause = convert_raw_depth(1.50, self.config)
+        assert ok is True
+        assert abs(d_val - 1.50) < 1e-4
+        assert cause is None
+
+        # Far saturation (5.000m when d_max=5.0m)
+        ok, d_val, cause = convert_raw_depth(5.000, self.config)
+        assert ok is False
+        assert cause == "invalid_depth"
+
+        # Zero and negative
+        ok, _, _ = convert_raw_depth(0.0, self.config)
+        assert ok is False
+        ok, _, _ = convert_raw_depth(-1.0, self.config)
+        assert ok is False
+
+        # NaN and Inf
+        ok, _, _ = convert_raw_depth(float("nan"), self.config)
+        assert ok is False
+        ok, _, _ = convert_raw_depth(float("inf"), self.config)
+        assert ok is False
+
+        # Point cloud extraction masking: depth map entirely composed of 0.500m near clamp
+        clamped_img = np.full((480, 640), 0.500, dtype=np.float32)
+        pts_clamped = unproject_depth_image(clamped_img, view_idx=0, config=self.config)
+        assert len(pts_clamped) == 0, "Near-clamped depth must not generate obstacle points"
 
 
 class TestZeroRhoPolicyAndAblationSwitches:

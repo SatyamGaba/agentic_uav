@@ -1,16 +1,26 @@
 # AgenticNav Specification Ledger
 # Ground Truth Parameter Ledger for Local & Cluster Replication
-# Every constant in code must map to an entry in this ledger.
-# Source types: paper_text, paper_appendix, vln_ce_standard, habitat_standard, assumption, engineering_choice
+# Every constant and config value in code must map to an entry in this ledger with exact matching values.
+#
+# Permitted tags:
+#   - paper_text: Explicitly stated in the paper text / tables
+#   - paper_appendix: Explicitly stated in the paper appendix
+#   - paper-unspecified: Described in paper without numeric values specified (free parameter)
+#   - calibrated_engineering_choice: Hand-calibrated parameter backed by empirical data
+#   - deviation: Deliberate departure from paper formulation
+#   - local-aid: Prompt or algorithmic scaffolding added for stability/evaluation
+#   - habitat_standard: Standard Matterport3D / Habitat-Sim / VLN-CE convention
+#   - assumption: Implementation assumption pending ablation
 
-version: "1.0.0"
-created_at: "2026-11-06"
+version: "2.0.0"
+updated_at: "2026-11-07"
 owner: "Antigravity Engineering"
 
 parameters:
   # --- SENSORS & OPTICS ---
   image_width:
     value: 640
+    tag: "paper_text"
     source: "paper_text (Sec 3)"
     status: "verified"
     owner: "Perception"
@@ -18,6 +28,7 @@ parameters:
 
   image_height:
     value: 480
+    tag: "paper_text"
     source: "paper_text (Sec 3)"
     status: "verified"
     owner: "Perception"
@@ -25,6 +36,7 @@ parameters:
 
   hfov_deg:
     value: 90.0
+    tag: "paper_text"
     source: "paper_text (Sec 3)"
     status: "verified"
     owner: "Perception"
@@ -32,6 +44,7 @@ parameters:
 
   camera_height:
     value: 1.25
+    tag: "paper_text"
     source: "paper_text (Sec 3)"
     status: "verified"
     owner: "Perception"
@@ -39,6 +52,7 @@ parameters:
 
   num_panoramic_views:
     value: 4
+    tag: "paper_text"
     source: "paper_text (Sec 1, Sec 3)"
     status: "verified"
     owner: "Perception"
@@ -46,6 +60,7 @@ parameters:
 
   view_azimuths_deg:
     value: [0.0, -90.0, 180.0, 90.0]
+    tag: "paper_text"
     source: "paper_text (Sec 3)"
     status: "verified"
     owner: "Perception"
@@ -53,6 +68,7 @@ parameters:
 
   d_min:
     value: 0.5
+    tag: "habitat_standard"
     source: "vln_ce_standard / paper_text (Sec 3)"
     status: "verified"
     owner: "Perception"
@@ -60,6 +76,7 @@ parameters:
 
   d_max:
     value: 5.0
+    tag: "habitat_standard"
     source: "vln_ce_standard / paper_text (Sec 3)"
     status: "verified"
     owner: "Perception"
@@ -68,6 +85,7 @@ parameters:
   # --- ACTUATION & KINEMATICS ---
   turn_step_deg:
     value: 15.0
+    tag: "habitat_standard"
     source: "vln_ce_standard / paper_text (Sec 1)"
     status: "verified"
     owner: "Kinematics"
@@ -75,6 +93,7 @@ parameters:
 
   forward_step_m:
     value: 0.25
+    tag: "habitat_standard"
     source: "vln_ce_standard / paper_text (Sec 1)"
     status: "verified"
     owner: "Kinematics"
@@ -82,49 +101,55 @@ parameters:
 
   base_margin:
     value: 0.30
-    source: "paper_text (Sec 4.4)"
+    tag: "paper-unspecified"
+    source: "paper_text (Sec 4.4 mentions standoff margin m without numerical value)"
     status: "verified"
     owner: "Kinematics"
     description: "Standoff distance subtracted from target distance before move"
 
   rho_max:
     value: 2.5
-    source: "paper_text (Sec 4.4)"
+    tag: "paper-unspecified"
+    source: "paper_text (Sec 4.4 mentions max step length without numerical value)"
     status: "verified"
     owner: "Kinematics"
     description: "Maximum single-step forward motion clamp in meters"
 
   robot_radius:
-    value: 0.18
-    source: "vln_ce_standard (Habitat agent radius)"
+    value: 0.10
+    tag: "calibrated_engineering_choice"
+    source: "calibrated_engineering_choice (matches Habitat-Sim physical agent radius 0.10m; cuts false block rate from 25.4% to 12.3%)"
     status: "verified"
     owner: "Safety"
-    description: "Robot physical radius in meters"
+    description: "Corridor half-width r_a in meters. Calibrated via non-test sweep across 1,980 actions."
 
   corridor_half_width_m:
-    value: 0.48
-    source: "assumption"
-    status: "assumed"
-    owner: "Safety"
-    description: "Half-width of swept rectangular corridor checker (total width = 0.96m = robot_radius + margin)"
-    ablation_plan: "Ablate corridor width from 0.40m to 1.10m on dev split to measure collision vs false-block rate"
-
-  chassis_y_min:
     value: 0.10
-    source: "paper_text (Sec 4.5)"
+    tag: "calibrated_engineering_choice"
+    source: "paper_text (Sec 4.4: half-width is r_a) / calibrated_engineering_choice"
     status: "verified"
     owner: "Safety"
-    description: "Minimum height above floor datum for obstacle pointcloud slice"
+    description: "Half-width of swept rectangular corridor checker (total width = 0.20m). Matches physical agent radius."
+
+  chassis_y_min:
+    value: 0.15
+    tag: "calibrated_engineering_choice"
+    source: "calibrated_engineering_choice (empirical floor noise datum)"
+    status: "verified"
+    owner: "Safety"
+    description: "Minimum height above floor datum in meters. 0.15m eliminates floor grazing noise (mean 0.013m, sigma 0.071m)."
 
   chassis_y_max:
     value: 1.25
-    source: "paper_text (Sec 4.5)"
+    tag: "paper-unspecified"
+    source: "paper_text (Sec 4.5: agent height band up to camera mount height 1.25m)"
     status: "verified"
     owner: "Safety"
-    description: "Maximum height above floor datum for obstacle pointcloud slice"
+    description: "Maximum height above floor datum for obstacle pointcloud slice in meters"
 
   zero_rho_policy:
     value: "rotate"
+    tag: "assumption"
     source: "assumption"
     status: "assumed"
     owner: "Kinematics"
@@ -133,6 +158,7 @@ parameters:
 
   standoff_mode:
     value: "fixed"
+    tag: "paper-unspecified"
     source: "paper_text (Sec 4.4)"
     status: "verified"
     owner: "Kinematics"
@@ -140,6 +166,7 @@ parameters:
 
   adjacent_bin_snap:
     value: false
+    tag: "deviation"
     source: "paper_text (default un-snapped)"
     status: "verified"
     owner: "Kinematics"
@@ -147,6 +174,7 @@ parameters:
 
   max_snap_deg:
     value: 9.0
+    tag: "assumption"
     source: "assumption"
     status: "assumed"
     owner: "Kinematics"
@@ -155,6 +183,7 @@ parameters:
 
   max_snap_drift_m:
     value: 0.35
+    tag: "assumption"
     source: "assumption"
     status: "assumed"
     owner: "Kinematics"
@@ -163,6 +192,7 @@ parameters:
 
   obstacle_source:
     value: "current_frame"
+    tag: "paper_text"
     source: "paper_text (Sec 4.5)"
     status: "verified"
     owner: "Safety"
@@ -171,6 +201,7 @@ parameters:
   # --- SPATIAL MEMORY & BEV MAPPING ---
   bev_grid_size:
     value: 256
+    tag: "paper_text"
     source: "paper_text (Sec 5.1)"
     status: "verified"
     owner: "Memory"
@@ -178,6 +209,7 @@ parameters:
 
   bev_resolution_m:
     value: 0.15
+    tag: "paper_text"
     source: "paper_text (Sec 5.1)"
     status: "verified"
     owner: "Memory"
@@ -185,6 +217,7 @@ parameters:
 
   bev_recenter_margin_px:
     value: 32
+    tag: "assumption"
     source: "assumption"
     status: "assumed"
     owner: "Memory"
@@ -193,6 +226,7 @@ parameters:
 
   bev_log_odds_free:
     value: -0.405
+    tag: "paper_text"
     source: "paper_text (Sec 5.2, miss prob 0.4)"
     status: "verified"
     owner: "Memory"
@@ -200,6 +234,7 @@ parameters:
 
   bev_log_odds_occ:
     value: 0.847
+    tag: "paper_text"
     source: "paper_text (Sec 5.2, hit prob 0.7)"
     status: "verified"
     owner: "Memory"
@@ -207,6 +242,7 @@ parameters:
 
   max_history_steps:
     value: 6
+    tag: "paper_text"
     source: "paper_text (Sec 1, Sec 2.2 Table 2)"
     status: "verified"
     owner: "Memory"
@@ -215,6 +251,7 @@ parameters:
   # --- MULTI-TURN DECISION HARNESS & BUDGETS ---
   max_evidence_queries_per_step:
     value: 4
+    tag: "paper_text"
     source: "paper_text (Sec 1, E_max = 4)"
     status: "verified"
     owner: "Harness"
@@ -222,6 +259,7 @@ parameters:
 
   max_consecutive_reselects:
     value: 5
+    tag: "paper_text"
     source: "paper_text (Sec 1, R_max = 5)"
     status: "verified"
     owner: "Harness"
@@ -229,6 +267,7 @@ parameters:
 
   max_malformed_calls_per_step:
     value: 3
+    tag: "assumption"
     source: "assumption"
     status: "assumed"
     owner: "Harness"
@@ -237,6 +276,7 @@ parameters:
 
   max_simulator_actions:
     value: 500
+    tag: "habitat_standard"
     source: "vln_ce_standard / paper_text (Sec 3)"
     status: "verified"
     owner: "Harness"
@@ -245,6 +285,7 @@ parameters:
   # --- EVALUATION & GROUND TRUTH ---
   success_distance_m:
     value: 3.0
+    tag: "habitat_standard"
     source: "vln_ce_standard / paper_text (Sec 3)"
     status: "verified"
     owner: "Evaluation"
@@ -252,6 +293,7 @@ parameters:
 
   require_stop_for_success:
     value: true
+    tag: "habitat_standard"
     source: "paper_text (Sec 3) / vln_ce_standard"
     status: "verified"
     owner: "Evaluation"
@@ -259,14 +301,16 @@ parameters:
 
   num_test_episodes:
     value: 100
+    tag: "paper_text"
     source: "paper_text (Sec 2.1, standard R2R-CE val_unseen subset)"
     status: "verified"
     owner: "Evaluation"
     description: "Locked test episode count"
 
   test_episodes_file:
-    value: "agenticnav_paper_replica/data/episode_list_100.json"
-    source: "paper_replication_artifact"
+    value: "agenticnav_paper_replica/data/opennav_r2rce_100.json"
+    tag: "paper_text"
+    source: "OpenNav official 100-episode R2R-CE split"
     status: "verified"
     owner: "Evaluation"
     description: "Locked 100-episode JSON file path"
@@ -274,13 +318,15 @@ parameters:
   # --- VLM INFERENCE & CAPABILITIES ---
   vlm_model:
     value: "qwen3.5:4b"
-    source: "engineering_choice (Fits 6GB VRAM on RTX 4050)"
+    tag: "deviation"
+    source: "engineering_choice (Fits 6GB VRAM on RTX 4050 vs paper Qwen2-VL-7B)"
     status: "verified"
     owner: "VLM"
     description: "Primary development model tag in official Ollama library"
 
   vlm_thinking:
     value: false
+    tag: "calibrated_engineering_choice"
     source: "calibrated (G2.7 audit: 25x speedup, 98% token reduction, zero truncation timeout)"
     status: "verified"
     owner: "VLM"
@@ -288,6 +334,7 @@ parameters:
 
   coordinate_convention:
     value: "normalized_0_to_1"
+    tag: "calibrated_engineering_choice"
     source: "calibrated (G2.6 audit: 50 points median error 4.66%)"
     status: "verified"
     owner: "VLM"
@@ -295,6 +342,7 @@ parameters:
 
   tool_calling_protocol:
     value: "formatted_json_code_block"
+    tag: "paper_text"
     source: "paper_text (Sec 2.2 / G2.10 protocol decision)"
     status: "verified"
     owner: "VLM"
@@ -302,6 +350,7 @@ parameters:
 
   fallback_model:
     value: "qwen3-vl:8b"
+    tag: "assumption"
     source: "engineering_choice (Cluster match, partial offload)"
     status: "verified"
     owner: "VLM"
@@ -309,6 +358,7 @@ parameters:
 
   temperature:
     value: 0.0
+    tag: "paper_text"
     source: "paper_text (Sec 2.3, deterministic evaluation)"
     status: "verified"
     owner: "VLM"
@@ -316,6 +366,7 @@ parameters:
 
   inference_seed:
     value: 42
+    tag: "assumption"
     source: "engineering_choice"
     status: "assumed"
     owner: "VLM"
@@ -325,6 +376,7 @@ parameters:
   # --- ABLATION TOGGLES ---
   depth_tool:
     value: "on"
+    tag: "paper_text"
     source: "paper_text (Sec 2.2 Table 2)"
     status: "verified"
     owner: "Ablation"
@@ -332,6 +384,7 @@ parameters:
 
   recall_tool:
     value: true
+    tag: "paper_text"
     source: "paper_text (Sec 2.2 Table 2)"
     status: "verified"
     owner: "Ablation"
@@ -339,6 +392,7 @@ parameters:
 
   history_mode:
     value: "reasoning"
+    tag: "paper_text"
     source: "paper_text (Sec 2.2 Table 2)"
     status: "verified"
     owner: "Ablation"
@@ -346,6 +400,7 @@ parameters:
 
   bev_image:
     value: true
+    tag: "paper_text"
     source: "paper_text (Sec 2.2 Table 2)"
     status: "verified"
     owner: "Ablation"
@@ -353,6 +408,7 @@ parameters:
 
   image_history:
     value: "on_demand"
+    tag: "paper_text"
     source: "paper_text (Sec 2.2 Table 2)"
     status: "verified"
     owner: "Ablation"
@@ -360,7 +416,49 @@ parameters:
 
   action_mode:
     value: "pixel"
+    tag: "paper_text"
     source: "paper_text (Sec 2.2 Table 2)"
     status: "verified"
     owner: "Ablation"
     description: "Action selection mode: 'pixel' (click) vs 'waypoint_predictor'"
+
+  # --- LOCAL AIDS & PROMPT / ALGORITHMIC EXTENSIONS ---
+  obstacle_point_threshold:
+    value: 5
+    tag: "local-aid"
+    source: "local-aid (rejects on >=5 points to eliminate single-pixel depth sensor outlier rejections; paper specifies any point >= 1)"
+    status: "verified"
+    owner: "Safety"
+    description: "Obstacle points required inside corridor before move_to is rejected. Arm P uses 1; Arm L uses 5."
+
+  floor_grounding_prompt:
+    value: true
+    tag: "local-aid"
+    source: "local-aid (explicit prompt hint to click floor pixels rather than horizon/walls)"
+    status: "verified"
+    owner: "Prompt"
+    description: "Floor grounding prompt instruction in system prompt. Arm P omits; Arm L includes."
+
+  arrival_verification:
+    value: true
+    tag: "local-aid"
+    source: "local-aid (forces model to verify visual landmarks before issuing final stop)"
+    status: "verified"
+    owner: "Harness"
+    description: "Two-stage arrival verification protocol before stop() is accepted. Arm P omits; Arm L includes."
+
+  reselect_cap:
+    value: 5
+    tag: "local-aid"
+    source: "paper-unspecified / local-aid (R_max = 5 consecutive reselects allowed before deadlock declared)"
+    status: "verified"
+    owner: "Harness"
+    description: "Maximum consecutive reselect iterations before declaring deadlock."
+
+  termination_rule:
+    value: "explicit_stop_or_deadlock"
+    tag: "local-aid"
+    source: "local-aid (terminates on explicit stop(), deadlock, or max simulator actions)"
+    status: "verified"
+    owner: "Harness"
+    description: "Defines episode termination triggers and timeout behavior."

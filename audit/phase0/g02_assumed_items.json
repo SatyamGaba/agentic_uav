@@ -1,8 +1,7 @@
 {
   "check": "G0.2",
-  "total_assumed_items": 7,
+  "total_assumed_items": 6,
   "assumed_items": [
-    "corridor_half_width_m",
     "zero_rho_policy",
     "max_snap_deg",
     "max_snap_drift_m",

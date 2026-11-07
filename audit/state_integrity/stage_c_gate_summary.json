@@ -1,0 +1,76 @@
+{
+  "task": "Stage C Gate Verification & Arm P vs Arm L Comparison",
+  "dataset": "r2rce_dev_20.json (non-test scenes: gZ6f7yhEvPG, sT4fr6TAbpF, JF19kD82Mey)",
+  "arm_p_paper_faithful": {
+    "description": "N_th=1 (any point), floor_guidance=False, arrival_verify=False",
+    "episodes": 20,
+    "success_rate": 0.0,
+    "oracle_success_rate": 0.05,
+    "mean_navigation_error_m": 9.282,
+    "deadlock_count": 6,
+    "deadlock_rate": 0.3,
+    "zero_action_count": 2,
+    "zero_action_rate": 0.1,
+    "failure_taxonomy": {
+      "success": 0,
+      "safety_deadlock": 6,
+      "stop_premature": 3,
+      "stop_after_reach": 0,
+      "missed_stop": 1,
+      "budget_exceeded": 9,
+      "protocol_violation": 1,
+      "infrastructure_failure": 0,
+      "unclassified": 0
+    }
+  },
+  "arm_l_local_aids": {
+    "description": "N_th=5 (calibrated), floor_guidance=True, arrival_verify=True",
+    "episodes": 20,
+    "success_rate": 0.0,
+    "oracle_success_rate": 0.2,
+    "mean_navigation_error_m": 8.5741,
+    "deadlock_count": 4,
+    "deadlock_rate": 0.2,
+    "zero_action_count": 2,
+    "zero_action_rate": 0.1,
+    "schema_validity_rate": 1.0,
+    "schema_valid_calls": 234,
+    "schema_total_calls": 234,
+    "failure_taxonomy": {
+      "success": 0,
+      "safety_deadlock": 4,
+      "stop_premature": 2,
+      "stop_after_reach": 0,
+      "missed_stop": 4,
+      "budget_exceeded": 10,
+      "protocol_violation": 0,
+      "infrastructure_failure": 0,
+      "unclassified": 0
+    }
+  },
+  "comparison_delta": {
+    "deadlock_reduction_pct": 33.33333333333333,
+    "osr_delta_pct": 15.000000000000002,
+    "ne_reduction_m": 0.7079000000000004
+  },
+  "gate_evaluation": {
+    "deadlock_rate_le_10pct": {
+      "value": 0.2,
+      "passed": false
+    },
+    "zero_action_rate_le_5pct": {
+      "value": 0.1,
+      "passed": false
+    },
+    "schema_valid_ge_98pct": {
+      "value": 1.0,
+      "passed": true
+    },
+    "osr_gt_random_walk": {
+      "value": 0.2,
+      "random_walk_osr": 0.02,
+      "passed": true
+    },
+    "stage_c_gate_status": "FAIL"
+  }
+}

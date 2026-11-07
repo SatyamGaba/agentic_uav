@@ -1,0 +1,485 @@
+{
+  "total_deadlocks": 12,
+  "zero_action_count": 5,
+  "multi_action_count": 7,
+  "reselect_causes": {
+    "obstacle": 50,
+    "no_motion": 10
+  },
+  "above_horizon_ratio": 0.0963855421686747,
+  "episodes": [
+    {
+      "episode_id": "r2r_ce_val_unseen_0111",
+      "scene_id": "oLBMNvg9in8",
+      "instruction": "Go down the stairs to the next floor. On the next floor take another right and go down the first section of stairs and stop on the landing in front of the room with the radiator visible.",
+      "actions_taken": 12,
+      "is_zero_action": false,
+      "total_move_calls": 8,
+      "above_horizon_count": 0,
+      "above_horizon_ratio": 0.0,
+      "reselect_causes": {
+        "obstacle": 5,
+        "no_motion": 1
+      },
+      "sample_calls": [
+        {
+          "view": 0,
+          "u": 0.5,
+          "v": 0.6,
+          "reason": "Advance forward through the doorway to reach the next area ("
+        },
+        {
+          "view": 3,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Navigate left to find an alternative path around the obstacl"
+        },
+        {
+          "view": 2,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Check the back of the room for an alternative path or stairc"
+        },
+        {
+          "view": 0,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Move forward through the doorway into the hallway to begin d"
+        }
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0202",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Make a left at the end of the bed. Walk to the banister. Walk to the bottom of the stairs to the left of this point. Make a right and move to the panoramic checker doors.",
+      "actions_taken": 1,
+      "is_zero_action": false,
+      "total_move_calls": 6,
+      "above_horizon_count": 0,
+      "above_horizon_ratio": 0.0,
+      "reselect_causes": {
+        "obstacle": 2,
+        "no_motion": 2
+      },
+      "sample_calls": [
+        {
+          "view": 0,
+          "u": 0.35,
+          "v": 0.6,
+          "reason": "Move forward and left towards the banister area to reach the"
+        },
+        {
+          "view": 0,
+          "u": 0.75,
+          "v": 0.5,
+          "reason": "Move forward towards the banister structure to reach the sta"
+        },
+        {
+          "view": 0,
+          "u": 0.45,
+          "v": 0.65,
+          "reason": "Move left and forward to navigate around obstacle and approa"
+        },
+        {
+          "view": 3,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Move left to navigate around obstacle and get better view of"
+        }
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0348",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Go up the stairs and take a left. Walk towards the couch and chairs in the sitting area. Walk through the sitting area and stop in front of the first door to the balcony on your left.",
+      "actions_taken": 0,
+      "is_zero_action": true,
+      "total_move_calls": 5,
+      "above_horizon_count": 1,
+      "above_horizon_ratio": 0.2,
+      "reselect_causes": {
+        "obstacle": 4
+      },
+      "sample_calls": [
+        {
+          "view": 0,
+          "u": 0.35,
+          "v": 0.45,
+          "reason": "Advance up the stairs towards the landing to begin the ascen"
+        },
+        {
+          "view": 1,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Navigate along the right side of the stairs/railing to clear"
+        },
+        {
+          "view": 3,
+          "u": 0.25,
+          "v": 0.6,
+          "reason": "Navigate up the stairs from the left side to avoid obstacles"
+        },
+        {
+          "view": 0,
+          "u": 0.4,
+          "v": 0.5,
+          "reason": "Advance up the stairs towards the landing, avoiding obstacle"
+        }
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0389",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Walk next to the first white chair on its right side, walk straight towards the older floral chair, take a right towards the stairs and stop.",
+      "actions_taken": 0,
+      "is_zero_action": true,
+      "total_move_calls": 5,
+      "above_horizon_count": 0,
+      "above_horizon_ratio": 0.0,
+      "reselect_causes": {
+        "obstacle": 4
+      },
+      "sample_calls": [
+        {
+          "view": 0,
+          "u": 0.5,
+          "v": 0.6,
+          "reason": "Move towards the white chair to position next to it on its r"
+        },
+        {
+          "view": 0,
+          "u": 0.3,
+          "v": 0.6,
+          "reason": "Navigate leftward to avoid obstacle while approaching the wh"
+        },
+        {
+          "view": 1,
+          "u": 0.7,
+          "v": 0.6,
+          "reason": "Navigate using the right view to find a clearer path towards"
+        },
+        {
+          "view": 3,
+          "u": 0.3,
+          "v": 0.6,
+          "reason": "Navigate using the left view to find a clearer path towards "
+        }
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0414",
+      "scene_id": "pLe4wQe7qrG",
+      "instruction": "Walk down the aisle to your right, and walk forward. Take the first right and stop between the first two pillars.",
+      "actions_taken": 8,
+      "is_zero_action": false,
+      "total_move_calls": 10,
+      "above_horizon_count": 2,
+      "above_horizon_ratio": 0.2,
+      "reselect_causes": {
+        "obstacle": 7
+      },
+      "sample_calls": [
+        {
+          "view": 0,
+          "u": 0.75,
+          "v": 0.5,
+          "reason": "Move forward and slightly right to enter the aisle on the ri"
+        },
+        {
+          "view": 0,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Advance forward to clear path and reorient for right turn"
+        },
+        {
+          "view": 1,
+          "u": 0.75,
+          "v": 0.5,
+          "reason": "Navigate into the right-hand aisle from a different perspect"
+        },
+        {
+          "view": 1,
+          "u": 0.75,
+          "v": 0.5,
+          "reason": "Navigate into the right-hand aisle from a different perspect"
+        }
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0637",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Continue down the wood staircase, turn right at the bottom and walk behind the two chairs toward the pool table. Turn right at the pool table and stop in front of the red chair with a brown leather foot stool.",
+      "actions_taken": 6,
+      "is_zero_action": false,
+      "total_move_calls": 8,
+      "above_horizon_count": 0,
+      "above_horizon_ratio": 0.0,
+      "reselect_causes": {
+        "obstacle": 6
+      },
+      "sample_calls": [
+        {
+          "view": 0,
+          "u": 0.5,
+          "v": 0.6,
+          "reason": "Advance forward down the wood staircase towards the bottom l"
+        },
+        {
+          "view": 2,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Move forward down the staircase towards the bottom, as indic"
+        },
+        {
+          "view": 3,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Navigate left to find the open path down the stairs, as forw"
+        },
+        {
+          "view": 0,
+          "u": 0.5,
+          "v": 0.6,
+          "reason": "Advance forward down the stairs towards the bottom, where th"
+        }
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0681",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Walk across the large room to the stairs. Wait under the stairs that lead downstairs.",
+      "actions_taken": 0,
+      "is_zero_action": true,
+      "total_move_calls": 5,
+      "above_horizon_count": 3,
+      "above_horizon_ratio": 0.6,
+      "reselect_causes": {
+        "obstacle": 4
+      },
+      "sample_calls": [
+        {
+          "view": 1,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Move forward through the large room towards the stairs, whic"
+        },
+        {
+          "view": 2,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Move towards the stairs located in the back of the room to p"
+        },
+        {
+          "view": 2,
+          "u": 0.5,
+          "v": 0.3,
+          "reason": "Move towards the stairs located at the back of the room, avo"
+        },
+        {
+          "view": 2,
+          "u": 0.35,
+          "v": 0.4,
+          "reason": "Move towards the stairs in the back view, targeting a point "
+        }
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0764",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "walk across living room behind couch to pool table. Stop at pool table.",
+      "actions_taken": 0,
+      "is_zero_action": true,
+      "total_move_calls": 5,
+      "above_horizon_count": 0,
+      "above_horizon_ratio": 0.0,
+      "reselect_causes": {
+        "obstacle": 4
+      },
+      "sample_calls": [
+        {
+          "view": 0,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Advance forward through the doorway from the kitchen into th"
+        },
+        {
+          "view": 0,
+          "u": 0.65,
+          "v": 0.5,
+          "reason": "Move rightward through doorway into living room to avoid obs"
+        },
+        {
+          "view": 0,
+          "u": 0.75,
+          "v": 0.5,
+          "reason": "Move to the right side of the front view to navigate around "
+        },
+        {
+          "view": 0,
+          "u": 0.25,
+          "v": 0.5,
+          "reason": "Move left to navigate around obstacle and find path into liv"
+        }
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_1342",
+      "scene_id": "oLBMNvg9in8",
+      "instruction": "Head down first flight of stairs and at landing turn right to go down next second flight of stairs. At landing of second flight of stairs veer to the right and turn right into first door way. Stop just inside of doorway.",
+      "actions_taken": 0,
+      "is_zero_action": true,
+      "total_move_calls": 6,
+      "above_horizon_count": 0,
+      "above_horizon_ratio": 0.0,
+      "reselect_causes": {
+        "obstacle": 5
+      },
+      "sample_calls": [
+        {
+          "view": 3,
+          "u": 0.15,
+          "v": 0.75,
+          "reason": "Move forward towards the first flight of stairs to begin des"
+        },
+        {
+          "view": 0,
+          "u": 0.15,
+          "v": 0.75,
+          "reason": "Move forward through the doorway to exit the current room an"
+        },
+        {
+          "view": 0,
+          "u": 0.15,
+          "v": 0.75,
+          "reason": "Advance forward through doorway to begin navigating down the"
+        },
+        {
+          "view": 3,
+          "u": 0.15,
+          "v": 0.75,
+          "reason": "Move towards the first flight of stairs from the left view, "
+        }
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_1483",
+      "scene_id": "pLe4wQe7qrG",
+      "instruction": "Turn around and walk along the wooden hallway.Wait the the wooden doorway.",
+      "actions_taken": 8,
+      "is_zero_action": false,
+      "total_move_calls": 7,
+      "above_horizon_count": 1,
+      "above_horizon_ratio": 0.14285714285714285,
+      "reselect_causes": {
+        "no_motion": 2,
+        "obstacle": 2
+      },
+      "sample_calls": [
+        {
+          "view": 3,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Turn around to face the wooden hallway as per instruction; t"
+        },
+        {
+          "view": 0,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Advance forward along the wooden hallway corridor towards th"
+        },
+        {
+          "view": 0,
+          "u": 0.5,
+          "v": 0.65,
+          "reason": "Advance forward along the wooden hallway corridor towards th"
+        },
+        {
+          "view": 1,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Navigate right to find an alternative path along the wooden "
+        }
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_1484",
+      "scene_id": "pLe4wQe7qrG",
+      "instruction": "With the low stone or concrete barrier behind you, walk parallel to the board covering the floor and turn left before reaching the end. Move forward to leave the wooden flooring and when on the stone flooring, turn right and stand in front of the doors leading out of the room.",
+      "actions_taken": 8,
+      "is_zero_action": false,
+      "total_move_calls": 11,
+      "above_horizon_count": 1,
+      "above_horizon_ratio": 0.09090909090909091,
+      "reselect_causes": {
+        "obstacle": 5,
+        "no_motion": 2
+      },
+      "sample_calls": [
+        {
+          "view": 0,
+          "u": 0.5,
+          "v": 0.6,
+          "reason": "Move forward along the stone corridor to get oriented and fi"
+        },
+        {
+          "view": 1,
+          "u": 0.5,
+          "v": 0.4,
+          "reason": "Move right to navigate around the obstacle and continue towa"
+        },
+        {
+          "view": 0,
+          "u": 0.35,
+          "v": 0.55,
+          "reason": "Move forward along the stone corridor, slightly offset from "
+        },
+        {
+          "view": 2,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Turn around to face the back of the room, looking for the ex"
+        }
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_1673",
+      "scene_id": "oLBMNvg9in8",
+      "instruction": "Continue up the stairs and wait atop the red door mat in front of the door with the black handle on the right.",
+      "actions_taken": 7,
+      "is_zero_action": false,
+      "total_move_calls": 7,
+      "above_horizon_count": 0,
+      "above_horizon_ratio": 0.0,
+      "reselect_causes": {
+        "obstacle": 2,
+        "no_motion": 3
+      },
+      "sample_calls": [
+        {
+          "view": 2,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Move forward along the hallway towards the door area to cont"
+        },
+        {
+          "view": 3,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Navigate left to find the stairway entrance, as moving strai"
+        },
+        {
+          "view": 3,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Move forward to ascend the stairs towards the goal destinati"
+        },
+        {
+          "view": 0,
+          "u": 0.5,
+          "v": 0.5,
+          "reason": "Attempt to advance forward up the stairs, as previous attemp"
+        }
+      ]
+    }
+  ]
+}
