@@ -1,6 +1,7 @@
 """Configuration parameters for AgenticNav replication (v7 Specification)."""
 
 from dataclasses import dataclass, field
+import os
 from typing import List, Optional
 
 
@@ -10,8 +11,9 @@ class ReplicaConfig:
     image_width: int = 640
     image_height: int = 480
     hfov_deg: float = 90.0
-    d_min: float = 0.5   # meters
-    d_max: float = 5.0   # meters
+    d_min: float = 0.5   # meters: waypoint query floor (paper sensor specification)
+    d_max: float = 5.0   # meters: sensor max range
+    min_obstacle_depth: float = 0.05  # meters: near obstacle detection threshold (deviation from 0.5m sensor floor)
     camera_height: float = 1.25  # meters above floor contact datum (y=0)
 
     # Robot geometry & Kinematics [Calibrated]
@@ -51,8 +53,10 @@ class ReplicaConfig:
     # Success threshold [P]
     success_distance_m: float = 3.0   # meters to goal for success (with stop called)
 
-    # Model parameters
-    vlm_model: str = "qwen3.5:4b"
+    # Model & Context parameters
+    vlm_model: Optional[str] = field(default_factory=lambda: os.environ.get("AGENTICNAV_MODEL_ID", None))
+    context_length: int = 32768       # 32k context window
+    max_images_per_request: int = 6   # 4 panoramic views + 1 BEV + at most 1 recalled image
     vlm_thinking: bool = False
     inference_seed: int = 42
     temperature: float = 0.0

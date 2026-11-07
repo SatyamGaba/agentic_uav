@@ -20,10 +20,15 @@ class EpisodeMetrics:
 
 
 def compute_trajectory_length(trajectory: List[Tuple[float, float, float]]) -> float:
-    """Sum of Euclidean distances between consecutive trajectory points."""
+    """Sum of Euclidean spatial distances between consecutive trajectory points.
+    
+    Points are 3D positions (x, y, z) or 2D (x, z). Angular yaw is never included.
+    In-place turns (dx=0, dy=0, dz=0) contribute 0.0 to trajectory length.
+    """
     if len(trajectory) < 2:
         return 0.0
     arr = np.array(trajectory, dtype=np.float64)
+    # If passed 3D points [x, y, z], compute 3D Euclidean displacement; if 2D, compute 2D
     diffs = np.diff(arr, axis=0)
     dists = np.sqrt(np.sum(diffs ** 2, axis=1))
     return float(np.sum(dists))
@@ -62,13 +67,15 @@ def compute_ndtw(
     if not trajectory or not reference_path or len(reference_path) == 0:
         return 0.0
 
-    # Project trajectory to (x, z) ground plane or 3D
-    p = np.array([[pt[0], pt[1] if len(pt) > 2 else 0.0, pt[2] if len(pt) > 2 else pt[1]] for pt in trajectory], dtype=np.float64)
-    q = np.array(reference_path, dtype=np.float64)
-    if q.shape[1] == 2 and p.shape[1] == 3:
-        p = p[:, [0, 2]]  # match dimensions to 2D
-    elif q.shape[1] == 3 and p.shape[1] == 2:
-        q = q[:, [0, 2]]
+    # Project trajectory and reference path to 2D (x, z) ground plane
+    # In allocentric trajectory, index 0 is x and index 1 is z.
+    p = np.array([[pt[0], pt[1]] for pt in trajectory], dtype=np.float64)
+    q_arr = np.array(reference_path, dtype=np.float64)
+    # If reference_path is 3D [x, y, z], horizontal coordinates are columns 0 and 2
+    if q_arr.shape[1] >= 3:
+        q = q_arr[:, [0, 2]]
+    else:
+        q = q_arr[:, :2]
 
     dtw_dist = compute_dtw(p, q)
     if np.isinf(dtw_dist):

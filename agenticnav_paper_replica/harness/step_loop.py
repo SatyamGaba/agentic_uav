@@ -5,6 +5,7 @@ import json
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 import numpy as np
 
+from agenticnav_paper_replica.geometry.pinhole import parse_view_index
 from agenticnav_paper_replica.harness.tools import get_available_tools
 from agenticnav_paper_replica.harness.executor import ToolExecutor
 from agenticnav_paper_replica.harness.prompts import (
@@ -39,6 +40,38 @@ def canonicalize_tool_name(name: str) -> str:
         return ""
     clean = str(name).strip().lower()
     return TOOL_NAME_ALIASES.get(clean, clean)
+
+
+def count_images_in_messages(messages: List[Dict[str, Any]]) -> int:
+    """Counts the total number of visual images across all messages in the request."""
+    cnt = 0
+    for m in messages:
+        if "rgb_views" in m and m["rgb_views"]:
+            cnt += len(m["rgb_views"])
+        if "bev_image" in m and m["bev_image"] is not None:
+            cnt += 1
+        if "recalled_image" in m and m["recalled_image"] is not None:
+            cnt += 1
+        if "images" in m and m["images"]:
+            cnt += len(m["images"])
+    return cnt
+
+
+def estimate_tokens_in_messages(messages: List[Dict[str, Any]], image_token_weight: int = 512) -> int:
+    """Estimates the total token count of a request (text characters / 3.5 + image tokens)."""
+    text_chars = 0
+    image_count = count_images_in_messages(messages)
+    for m in messages:
+        c = m.get("content")
+        if isinstance(c, str):
+            text_chars += len(c)
+        elif isinstance(c, list):
+            for part in c:
+                if isinstance(part, dict) and "text" in part:
+                    text_chars += len(part["text"])
+    estimated_text_tokens = int(math.ceil(text_chars / 3.5))
+    estimated_image_tokens = image_count * image_token_weight
+    return estimated_text_tokens + estimated_image_tokens
 
 
 @dataclass
@@ -154,8 +187,16 @@ class StepDecisionLoop:
                 allow_recall = self.enable_recall and (evidence_count < self.max_evidence_queries)
                 tools = get_available_tools(enable_depth=allow_depth, enable_recall=allow_recall)
 
+            req_img_count = count_images_in_messages(messages)
+            req_est_tokens = estimate_tokens_in_messages(messages)
+
             vlm_response = vlm_client_fn(messages, tools)
-            turn_log.append({"role": "assistant", "response": vlm_response})
+            turn_log.append({
+                "role": "assistant",
+                "response": vlm_response,
+                "request_image_count": req_img_count,
+                "estimated_tokens": req_est_tokens,
+            })
 
             # Record assistant turn in messages for proper ChatML alternation
             assistant_thought = vlm_response.get("thought", "")
@@ -231,7 +272,7 @@ class StepDecisionLoop:
                     else:  # recall
                         exec_res = self.executor.execute_recall(
                             node=int(t_args.get("node", 1)),
-                            view=int(t_args.get("view", 0)),
+                            view=parse_view_index(t_args.get("view", 0)),
                         )
 
                     tool_msg = {
@@ -240,6 +281,10 @@ class StepDecisionLoop:
                         "content": json.dumps(exec_res, default=str),
                     }
                     if t_name == "recall" and exec_res.get("status") == "success":
+                        # Hard rule for recall: drop older recalled images to respect the request image cap
+                        for prev_msg in messages:
+                            if "recalled_image" in prev_msg:
+                                prev_msg.pop("recalled_image", None)
                         tool_msg["recalled_image"] = exec_res.get("image")
 
                     messages.append(tool_msg)
@@ -308,7 +353,7 @@ class StepDecisionLoop:
                     )
 
                 elif t_name == "move_to":
-                    t_view = int(t_args.get("view", 0))
+                    t_view = parse_view_index(t_args.get("view", 0))
                     t_u = float(t_args.get("u", 0.5))
                     t_v = float(t_args.get("v", 0.5))
                     exec_res = self.executor.execute_move_to(
@@ -341,11 +386,7 @@ class StepDecisionLoop:
                             last_failed_target = target_key
                             duplicate_target_repeats = 1
 
-                        if is_duplicate and not verification_triggered:
-                            # A repeated target must not consume the reselect budget indefinitely.
-                            pass
-                        else:
-                            consecutive_reselects += 1
+                        consecutive_reselects += 1
 
                         should_verify = False
                         if self.enable_arrival_verification and not verification_triggered:

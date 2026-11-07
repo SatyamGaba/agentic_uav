@@ -167,8 +167,9 @@ class MockGroundEmbodiment(EmbodimentBase):
             self.yaw_rad += math.radians(15.0 * turn_dir)
             self.action_count += 1
             cur_pose = (self.x, self.z, self.yaw_rad)
+            cur_pos = (self.x, 0.0, self.z)
             self.trajectory.append(cur_pose)
-            prim_traj.append(cur_pose)
+            prim_traj.append(cur_pos)
             prim_geod.append(self.get_geodesic_distance_to_goal())
 
         dx = -math.sin(self.yaw_rad) * 0.25
@@ -178,8 +179,9 @@ class MockGroundEmbodiment(EmbodimentBase):
             self.z += dz
             self.action_count += 1
             cur_pose = (self.x, self.z, self.yaw_rad)
+            cur_pos = (self.x, 0.0, self.z)
             self.trajectory.append(cur_pose)
-            prim_traj.append(cur_pose)
+            prim_traj.append(cur_pos)
             prim_geod.append(self.get_geodesic_distance_to_goal())
 
         actual_dist = math.sqrt((self.x - x_before) ** 2 + (self.z - z_before) ** 2)
@@ -400,9 +402,7 @@ class HabitatGroundEmbodiment(EmbodimentBase):
         def record_substep():
             state = self.sim.get_agent(0).get_state()
             pos = state.position
-            rot = state.rotation
-            yaw = 2.0 * math.atan2(rot.y, rot.w)
-            prim_traj.append((float(pos[0]), float(pos[2]), float(yaw)))
+            prim_traj.append((float(pos[0]), float(pos[1]), float(pos[2])))
             prim_geod.append(self.get_geodesic_distance_to_goal())
 
         # Execute turn actions
@@ -440,9 +440,9 @@ class HabitatGroundEmbodiment(EmbodimentBase):
 
         for v_idx in VIEW_AZIMUTHS_DEG:
             rgb_views[v_idx] = raw_obs[f"rgb_view_{v_idx}"][:, :, :3]
-            # Depth sensor returns planar z_c in meters
+            # Depth sensor returns planar z_c in meters: preserve raw metric depth up to d_max
             d = raw_obs[f"depth_view_{v_idx}"]
-            depth_views[v_idx] = np.clip(d, self.config.d_min, self.config.d_max)
+            depth_views[v_idx] = np.clip(d, 0.0, self.config.d_max)
 
         state = self.sim.get_agent(0).get_state()
         pos = state.position
@@ -456,6 +456,7 @@ class HabitatGroundEmbodiment(EmbodimentBase):
             allocentric_pose=(float(pos[0]), float(pos[2]), float(yaw)),
             simulator_actions_taken=self.action_count,
             is_done=(self.action_count >= self.max_actions),
+            position=(float(pos[0]), float(pos[1]), float(pos[2])),
         )
 
     def get_geodesic_distance_to_goal(self) -> float:

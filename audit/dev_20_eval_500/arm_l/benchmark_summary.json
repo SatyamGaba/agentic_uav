@@ -1,0 +1,18 @@
+{
+  "num_episodes": 20,
+  "success_rate_pct": 25.0,
+  "oracle_success_rate_pct": 25.0,
+  "mean_spl_pct": 15.82,
+  "mean_navigation_error_m": 8.88,
+  "mean_simulator_actions": 62.0,
+  "deadlock_rate_pct": 45.0,
+  "zero_action_rate_pct": 10.0,
+  "budget_exceeded_rate_pct": 0.0,
+  "failure_taxonomy": {
+    "success": 5,
+    "safety_deadlock": 9,
+    "stop_premature": 5,
+    "budget_exceeded": 0,
+    "protocol_violation": 1
+  }
+}

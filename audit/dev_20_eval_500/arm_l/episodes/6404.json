@@ -1,0 +1,58 @@
+{
+  "episode_id": "6404",
+  "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+  "instruction": {
+    "instruction_text": "Go past the tv and go up the steps. Turn left and go into the hallway. Wait there. ",
+    "instruction_tokens": [
+      1067,
+      1728,
+      2389,
+      2501,
+      119,
+      1067,
+      2527,
+      2389,
+      2265,
+      15,
+      2494,
+      1360,
+      119,
+      1067,
+      1264,
+      2389,
+      1126,
+      15,
+      2579,
+      2395,
+      15
+    ]
+  },
+  "model": "qwen3.5:4b",
+  "called_stop": true,
+  "terminated_deadlock": false,
+  "terminated_protocol_violation": false,
+  "total_steps": 16,
+  "arrival_verification_steps": 0,
+  "failure_category": "stop_premature",
+  "metrics": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 4.0198564529418945,
+    "trajectory_length_m": 11.003648524239626,
+    "simulator_action_count": 169
+  },
+  "metrics_dataclass": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 4.0198564529418945,
+    "trajectory_length_m": 11.003648524239626,
+    "shortest_path_distance_m": 7.560338497161865,
+    "total_steps": 170,
+    "simulator_action_count": 169,
+    "ndtw": 0.0
+  },
+  "shortest_path_distance_m": 0.0,
+  "goal_radius_m": 3.0
+}

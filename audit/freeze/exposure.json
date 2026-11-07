@@ -1,2215 +1,449 @@
 {
-  "audit_name": "T-A1 Exposure Audit",
+  "audit_name": "T-A1 Exposure Audit (Re-keyed)",
   "locked_100_source": "OpenNav_R2R-CE_100_bertidx.json.gz",
   "total_locked_episodes": 100,
-  "exposed_count": 22,
-  "unexposed_count": 78,
+  "exposed_count": 21,
+  "unexposed_count": 79,
   "exposed_episodes": {
-    "259": {
-      "episode_id": "259",
-      "scene": "TbHJrupSAjP",
-      "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/259.json",
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl"
-      ]
-    },
     "7": {
-      "episode_id": "7",
+      "episode_id": 7,
       "scene": "x8F5xyUWy9e",
+      "trajectory_id": 42,
+      "start_position": [
+        -0.944907009601593,
+        0.04610800743103027,
+        5.948919773101807
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "11": {
-      "episode_id": "11",
+      "episode_id": 11,
       "scene": "2azQ1b91cZZ",
+      "trajectory_id": 57,
+      "start_position": [
+        16.489099502563477,
+        0.12711000442504883,
+        8.970789909362793
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "13": {
-      "episode_id": "13",
+      "episode_id": 13,
       "scene": "zsNo4HB9uLZ",
+      "trajectory_id": 62,
+      "start_position": [
+        17.45949935913086,
+        0.17162801325321198,
+        0.21568399667739868
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "40": {
-      "episode_id": "40",
+      "episode_id": 40,
       "scene": "zsNo4HB9uLZ",
+      "trajectory_id": 155,
+      "start_position": [
+        14.38700008392334,
+        0.17162801325321198,
+        -0.21611900627613068
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "42": {
-      "episode_id": "42",
+      "episode_id": 42,
       "scene": "zsNo4HB9uLZ",
+      "trajectory_id": 155,
+      "start_position": [
+        14.38700008392334,
+        0.17162801325321198,
+        -0.21611900627613068
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "52": {
-      "episode_id": "52",
+      "episode_id": 52,
       "scene": "zsNo4HB9uLZ",
+      "trajectory_id": 175,
+      "start_position": [
+        5.029807090759277,
+        0.17162801325321198,
+        4.014754295349121
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "70": {
-      "episode_id": "70",
+      "episode_id": 70,
       "scene": "2azQ1b91cZZ",
+      "trajectory_id": 254,
+      "start_position": [
+        -7.24875020980835,
+        0.12711000442504883,
+        4.79511022567749
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "94": {
-      "episode_id": "94",
+      "episode_id": 94,
       "scene": "QUCTc6BB5sX",
+      "trajectory_id": 300,
+      "start_position": [
+        -8.658539772033691,
+        0.05381801724433899,
+        -13.317299842834473
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "116": {
-      "episode_id": "116",
+      "episode_id": 116,
       "scene": "2azQ1b91cZZ",
+      "trajectory_id": 412,
+      "start_position": [
+        29.01490020751953,
+        0.12711000442504883,
+        -2.6037700176239014
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "140": {
-      "episode_id": "140",
+      "episode_id": 140,
       "scene": "2azQ1b91cZZ",
+      "trajectory_id": 552,
+      "start_position": [
+        9.96049976348877,
+        0.12711000442504883,
+        7.152679920196533
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "150": {
-      "episode_id": "150",
+      "episode_id": 150,
       "scene": "QUCTc6BB5sX",
+      "trajectory_id": 601,
+      "start_position": [
+        -16.3346004486084,
+        0.35480499267578125,
+        11.633500099182129
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "156": {
-      "episode_id": "156",
+      "episode_id": 156,
       "scene": "zsNo4HB9uLZ",
+      "trajectory_id": 635,
+      "start_position": [
+        3.022160053253174,
+        0.17162801325321198,
+        -2.33309006690979
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "166": {
-      "episode_id": "166",
+      "episode_id": 166,
       "scene": "2azQ1b91cZZ",
+      "trajectory_id": 668,
+      "start_position": [
+        6.081419944763184,
+        0.12711000442504883,
+        6.774179935455322
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "171": {
-      "episode_id": "171",
+      "episode_id": 171,
       "scene": "TbHJrupSAjP",
+      "trajectory_id": 686,
+      "start_position": [
+        -2.9381399154663086,
+        0.024399995803833008,
+        -3.5193700790405273
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "176": {
-      "episode_id": "176",
+      "episode_id": 176,
       "scene": "QUCTc6BB5sX",
+      "trajectory_id": 705,
+      "start_position": [
+        0.13766999542713165,
+        0.15480518341064453,
+        -15.434499740600586
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "181": {
-      "episode_id": "181",
+      "episode_id": 181,
       "scene": "TbHJrupSAjP",
+      "trajectory_id": 722,
+      "start_position": [
+        -0.7721850275993347,
+        0.8016900420188904,
+        -2.559380054473877
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "187": {
-      "episode_id": "187",
+      "episode_id": 187,
       "scene": "x8F5xyUWy9e",
+      "trajectory_id": 774,
+      "start_position": [
+        -6.052060127258301,
+        1.0461080074310303,
+        -0.692093014717102
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "190": {
-      "episode_id": "190",
+      "episode_id": 190,
       "scene": "QUCTc6BB5sX",
+      "trajectory_id": 788,
+      "start_position": [
+        -11.464799880981445,
+        0.15480518341064453,
+        -14.469200134277344
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "191": {
-      "episode_id": "191",
+      "episode_id": 191,
       "scene": "QUCTc6BB5sX",
+      "trajectory_id": 788,
+      "start_position": [
+        -11.464799880981445,
+        0.15480518341064453,
+        -14.469200134277344
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "207": {
-      "episode_id": "207",
+      "episode_id": 207,
       "scene": "Z6MFQCViBuw",
+      "trajectory_id": 817,
+      "start_position": [
+        18.33970069885254,
+        0.20952606201171875,
+        -13.775799751281738
+      ],
       "sources": [
-        "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+        "C:/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json"
+      ],
+      "notes": [
+        "JSON episode array"
       ]
     },
     "765": {
-      "episode_id": "765",
+      "episode_id": 765,
       "scene": "EU6Fwq7SyZv",
+      "trajectory_id": 3149,
+      "start_position": [
+        1.7150399684906006,
+        0.018061161041259766,
+        2.549030065536499
+      ],
       "sources": [
         "Pilot A / Diagnostic review"
+      ],
+      "notes": [
+        "Diagnostic episode 0764 investigation"
       ]
     }
   },
-  "unexposed_episode_ids": [
-    "218",
-    "226",
-    "232",
-    "244",
-    "247",
-    "265",
-    "275",
-    "308",
-    "312",
-    "321",
-    "330",
-    "338",
-    "348",
-    "362",
-    "371",
-    "377",
-    "387",
-    "403",
-    "411",
-    "423",
-    "432",
-    "439",
-    "447",
-    "454",
-    "461",
-    "469",
-    "479",
-    "513",
-    "516",
-    "526",
-    "531",
-    "546",
-    "550",
-    "559",
-    "568",
-    "576",
-    "586",
-    "602",
-    "609",
-    "620",
-    "643",
-    "655",
-    "670",
-    "677",
-    "698",
-    "705",
-    "715",
-    "721",
-    "739",
-    "743",
-    "748",
-    "755",
-    "781",
-    "787",
-    "804",
-    "810",
-    "821",
-    "824",
-    "842",
-    "1051",
-    "1056",
-    "1061",
-    "1071",
-    "1077",
-    "1084",
-    "1085",
-    "1087",
-    "1092",
-    "1106",
-    "1117",
-    "1133",
-    "1139",
-    "1142",
-    "1148",
-    "1284",
-    "1301",
-    "1307",
-    "1406"
+  "exposed_episode_ids": [
+    7,
+    11,
+    13,
+    40,
+    42,
+    52,
+    70,
+    94,
+    116,
+    140,
+    150,
+    156,
+    166,
+    171,
+    176,
+    181,
+    187,
+    190,
+    191,
+    207,
+    765
   ],
-  "all_exposure_records": [
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_0110",
-      "resolved_episode_id": "r2r_ce_val_unseen_0110",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_0111",
-      "resolved_episode_id": "r2r_ce_val_unseen_0111",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_0202",
-      "resolved_episode_id": "r2r_ce_val_unseen_0202",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_0348",
-      "resolved_episode_id": "r2r_ce_val_unseen_0348",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_0389",
-      "resolved_episode_id": "r2r_ce_val_unseen_0389",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_0414",
-      "resolved_episode_id": "r2r_ce_val_unseen_0414",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_0437",
-      "resolved_episode_id": "r2r_ce_val_unseen_0437",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_0444",
-      "resolved_episode_id": "r2r_ce_val_unseen_0444",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_0637",
-      "resolved_episode_id": "r2r_ce_val_unseen_0637",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_0681",
-      "resolved_episode_id": "r2r_ce_val_unseen_0681",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_0764",
-      "resolved_episode_id": "r2r_ce_val_unseen_0764",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_1342",
-      "resolved_episode_id": "r2r_ce_val_unseen_1342",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_1483",
-      "resolved_episode_id": "r2r_ce_val_unseen_1483",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_1484",
-      "resolved_episode_id": "r2r_ce_val_unseen_1484",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_1547",
-      "resolved_episode_id": "r2r_ce_val_unseen_1547",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_1673",
-      "resolved_episode_id": "r2r_ce_val_unseen_1673",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "r2rce_val_unseen_17.json",
-      "raw_id": "r2r_ce_val_unseen_1833",
-      "resolved_episode_id": "r2r_ce_val_unseen_1833",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Stratified 17-ep evaluation subset"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "2022",
-      "resolved_episode_id": "2022",
-      "scene": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "2021",
-      "resolved_episode_id": "2021",
-      "scene": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "2023",
-      "resolved_episode_id": "2023",
-      "scene": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "1876",
-      "resolved_episode_id": "1876",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "259",
-      "resolved_episode_id": "259",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "3453",
-      "resolved_episode_id": "3453",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "3452",
-      "resolved_episode_id": "3452",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "168",
-      "resolved_episode_id": "168",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "1994",
-      "resolved_episode_id": "1994",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "5173",
-      "resolved_episode_id": "5173",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "8134",
-      "resolved_episode_id": "8134",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "6404",
-      "resolved_episode_id": "6404",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "5445",
-      "resolved_episode_id": "5445",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "8628",
-      "resolved_episode_id": "8628",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "1868",
-      "resolved_episode_id": "1868",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "8413",
-      "resolved_episode_id": "8413",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "4164",
-      "resolved_episode_id": "4164",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "8627",
-      "resolved_episode_id": "8627",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "7280",
-      "resolved_episode_id": "7280",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/benchmark_summary.json",
-      "raw_id": "3819",
-      "resolved_episode_id": "3819",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/168.json",
-      "raw_id": "168",
-      "resolved_episode_id": "168",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/1868.json",
-      "raw_id": "1868",
-      "resolved_episode_id": "1868",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/1876.json",
-      "raw_id": "1876",
-      "resolved_episode_id": "1876",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/1994.json",
-      "raw_id": "1994",
-      "resolved_episode_id": "1994",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/2021.json",
-      "raw_id": "2021",
-      "resolved_episode_id": "2021",
-      "scene": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/2022.json",
-      "raw_id": "2022",
-      "resolved_episode_id": "2022",
-      "scene": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/2023.json",
-      "raw_id": "2023",
-      "resolved_episode_id": "2023",
-      "scene": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/259.json",
-      "raw_id": "259",
-      "resolved_episode_id": "259",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": true,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/3452.json",
-      "raw_id": "3452",
-      "resolved_episode_id": "3452",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/3453.json",
-      "raw_id": "3453",
-      "resolved_episode_id": "3453",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/3819.json",
-      "raw_id": "3819",
-      "resolved_episode_id": "3819",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/4164.json",
-      "raw_id": "4164",
-      "resolved_episode_id": "4164",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/5173.json",
-      "raw_id": "5173",
-      "resolved_episode_id": "5173",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/5445.json",
-      "raw_id": "5445",
-      "resolved_episode_id": "5445",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/6404.json",
-      "raw_id": "6404",
-      "resolved_episode_id": "6404",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/7280.json",
-      "raw_id": "7280",
-      "resolved_episode_id": "7280",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/8134.json",
-      "raw_id": "8134",
-      "resolved_episode_id": "8134",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/8413.json",
-      "raw_id": "8413",
-      "resolved_episode_id": "8413",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/8627.json",
-      "raw_id": "8627",
-      "resolved_episode_id": "8627",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/episodes/8628.json",
-      "raw_id": "8628",
-      "resolved_episode_id": "8628",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/interactive_session/episode_0764_comprehensive_diagnosis.json",
-      "raw_id": "r2r_ce_val_unseen_0764",
-      "resolved_episode_id": "r2r_ce_val_unseen_0764",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/interactive_session/session_state.json",
-      "raw_id": "r2r_ce_val_unseen_0389",
-      "resolved_episode_id": "r2r_ce_val_unseen_0389",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase6/g65_scripted_episode.json",
-      "raw_id": "g65_scripted_ep",
-      "resolved_episode_id": "g65_scripted_ep",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase8/manifest.json",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase8/phase8_gate_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0002",
-      "resolved_episode_id": "r2r_ce_val_unseen_0002",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0003",
-      "resolved_episode_id": "r2r_ce_val_unseen_0003",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0004",
-      "resolved_episode_id": "r2r_ce_val_unseen_0004",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0005",
-      "resolved_episode_id": "r2r_ce_val_unseen_0005",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0006",
-      "resolved_episode_id": "r2r_ce_val_unseen_0006",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0007",
-      "resolved_episode_id": "r2r_ce_val_unseen_0007",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0008",
-      "resolved_episode_id": "r2r_ce_val_unseen_0008",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0009",
-      "resolved_episode_id": "r2r_ce_val_unseen_0009",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0010",
-      "resolved_episode_id": "r2r_ce_val_unseen_0010",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0011",
-      "resolved_episode_id": "r2r_ce_val_unseen_0011",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0012",
-      "resolved_episode_id": "r2r_ce_val_unseen_0012",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0013",
-      "resolved_episode_id": "r2r_ce_val_unseen_0013",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0014",
-      "resolved_episode_id": "r2r_ce_val_unseen_0014",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/baseline_sanity_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0015",
-      "resolved_episode_id": "r2r_ce_val_unseen_0015",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/stop_isolation/stop_isolation_battery.json",
-      "raw_id": "r2r_ce_val_unseen_0012",
-      "resolved_episode_id": "r2r_ce_val_unseen_0012",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0110",
-      "resolved_episode_id": "r2r_ce_val_unseen_0110",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0111",
-      "resolved_episode_id": "r2r_ce_val_unseen_0111",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0202",
-      "resolved_episode_id": "r2r_ce_val_unseen_0202",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0348",
-      "resolved_episode_id": "r2r_ce_val_unseen_0348",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0389",
-      "resolved_episode_id": "r2r_ce_val_unseen_0389",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0414",
-      "resolved_episode_id": "r2r_ce_val_unseen_0414",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0437",
-      "resolved_episode_id": "r2r_ce_val_unseen_0437",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0444",
-      "resolved_episode_id": "r2r_ce_val_unseen_0444",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0637",
-      "resolved_episode_id": "r2r_ce_val_unseen_0637",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0681",
-      "resolved_episode_id": "r2r_ce_val_unseen_0681",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0764",
-      "resolved_episode_id": "r2r_ce_val_unseen_0764",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_1342",
-      "resolved_episode_id": "r2r_ce_val_unseen_1342",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_1483",
-      "resolved_episode_id": "r2r_ce_val_unseen_1483",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_1484",
-      "resolved_episode_id": "r2r_ce_val_unseen_1484",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_1547",
-      "resolved_episode_id": "r2r_ce_val_unseen_1547",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_1673",
-      "resolved_episode_id": "r2r_ce_val_unseen_1673",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_1833",
-      "resolved_episode_id": "r2r_ce_val_unseen_1833",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/deadlock_diagnosis.json",
-      "raw_id": "r2r_ce_val_unseen_0111",
-      "resolved_episode_id": "r2r_ce_val_unseen_0111",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/deadlock_diagnosis.json",
-      "raw_id": "r2r_ce_val_unseen_0202",
-      "resolved_episode_id": "r2r_ce_val_unseen_0202",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/deadlock_diagnosis.json",
-      "raw_id": "r2r_ce_val_unseen_0348",
-      "resolved_episode_id": "r2r_ce_val_unseen_0348",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/deadlock_diagnosis.json",
-      "raw_id": "r2r_ce_val_unseen_0389",
-      "resolved_episode_id": "r2r_ce_val_unseen_0389",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/deadlock_diagnosis.json",
-      "raw_id": "r2r_ce_val_unseen_0414",
-      "resolved_episode_id": "r2r_ce_val_unseen_0414",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/deadlock_diagnosis.json",
-      "raw_id": "r2r_ce_val_unseen_0637",
-      "resolved_episode_id": "r2r_ce_val_unseen_0637",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/deadlock_diagnosis.json",
-      "raw_id": "r2r_ce_val_unseen_0681",
-      "resolved_episode_id": "r2r_ce_val_unseen_0681",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/deadlock_diagnosis.json",
-      "raw_id": "r2r_ce_val_unseen_0764",
-      "resolved_episode_id": "r2r_ce_val_unseen_0764",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/deadlock_diagnosis.json",
-      "raw_id": "r2r_ce_val_unseen_1342",
-      "resolved_episode_id": "r2r_ce_val_unseen_1342",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/deadlock_diagnosis.json",
-      "raw_id": "r2r_ce_val_unseen_1483",
-      "resolved_episode_id": "r2r_ce_val_unseen_1483",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/deadlock_diagnosis.json",
-      "raw_id": "r2r_ce_val_unseen_1484",
-      "resolved_episode_id": "r2r_ce_val_unseen_1484",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/deadlock_diagnosis.json",
-      "raw_id": "r2r_ce_val_unseen_1673",
-      "resolved_episode_id": "r2r_ce_val_unseen_1673",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_0110.json",
-      "raw_id": "r2r_ce_val_unseen_0110",
-      "resolved_episode_id": "r2r_ce_val_unseen_0110",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_0111.json",
-      "raw_id": "r2r_ce_val_unseen_0111",
-      "resolved_episode_id": "r2r_ce_val_unseen_0111",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_0202.json",
-      "raw_id": "r2r_ce_val_unseen_0202",
-      "resolved_episode_id": "r2r_ce_val_unseen_0202",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_0348.json",
-      "raw_id": "r2r_ce_val_unseen_0348",
-      "resolved_episode_id": "r2r_ce_val_unseen_0348",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_0389.json",
-      "raw_id": "r2r_ce_val_unseen_0389",
-      "resolved_episode_id": "r2r_ce_val_unseen_0389",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_0414.json",
-      "raw_id": "r2r_ce_val_unseen_0414",
-      "resolved_episode_id": "r2r_ce_val_unseen_0414",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_0437.json",
-      "raw_id": "r2r_ce_val_unseen_0437",
-      "resolved_episode_id": "r2r_ce_val_unseen_0437",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_0444.json",
-      "raw_id": "r2r_ce_val_unseen_0444",
-      "resolved_episode_id": "r2r_ce_val_unseen_0444",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_0637.json",
-      "raw_id": "r2r_ce_val_unseen_0637",
-      "resolved_episode_id": "r2r_ce_val_unseen_0637",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_0681.json",
-      "raw_id": "r2r_ce_val_unseen_0681",
-      "resolved_episode_id": "r2r_ce_val_unseen_0681",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_0764.json",
-      "raw_id": "r2r_ce_val_unseen_0764",
-      "resolved_episode_id": "r2r_ce_val_unseen_0764",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_1342.json",
-      "raw_id": "r2r_ce_val_unseen_1342",
-      "resolved_episode_id": "r2r_ce_val_unseen_1342",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_1483.json",
-      "raw_id": "r2r_ce_val_unseen_1483",
-      "resolved_episode_id": "r2r_ce_val_unseen_1483",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_1484.json",
-      "raw_id": "r2r_ce_val_unseen_1484",
-      "resolved_episode_id": "r2r_ce_val_unseen_1484",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_1547.json",
-      "raw_id": "r2r_ce_val_unseen_1547",
-      "resolved_episode_id": "r2r_ce_val_unseen_1547",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_1673.json",
-      "raw_id": "r2r_ce_val_unseen_1673",
-      "resolved_episode_id": "r2r_ce_val_unseen_1673",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/episodes/r2r_ce_val_unseen_1833.json",
-      "raw_id": "r2r_ce_val_unseen_1833",
-      "resolved_episode_id": "r2r_ce_val_unseen_1833",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix_pilot/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0110",
-      "resolved_episode_id": "r2r_ce_val_unseen_0110",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix_pilot/episodes/r2r_ce_val_unseen_0110.json",
-      "raw_id": "r2r_ce_val_unseen_0110",
-      "resolved_episode_id": "r2r_ce_val_unseen_0110",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix_pilot2/benchmark_summary.json",
-      "raw_id": "r2r_ce_val_unseen_0110",
-      "resolved_episode_id": "r2r_ce_val_unseen_0110",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix_pilot2/episodes/r2r_ce_val_unseen_0110.json",
-      "raw_id": "r2r_ce_val_unseen_0110",
-      "resolved_episode_id": "r2r_ce_val_unseen_0110",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "7",
-      "resolved_episode_id": "7",
-      "scene": "x8F5xyUWy9e",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "11",
-      "resolved_episode_id": "11",
-      "scene": "2azQ1b91cZZ",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "13",
-      "resolved_episode_id": "13",
-      "scene": "zsNo4HB9uLZ",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "40",
-      "resolved_episode_id": "40",
-      "scene": "zsNo4HB9uLZ",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "42",
-      "resolved_episode_id": "42",
-      "scene": "zsNo4HB9uLZ",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "52",
-      "resolved_episode_id": "52",
-      "scene": "zsNo4HB9uLZ",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "70",
-      "resolved_episode_id": "70",
-      "scene": "2azQ1b91cZZ",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "94",
-      "resolved_episode_id": "94",
-      "scene": "QUCTc6BB5sX",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "116",
-      "resolved_episode_id": "116",
-      "scene": "2azQ1b91cZZ",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "140",
-      "resolved_episode_id": "140",
-      "scene": "2azQ1b91cZZ",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "150",
-      "resolved_episode_id": "150",
-      "scene": "QUCTc6BB5sX",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "156",
-      "resolved_episode_id": "156",
-      "scene": "zsNo4HB9uLZ",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "166",
-      "resolved_episode_id": "166",
-      "scene": "2azQ1b91cZZ",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "171",
-      "resolved_episode_id": "171",
-      "scene": "TbHJrupSAjP",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "176",
-      "resolved_episode_id": "176",
-      "scene": "QUCTc6BB5sX",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "181",
-      "resolved_episode_id": "181",
-      "scene": "TbHJrupSAjP",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "187",
-      "resolved_episode_id": "187",
-      "scene": "x8F5xyUWy9e",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "190",
-      "resolved_episode_id": "190",
-      "scene": "QUCTc6BB5sX",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "191",
-      "resolved_episode_id": "191",
-      "scene": "QUCTc6BB5sX",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/positive_control/oracle_follower_results.json",
-      "raw_id": "207",
-      "resolved_episode_id": "207",
-      "scene": "Z6MFQCViBuw",
-      "in_locked_100": true,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "2022",
-      "resolved_episode_id": "2022",
-      "scene": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "2021",
-      "resolved_episode_id": "2021",
-      "scene": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "2023",
-      "resolved_episode_id": "2023",
-      "scene": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "1876",
-      "resolved_episode_id": "1876",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "259",
-      "resolved_episode_id": "259",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": true,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "3453",
-      "resolved_episode_id": "3453",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "3452",
-      "resolved_episode_id": "3452",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "168",
-      "resolved_episode_id": "168",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "1994",
-      "resolved_episode_id": "1994",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "5173",
-      "resolved_episode_id": "5173",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "8134",
-      "resolved_episode_id": "8134",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "6404",
-      "resolved_episode_id": "6404",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "5445",
-      "resolved_episode_id": "5445",
-      "scene": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "8628",
-      "resolved_episode_id": "8628",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "1868",
-      "resolved_episode_id": "1868",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "8413",
-      "resolved_episode_id": "8413",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "4164",
-      "resolved_episode_id": "4164",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "8627",
-      "resolved_episode_id": "8627",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "7280",
-      "resolved_episode_id": "7280",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/dev_20_eval/traces/evaluation_traces.jsonl",
-      "raw_id": "3819",
-      "resolved_episode_id": "3819",
-      "scene": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase10/smoke_traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase10/smoke_traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0002",
-      "resolved_episode_id": "r2r_ce_val_unseen_0002",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase10/smoke_traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0003",
-      "resolved_episode_id": "r2r_ce_val_unseen_0003",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase10/smoke_traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase10/smoke_traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0002",
-      "resolved_episode_id": "r2r_ce_val_unseen_0002",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase10/smoke_traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0003",
-      "resolved_episode_id": "r2r_ce_val_unseen_0003",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase6/traces/evaluation_traces.jsonl",
-      "raw_id": "g65_scripted_ep",
-      "resolved_episode_id": "g65_scripted_ep",
-      "scene": "mock_scene",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase6/traces/evaluation_traces.jsonl",
-      "raw_id": "g65_scripted_ep",
-      "resolved_episode_id": "g65_scripted_ep",
-      "scene": "mock_scene",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase7/habitat_traces/evaluation_traces.jsonl",
-      "raw_id": "g76_habitat_dev_01",
-      "resolved_episode_id": "g76_habitat_dev_01",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase7/mock_traces/evaluation_traces.jsonl",
-      "raw_id": "g76_mock_dev_01",
-      "resolved_episode_id": "g76_mock_dev_01",
-      "scene": "mock_indoor",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase7/mock_traces/evaluation_traces.jsonl",
-      "raw_id": "g76_mock_dev_01",
-      "resolved_episode_id": "g76_mock_dev_01",
-      "scene": "mock_indoor",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase8/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0003",
-      "resolved_episode_id": "r2r_ce_val_unseen_0003",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0004",
-      "resolved_episode_id": "r2r_ce_val_unseen_0004",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0005",
-      "resolved_episode_id": "r2r_ce_val_unseen_0005",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0006",
-      "resolved_episode_id": "r2r_ce_val_unseen_0006",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0007",
-      "resolved_episode_id": "r2r_ce_val_unseen_0007",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0008",
-      "resolved_episode_id": "r2r_ce_val_unseen_0008",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0009",
-      "resolved_episode_id": "r2r_ce_val_unseen_0009",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0010",
-      "resolved_episode_id": "r2r_ce_val_unseen_0010",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0011",
-      "resolved_episode_id": "r2r_ce_val_unseen_0011",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0013",
-      "resolved_episode_id": "r2r_ce_val_unseen_0013",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0014",
-      "resolved_episode_id": "r2r_ce_val_unseen_0014",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0015",
-      "resolved_episode_id": "r2r_ce_val_unseen_0015",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0016",
-      "resolved_episode_id": "r2r_ce_val_unseen_0016",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0017",
-      "resolved_episode_id": "r2r_ce_val_unseen_0017",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0110",
-      "resolved_episode_id": "r2r_ce_val_unseen_0110",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0111",
-      "resolved_episode_id": "r2r_ce_val_unseen_0111",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0202",
-      "resolved_episode_id": "r2r_ce_val_unseen_0202",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0348",
-      "resolved_episode_id": "r2r_ce_val_unseen_0348",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0389",
-      "resolved_episode_id": "r2r_ce_val_unseen_0389",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0414",
-      "resolved_episode_id": "r2r_ce_val_unseen_0414",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0437",
-      "resolved_episode_id": "r2r_ce_val_unseen_0437",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0444",
-      "resolved_episode_id": "r2r_ce_val_unseen_0444",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0637",
-      "resolved_episode_id": "r2r_ce_val_unseen_0637",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0681",
-      "resolved_episode_id": "r2r_ce_val_unseen_0681",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0764",
-      "resolved_episode_id": "r2r_ce_val_unseen_0764",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_1342",
-      "resolved_episode_id": "r2r_ce_val_unseen_1342",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_1483",
-      "resolved_episode_id": "r2r_ce_val_unseen_1483",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_1484",
-      "resolved_episode_id": "r2r_ce_val_unseen_1484",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_1547",
-      "resolved_episode_id": "r2r_ce_val_unseen_1547",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_1673",
-      "resolved_episode_id": "r2r_ce_val_unseen_1673",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_1833",
-      "resolved_episode_id": "r2r_ce_val_unseen_1833",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix_pilot/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0110",
-      "resolved_episode_id": "r2r_ce_val_unseen_0110",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase9_postfix_pilot2/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0110",
-      "resolved_episode_id": "r2r_ce_val_unseen_0110",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/eval_10ep/summary_metrics.json",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/eval_10ep/summary_metrics.json",
-      "raw_id": "r2r_ce_val_unseen_0002",
-      "resolved_episode_id": "r2r_ce_val_unseen_0002",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit summary list"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/eval_10ep/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/eval_10ep/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0002",
-      "resolved_episode_id": "r2r_ce_val_unseen_0002",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/full_20261030_125308/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/full_20261030_125308/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0002",
-      "resolved_episode_id": "r2r_ce_val_unseen_0002",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/full_20261030_125401/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/full_20261030_125401/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0002",
-      "resolved_episode_id": "r2r_ce_val_unseen_0002",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/full_20261030_125448/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/full_20261030_125448/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0002",
-      "resolved_episode_id": "r2r_ce_val_unseen_0002",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/local_10_complex/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0003",
-      "resolved_episode_id": "r2r_ce_val_unseen_0003",
-      "scene": "r1Q1Z4BcVte",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/local_10_complex/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0004",
-      "resolved_episode_id": "r2r_ce_val_unseen_0004",
-      "scene": "sT4fr6TAbpF",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/local_10_complex/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0005",
-      "resolved_episode_id": "r2r_ce_val_unseen_0005",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/local_10_complex/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0009",
-      "resolved_episode_id": "r2r_ce_val_unseen_0009",
-      "scene": "oLBMNvg9in8",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/local_10_complex/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0010",
-      "resolved_episode_id": "r2r_ce_val_unseen_0010",
-      "scene": "X7NsGo2t5Ab",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/local_10_complex/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0011",
-      "resolved_episode_id": "r2r_ce_val_unseen_0011",
-      "scene": "cVre9nv62Rh",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/local_10_complex/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0015",
-      "resolved_episode_id": "r2r_ce_val_unseen_0015",
-      "scene": "sT4fr6TAbpF",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/local_test/r2r_ce_val_unseen_0001/audit_eval_r2r_ce_val_unseen_0001.json",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/local_test/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/local_test/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/pilot_deep_inspection/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/pilot_deep_inspection/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/pilot_deep_inspection/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/pilot_deep_inspection/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0002",
-      "resolved_episode_id": "r2r_ce_val_unseen_0002",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/pilot_step_tracking/r2r_ce_val_unseen_0001/audit_eval_r2r_ce_val_unseen_0001.json",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "unknown",
-      "in_locked_100": false,
-      "notes": "Audit episode json"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/runs/pilot_step_tracking/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/archive/legacy_logs_and_scratch/scratch/test_bench_run/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0001",
-      "resolved_episode_id": "r2r_ce_val_unseen_0001",
-      "scene": "gZ6f7yhEvPG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/archive/legacy_logs_and_scratch/scratch/test_bench_run/traces/evaluation_traces.jsonl",
-      "raw_id": "r2r_ce_val_unseen_0002",
-      "resolved_episode_id": "r2r_ce_val_unseen_0002",
-      "scene": "pLe4wQe7qrG",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/archive/legacy_logs_and_scratch/scratch/test_traces/evaluation_traces.jsonl",
-      "raw_id": "ep_test_001",
-      "resolved_episode_id": "ep_test_001",
-      "scene": "mp3d_test_scene",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/archive/legacy_logs_and_scratch/scratch/test_traces/evaluation_traces.jsonl",
-      "raw_id": "ep_test_001",
-      "resolved_episode_id": "ep_test_001",
-      "scene": "mp3d_test_scene",
-      "in_locked_100": false,
-      "notes": "Trace line"
-    },
-    {
-      "source": "Pilot A / Diagnostic review",
-      "raw_id": "764",
-      "resolved_episode_id": "765",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": true,
-      "notes": "Diagnostic episode 0764 investigated in pilot (mapped from index 764)"
-    },
-    {
-      "source": "Pilot B / Diagnostic review",
-      "raw_id": "414",
-      "resolved_episode_id": "414",
-      "scene": "EU6Fwq7SyZv",
-      "in_locked_100": false,
-      "notes": "Diagnostic episode 0414 investigated in pilot"
-    }
+  "unexposed_episode_ids": [
+    218,
+    226,
+    232,
+    244,
+    247,
+    259,
+    265,
+    275,
+    308,
+    312,
+    321,
+    330,
+    338,
+    348,
+    362,
+    371,
+    377,
+    387,
+    403,
+    411,
+    423,
+    432,
+    439,
+    447,
+    454,
+    461,
+    469,
+    479,
+    513,
+    516,
+    526,
+    531,
+    546,
+    550,
+    559,
+    568,
+    576,
+    586,
+    602,
+    609,
+    620,
+    643,
+    655,
+    670,
+    677,
+    698,
+    705,
+    715,
+    721,
+    739,
+    743,
+    748,
+    755,
+    781,
+    787,
+    804,
+    810,
+    821,
+    824,
+    842,
+    1051,
+    1056,
+    1061,
+    1071,
+    1077,
+    1084,
+    1085,
+    1087,
+    1092,
+    1106,
+    1117,
+    1133,
+    1139,
+    1142,
+    1148,
+    1284,
+    1301,
+    1307,
+    1406
   ]
 }

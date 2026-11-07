@@ -1,0 +1,230 @@
+{
+  "num_episodes": 20,
+  "success_rate": 100.0,
+  "spl": 1.0,
+  "mean_navigation_error_m": 1.7540254026651383,
+  "total_rejections": 19,
+  "deadlocks": 0,
+  "episodes": [
+    {
+      "episode_id": "2022",
+      "scene_id": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 1.491991400718689,
+      "actions": 21,
+      "steps": 3,
+      "rejections": 0,
+      "failure_category": null
+    },
+    {
+      "episode_id": "2021",
+      "scene_id": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 1.491991400718689,
+      "actions": 21,
+      "steps": 3,
+      "rejections": 0,
+      "failure_category": null
+    },
+    {
+      "episode_id": "2023",
+      "scene_id": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 1.491991400718689,
+      "actions": 21,
+      "steps": 3,
+      "rejections": 0,
+      "failure_category": null
+    },
+    {
+      "episode_id": "1876",
+      "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 1.241439700126648,
+      "actions": 23,
+      "steps": 4,
+      "rejections": 2,
+      "failure_category": null
+    },
+    {
+      "episode_id": "259",
+      "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 1.9976989030838013,
+      "actions": 69,
+      "steps": 9,
+      "rejections": 2,
+      "failure_category": null
+    },
+    {
+      "episode_id": "3453",
+      "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 2.393667221069336,
+      "actions": 16,
+      "steps": 3,
+      "rejections": 0,
+      "failure_category": null
+    },
+    {
+      "episode_id": "3452",
+      "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 2.393667221069336,
+      "actions": 16,
+      "steps": 3,
+      "rejections": 0,
+      "failure_category": null
+    },
+    {
+      "episode_id": "168",
+      "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 0.8362435102462769,
+      "actions": 43,
+      "steps": 6,
+      "rejections": 1,
+      "failure_category": null
+    },
+    {
+      "episode_id": "1994",
+      "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 1.6276038885116577,
+      "actions": 42,
+      "steps": 5,
+      "rejections": 0,
+      "failure_category": null
+    },
+    {
+      "episode_id": "5173",
+      "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 1.9588658809661865,
+      "actions": 36,
+      "steps": 5,
+      "rejections": 0,
+      "failure_category": null
+    },
+    {
+      "episode_id": "8134",
+      "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 0.7698668837547302,
+      "actions": 37,
+      "steps": 5,
+      "rejections": 0,
+      "failure_category": null
+    },
+    {
+      "episode_id": "6404",
+      "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 1.7268633842468262,
+      "actions": 29,
+      "steps": 5,
+      "rejections": 0,
+      "failure_category": null
+    },
+    {
+      "episode_id": "5445",
+      "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 2.076115369796753,
+      "actions": 56,
+      "steps": 7,
+      "rejections": 0,
+      "failure_category": null
+    },
+    {
+      "episode_id": "8628",
+      "scene_id": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 1.5718485116958618,
+      "actions": 78,
+      "steps": 10,
+      "rejections": 2,
+      "failure_category": null
+    },
+    {
+      "episode_id": "1868",
+      "scene_id": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 2.34452223777771,
+      "actions": 56,
+      "steps": 8,
+      "rejections": 2,
+      "failure_category": null
+    },
+    {
+      "episode_id": "8413",
+      "scene_id": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 2.0604584217071533,
+      "actions": 48,
+      "steps": 7,
+      "rejections": 3,
+      "failure_category": null
+    },
+    {
+      "episode_id": "4164",
+      "scene_id": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 1.9580212831497192,
+      "actions": 70,
+      "steps": 10,
+      "rejections": 1,
+      "failure_category": null
+    },
+    {
+      "episode_id": "8627",
+      "scene_id": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 1.5718485116958618,
+      "actions": 78,
+      "steps": 10,
+      "rejections": 2,
+      "failure_category": null
+    },
+    {
+      "episode_id": "7280",
+      "scene_id": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 2.4699349403381348,
+      "actions": 17,
+      "steps": 3,
+      "rejections": 0,
+      "failure_category": null
+    },
+    {
+      "episode_id": "3819",
+      "scene_id": "mp3d/JF19kD82Mey/JF19kD82Mey.glb",
+      "success": true,
+      "spl": 1.0,
+      "navigation_error_m": 1.6058679819107056,
+      "actions": 83,
+      "steps": 9,
+      "rejections": 4,
+      "failure_category": null
+    }
+  ]
+}

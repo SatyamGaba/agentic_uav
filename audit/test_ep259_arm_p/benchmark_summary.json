@@ -1,0 +1,168 @@
+{
+  "episode_count": 1,
+  "primary_metrics": {
+    "success_rate": {
+      "mean": 0.0,
+      "ci_95": [
+        0.0,
+        0.0
+      ],
+      "wilson_ci_95_pct": [
+        0.0,
+        79.35
+      ]
+    },
+    "spl": {
+      "mean": 0.0,
+      "ci_95": [
+        0.0,
+        0.0
+      ]
+    },
+    "oracle_success_rate": {
+      "mean": 0.0,
+      "ci_95": [
+        0.0,
+        0.0
+      ],
+      "wilson_ci_95_pct": [
+        0.0,
+        79.35
+      ]
+    },
+    "navigation_error_m": {
+      "mean": 13.2258,
+      "ci_95": [
+        13.2258,
+        13.2258
+      ]
+    },
+    "trajectory_length_m": {
+      "mean": 39.7361,
+      "ci_95": [
+        39.7361,
+        39.7361
+      ]
+    },
+    "simulator_actions": {
+      "mean": 303.0,
+      "ci_95": [
+        303.0,
+        303.0
+      ]
+    }
+  },
+  "failure_taxonomy": {
+    "success": 0,
+    "safety_deadlock": 0,
+    "stop_premature": 0,
+    "stop_after_reach": 0,
+    "missed_stop": 0,
+    "budget_exceeded": 1,
+    "protocol_violation": 0,
+    "infrastructure_failure": 0,
+    "unclassified": 0
+  },
+  "config": {
+    "model": "qwen3.5:4b",
+    "max_simulator_actions": 500,
+    "max_decision_steps": 25,
+    "max_evidence_queries_per_step": 4,
+    "max_consecutive_reselects": 5,
+    "max_malformed_calls_per_step": 3,
+    "success_distance_m": 3.0,
+    "temperature": 0.0,
+    "seed": 42
+  },
+  "episodes": [
+    {
+      "episode_id": "259",
+      "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+      "instruction": {
+        "instruction_text": "Turn around walk down the hallway past the open house doors and turn the corner to the left. Walk through the door at the end of the hall and into the bedroom with two large beds. Walk through the room and into the bathroom stopping near the sink. ",
+        "instruction_tokens": [
+          2494,
+          159,
+          2584,
+          780,
+          2389,
+          1126,
+          1728,
+          2389,
+          1625,
+          1213,
+          762,
+          119,
+          2494,
+          2389,
+          589,
+          2438,
+          2389,
+          1360,
+          15,
+          2584,
+          2418,
+          2389,
+          757,
+          178,
+          2389,
+          851,
+          1605,
+          2389,
+          1121,
+          119,
+          1264,
+          2389,
+          273,
+          2661,
+          2509,
+          1336,
+          275,
+          15,
+          2584,
+          2418,
+          2389,
+          1994,
+          119,
+          1264,
+          2389,
+          242,
+          2279,
+          1563,
+          2389,
+          2132,
+          15
+        ]
+      },
+      "model": "qwen3.5:4b",
+      "called_stop": false,
+      "terminated_deadlock": false,
+      "terminated_protocol_violation": false,
+      "total_steps": 26,
+      "arrival_verification_steps": 0,
+      "failure_category": "budget_exceeded",
+      "metrics": {
+        "success": false,
+        "spl": 0.0,
+        "oracle_success": false,
+        "navigation_error_m": 13.225785255432129,
+        "trajectory_length_m": 39.736059895265456,
+        "simulator_action_count": 303
+      },
+      "metrics_dataclass": {
+        "success": false,
+        "spl": 0.0,
+        "oracle_success": false,
+        "navigation_error_m": 13.225785255432129,
+        "trajectory_length_m": 39.736059895265456,
+        "shortest_path_distance_m": 14.046523094177246,
+        "total_steps": 304,
+        "simulator_action_count": 303,
+        "ndtw": 0.0
+      },
+      "shortest_path_distance_m": 0.0,
+      "goal_radius_m": 3.0
+    }
+  ],
+  "infrastructure_errors": []
+}

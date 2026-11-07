@@ -1,48 +1,40 @@
-import os
 import hashlib
+import os
 import json
 
-base_dir = "/home/krutik/data/scene_datasets/mp3d"
-val_scenes = [
-    "2azQ1b91cZZ", "8194nk5LbLH", "EU6Fwq7SyZv", "QUCTc6BB5sX", "TbHJrupSAjP",
-    "X7HyMhZNoso", "Z6MFQCViBuw", "oLBMNvg9in8", "pLe4wQe7qrG", "x8F5xyUWy9e", "zsNo4HB9uLZ"
+scenes = [
+    '2azQ1b91cZZ', '8194nk5LbLH', 'EU6Fwq7SyZv', 'QUCTc6BB5sX', 'TbHJrupSAjP',
+    'X7HyMhZNoso', 'Z6MFQCViBuw', 'oLBMNvg9in8', 'x8F5xyUWy9e', 'zsNo4HB9uLZ'
 ]
 
-def get_file_info(path):
-    if not os.path.exists(path):
-        return None
-    size = os.path.getsize(path)
-    sha256 = hashlib.sha256()
-    with open(path, "rb") as f:
-        while chunk := f.read(1024 * 1024):
-            sha256.update(chunk)
-    return {
-        "size_bytes": size,
-        "sha256": sha256.hexdigest()
-    }
-
+base_dir = '/home/krutik/data/scene_datasets/mp3d'
 results = {}
-for s in sorted(val_scenes):
+
+for s in sorted(scenes):
     glb_path = os.path.join(base_dir, s, f"{s}.glb")
     nav_path = os.path.join(base_dir, s, f"{s}.navmesh")
-    results[s] = {
-        "glb": get_file_info(glb_path),
-        "navmesh": get_file_info(nav_path)
-    }
-    print(f"Scene: {s}")
-    if results[s]["glb"]:
-        print(f"  GLB:     {results[s]['glb']['size_bytes']:>10} bytes | {results[s]['glb']['sha256']}")
-    else:
-        print("  GLB:     MISSING")
-    if results[s]["navmesh"]:
-        print(f"  NAVMESH: {results[s]['navmesh']['size_bytes']:>10} bytes | {results[s]['navmesh']['sha256']}")
-    else:
-        print("  NAVMESH: MISSING")
+    
+    glb_hash = "missing"
+    if os.path.exists(glb_path):
+        h = hashlib.sha256()
+        with open(glb_path, 'rb') as f:
+            while chunk := f.read(65536):
+                h.update(chunk)
+        glb_hash = h.hexdigest()
+        
+    nav_hash = "missing"
+    if os.path.exists(nav_path):
+        h = hashlib.sha256()
+        with open(nav_path, 'rb') as f:
+            while chunk := f.read(65536):
+                h.update(chunk)
+        nav_hash = h.hexdigest()
+        
+    results[s] = {"glb_sha256": glb_hash, "navmesh_sha256": nav_hash}
+    print(f"{s}: glb={glb_hash[:16]} nav={nav_hash[:16]}")
 
-out_file = "audit/interactive_session/mp3d_val_unseen_11_scenes_hashes.json"
-os.makedirs(os.path.dirname(out_file), exist_ok=True)
-with open(out_file, "w") as f:
+out_path = "audit/metric_validation/locked_100_scene_hashes.json"
+os.makedirs(os.path.dirname(out_path), exist_ok=True)
+with open(out_path, "w") as f:
     json.dump(results, f, indent=2)
-
-print(f"\nSaved hash manifest to {out_file}")
-
+print("Saved to", out_path)

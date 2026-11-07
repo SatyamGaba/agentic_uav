@@ -72,6 +72,24 @@ def git_revision() -> Optional[str]:
         return None
 
 
+def check_clean_git_tree() -> str:
+    """Verifies that the git working tree is clean and returns the current commit hash."""
+    rev = git_revision()
+    if not rev:
+        raise RuntimeError("Not a valid git repository or git rev-parse failed.")
+    status = subprocess.check_output(
+        ["git", "status", "--porcelain"],
+        cwd=PROJECT_ROOT,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    ).strip()
+    if status:
+        raise RuntimeError(
+            f"Git working tree is dirty! Commit all changes before running benchmark.\nDirty files:\n{status}"
+        )
+    return rev
+
+
 def wilson_ci(successes: int, total: int, z: float = 1.96) -> Dict[str, Any]:
     if total <= 0:
         return {"mean_pct": 0.0, "ci_95_pct": [0.0, 0.0]}
@@ -227,6 +245,7 @@ def summarize(
         "config": {
             "model": model_name,
             "max_simulator_actions": config.max_simulator_actions,
+            "max_decision_steps": config.max_decision_steps,
             "max_evidence_queries_per_step": config.max_evidence_queries_per_step,
             "max_consecutive_reselects": config.max_consecutive_reselects,
             "max_malformed_calls_per_step": config.max_malformed_calls_per_step,
@@ -244,9 +263,13 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--arm", type=str, choices=["P", "L"], default="L",
                         help="Experimental arm: 'P' (Paper-faithful: N_th=1, no arrival verify, no floor guidance) or 'L' (Local aids: N_th=5, arrival verify, floor guidance).")
-    parser.add_argument("--model", type=str, default="qwen3.5:4b")
+    parser.add_argument("--model", type=str, default=None,
+                        help="VLM Model ID (or set AGENTICNAV_MODEL_ID env var). Required.")
+    parser.add_argument("--allow-dirty", action="store_true",
+                        help="Allow running with dirty git tree (development/smoke only).")
     parser.add_argument("--max-episodes", type=int, default=None)
-    parser.add_argument("--max-actions", type=int, default=25)
+    parser.add_argument("--max-actions", type=int, default=500)
+    parser.add_argument("--max-decision-steps", type=int, default=25)
     parser.add_argument("--no-baseline", "--main-only", action="store_true",
                         help="Skip the stop-immediately control baseline.")
     parser.add_argument("--baseline-only", action="store_true",
@@ -255,6 +278,26 @@ def main() -> int:
 
     if not HABITAT_AVAILABLE:
         raise RuntimeError("habitat_sim is not installed in the active Python environment.")
+
+    # Model resolution: stop hard-coding; read from args or env var, fail loudly if empty
+    if not args.baseline_only:
+        model_name = args.model or os.environ.get("AGENTICNAV_MODEL_ID")
+        if not model_name:
+            raise ValueError(
+                "Model ID is not specified! Provide --model <MODEL_ID> or set AGENTICNAV_MODEL_ID environment variable."
+            )
+    else:
+        model_name = "stop_immediately_control"
+
+    # Enforce clean git working tree unless --allow-dirty is explicitly passed
+    if not args.allow_dirty:
+        commit_hash = check_clean_git_tree()
+    else:
+        commit_hash = git_revision() or "dirty_development_tree"
+
+    prompt_file = PROJECT_ROOT / "agenticnav_paper_replica/harness/prompts.py"
+    prompt_hash = sha256_file(prompt_file) if prompt_file.exists() else "unknown"
+    dataset_hash = sha256_file(Path(args.episodes))
 
     with open(args.episodes, "r", encoding="utf-8") as f:
         dataset = json.load(f)
@@ -280,13 +323,14 @@ def main() -> int:
 
     config = ReplicaConfig()
     config.max_simulator_actions = args.max_actions
+    config.max_decision_steps = args.max_decision_steps
     config.max_evidence_queries_per_step = 4
     config.max_consecutive_reselects = 5
     config.max_malformed_calls_per_step = 3
     config.success_distance_m = 3.0
     config.temperature = 0.0
     config.inference_seed = 42
-    config.vlm_model = args.model
+    config.vlm_model = model_name
 
     if args.arm == "P":
         config.obstacle_point_threshold = 1
@@ -302,29 +346,31 @@ def main() -> int:
 
     if not args.baseline_only:
         ollama_client = OllamaNavClient(
-            model_name=args.model,
+            model_name=model_name,
             temperature=config.temperature,
             seed=config.inference_seed,
             thinking=False,
+            num_ctx=config.context_length,
         )
         if not ollama_client.is_configured():
             raise RuntimeError(f"Ollama is not reachable at {ollama_client.base_url}.")
-        model_name = ollama_client.model_name
         ollama_url = ollama_client.base_url
     else:
         ollama_client = None
-        model_name = "stop_immediately_control"
         ollama_url = "none"
 
     trace_logger = TraceLogger(output_dir / "traces")
 
     manifest = {
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
-        "git_revision": git_revision(),
+        "commit_hash": commit_hash,
+        "prompt_hash": prompt_hash,
+        "dataset_hash": dataset_hash,
+        "model_id": model_name,
+        "git_revision": commit_hash,
         "python": sys.version,
         "platform": platform.platform(),
         "habitat_sim_available": HABITAT_AVAILABLE,
-        "model": model_name,
         "ollama_base_url": ollama_url,
         "dataset": metadata,
         "episode_ids": [e["episode_id"] for e in episodes],
@@ -334,6 +380,7 @@ def main() -> int:
             "floor_grounding_prompt": config.floor_grounding_prompt,
             "arrival_verification": config.arrival_verification,
             "max_simulator_actions": config.max_simulator_actions,
+            "max_decision_steps": config.max_decision_steps,
             "max_evidence_queries_per_step": config.max_evidence_queries_per_step,
             "max_consecutive_reselects": config.max_consecutive_reselects,
             "max_malformed_calls_per_step": config.max_malformed_calls_per_step,

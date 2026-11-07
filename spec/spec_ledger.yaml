@@ -82,6 +82,14 @@ parameters:
     owner: "Perception"
     description: "Maximum valid depth sensor reading in meters"
 
+  min_obstacle_depth:
+    value: 0.05
+    tag: "deviation"
+    source: "local_safety_engineering"
+    status: "verified"
+    owner: "Perception"
+    description: "Near-obstacle detection threshold in meters (deviation from 0.5m sensor floor to detect physical obstacles within 0.05m-0.50m; applies to both Arm L and Arm P)"
+
   # --- ACTUATION & KINEMATICS ---
   turn_step_deg:
     value: 15.0

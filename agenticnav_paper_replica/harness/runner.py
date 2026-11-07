@@ -64,6 +64,7 @@ def run_episode(
         hfov_deg=config.hfov_deg,
         d_min=config.d_min,
         d_max=config.d_max,
+        min_obstacle_depth=getattr(config, "min_obstacle_depth", 0.05),
         camera_height=config.camera_height,
     )
     corridor_checker = GroundCorridorChecker(
@@ -104,7 +105,7 @@ def run_episode(
     image_cache.set_current_node(current_node)
     image_cache.store_node_observations(current_node, obs.rgb_views)
 
-    trajectory: List[Tuple[float, float, float]] = [obs.allocentric_pose]
+    trajectory: List[Tuple[float, float, float]] = [obs.position]
     node_poses: List[Tuple[float, float, float]] = [obs.allocentric_pose]
     geodesic_distances: List[float] = [embodiment.get_geodesic_distance_to_goal()]
 
@@ -115,7 +116,14 @@ def run_episode(
     step_traces: List[Dict[str, Any]] = []
 
     # 3. Main decision loop
-    while not obs.is_done and not called_stop and not terminated_deadlock and not terminated_protocol_violation:
+    max_decision_steps = getattr(config, "max_decision_steps", 25)
+    while (
+        not obs.is_done
+        and not called_stop
+        and not terminated_deadlock
+        and not terminated_protocol_violation
+        and current_node <= max_decision_steps
+    ):
         # Extract 3D obstacle pointcloud and 2D free-space endpoints from current depth views
         obstacle_pts_list = []
         free_pts_list = []
@@ -295,13 +303,22 @@ def run_episode(
                 trajectory.extend(obs.primitive_trajectory)
                 geodesic_distances.extend(obs.primitive_geodesic_distances)
             else:
-                trajectory.append(obs.allocentric_pose)
+                trajectory.append(obs.position)
                 geodesic_distances.append(embodiment.get_geodesic_distance_to_goal())
 
             # Ground move outcome with actual simulator physics
             outcome_dict = dict(step_result.action_payload)
             outcome_dict["moved_m"] = round(obs.actual_distance_moved, 2)
             outcome_dict["collided"] = obs.collided
+
+            if step_traces:
+                step_traces[-1]["post_geodesic_distance_to_goal_m"] = embodiment.get_geodesic_distance_to_goal()
+                step_traces[-1]["outcome"] = outcome_dict
+                step_traces[-1]["post_agent_pose"] = {
+                    "x": obs.allocentric_pose[0],
+                    "z": obs.allocentric_pose[1],
+                    "yaw_rad": obs.allocentric_pose[2],
+                }
 
             if step_evaluator:
                 step_evaluator.evaluate_step(
@@ -358,7 +375,10 @@ def run_episode(
         oracle_success=metrics.oracle_success,
         called_stop=called_stop,
         final_distance_to_goal=metrics.navigation_error_m,
-        action_budget_exceeded=obs.simulator_actions_taken >= config.max_simulator_actions,
+        action_budget_exceeded=(
+            obs.simulator_actions_taken >= config.max_simulator_actions
+            or current_node > max_decision_steps
+        ),
         deadlock_terminated=terminated_deadlock,
         protocol_violation=terminated_protocol_violation,
         infrastructure_error=False,
@@ -373,6 +393,9 @@ def run_episode(
             scene_id=scene_id,
             instruction=instruction,
             shortest_path_distance_m=embodiment.get_shortest_path_distance(),
+            split=str(episode_data.get("split", "unknown")),
+            trajectory_id=episode_data.get("trajectory_id"),
+            start_position=episode_data.get("start_position"),
             steps=step_traces,
             metrics={
                 "success": metrics.success,

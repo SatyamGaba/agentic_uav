@@ -32,6 +32,9 @@ class EpisodeTrace:
     scene_id: str
     instruction: str
     shortest_path_distance_m: float
+    split: Optional[str] = None
+    trajectory_id: Optional[Union[int, str]] = None
+    start_position: Optional[List[float]] = None
     steps: List[Dict[str, Any]] = field(default_factory=list)
     metrics: Optional[Dict[str, Any]] = None
     failure_category: Optional[str] = None

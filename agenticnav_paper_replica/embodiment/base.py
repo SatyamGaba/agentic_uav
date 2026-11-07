@@ -14,6 +14,7 @@ class StepObservation:
     allocentric_pose: Tuple[float, float, float]  # (x, z, yaw_rad) relative to start pose
     simulator_actions_taken: int
     is_done: bool
+    position: Tuple[float, float, float] = (0.0, 0.0, 0.0)
     primitive_trajectory: List[Tuple[float, float, float]] = field(default_factory=list)
     primitive_geodesic_distances: List[float] = field(default_factory=list)
     actual_distance_moved: float = 0.0

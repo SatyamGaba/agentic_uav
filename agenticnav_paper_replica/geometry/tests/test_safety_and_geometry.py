@@ -315,10 +315,10 @@ class TestRequiredSection44UnitTests:
         ok, _, _ = convert_raw_depth(float("inf"), self.config)
         assert ok is False
 
-        # Point cloud extraction masking: depth map entirely composed of 0.500m near clamp
-        clamped_img = np.full((480, 640), 0.500, dtype=np.float32)
-        pts_clamped = unproject_depth_image(clamped_img, view_idx=0, config=self.config)
-        assert len(pts_clamped) == 0, "Near-clamped depth must not generate obstacle points"
+        # Point cloud extraction masking: depth map entirely composed of 0.000m near-clipping dropouts
+        dropped_img = np.zeros((480, 640), dtype=np.float32)
+        pts_dropped = unproject_depth_image(dropped_img, view_idx=0, config=self.config)
+        assert len(pts_dropped) == 0, "Near-clipping dropouts (0.0m) must not generate obstacle points"
 
 
 class TestZeroRhoPolicyAndAblationSwitches:

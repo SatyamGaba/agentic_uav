@@ -1,0 +1,52 @@
+{
+  "episode_id": "3453",
+  "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+  "instruction": {
+    "instruction_text": "Walk through the doorway across the dining room. Wait next to the door. ",
+    "instruction_tokens": [
+      2584,
+      2418,
+      2389,
+      766,
+      85,
+      2389,
+      711,
+      1994,
+      15,
+      2579,
+      1576,
+      2438,
+      2389,
+      757,
+      15
+    ]
+  },
+  "model": "qwen3.5:4b",
+  "called_stop": true,
+  "terminated_deadlock": false,
+  "terminated_protocol_violation": false,
+  "total_steps": 5,
+  "arrival_verification_steps": 0,
+  "failure_category": "success",
+  "metrics": {
+    "success": true,
+    "spl": 0.6202411651611328,
+    "oracle_success": true,
+    "navigation_error_m": 2.6388802528381348,
+    "trajectory_length_m": 9.5,
+    "simulator_action_count": 46
+  },
+  "metrics_dataclass": {
+    "success": true,
+    "spl": 0.6202411651611328,
+    "oracle_success": true,
+    "navigation_error_m": 2.6388802528381348,
+    "trajectory_length_m": 9.5,
+    "shortest_path_distance_m": 5.892291069030762,
+    "total_steps": 47,
+    "simulator_action_count": 46,
+    "ndtw": 0.0
+  },
+  "shortest_path_distance_m": 0.0,
+  "goal_radius_m": 3.0
+}

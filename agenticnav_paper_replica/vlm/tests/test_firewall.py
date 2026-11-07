@@ -79,3 +79,15 @@ def test_positive_control_intentional_leak_trips_firewall():
     assert "Sentinel canary token" in str(exc_info.value)
 
 
+def test_vllm_client_firewall_trips_on_leak():
+    """Verify OpenAIVLLMNavClient triggers PrivilegeFirewallBreach before network dispatch."""
+    from agenticnav_paper_replica.vlm.vllm_client import OpenAIVLLMNavClient
+    client = OpenAIVLLMNavClient(base_url="http://fake-host:8000/v1")
+    messages = [
+        {"role": "user", "content": "Here is the oracle distance_to_goal: 3.5m"}
+    ]
+    with pytest.raises(PrivilegeFirewallBreach, match="Forbidden oracle key 'distance_to_goal'"):
+        client(messages)
+
+
+

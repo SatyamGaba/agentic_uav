@@ -19,7 +19,7 @@ View Azimuths (CCW-positive around +Y_agent):
 
 from dataclasses import dataclass
 import math
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
 
 
@@ -38,14 +38,38 @@ VIEW_LABELS: Dict[int, str] = {
 }
 
 
+def parse_view_index(val: Any) -> int:
+    """Robustly parse a view index from an int, float, or string (e.g. 0, 'Front', 'View 0', 'Right')."""
+    if val is None:
+        return 0
+    if isinstance(val, (int, np.integer)):
+        return int(val) % 4
+    if isinstance(val, float):
+        return int(round(val)) % 4
+    s = str(val).strip().lower()
+    if "front" in s or "forward" in s:
+        return 0
+    if "right" in s:
+        return 1
+    if "back" in s or "behind" in s or "rear" in s:
+        return 2
+    if "left" in s:
+        return 3
+    for char in s:
+        if char in "0123":
+            return int(char)
+    return 0
+
+
 @dataclass
 class CameraConfig:
     """Sensor parameters matching standard R2R-CE VLN-CE Habitat-Sim setup."""
     image_width: int = 640
     image_height: int = 480
     hfov_deg: float = 90.0
-    d_min: float = 0.5   # meters
-    d_max: float = 5.0   # meters
+    d_min: float = 0.5   # meters: waypoint query floor (paper sensor specification)
+    d_max: float = 5.0   # meters: sensor max range
+    min_obstacle_depth: float = 0.05  # meters: near obstacle detection threshold (deviation from 0.5m sensor floor)
     camera_height: float = 1.25  # meters above floor (y=0)
     is_raw_normalized: bool = False  # False for metric buffers in meters; True if [0, 1] raw
 
@@ -114,7 +138,7 @@ def convert_raw_depth(
         d_metric = config.d_min + val * (config.d_max - config.d_min)
         return True, float(d_metric), None
     else:
-        # Metric depth in meters: mask near clamp and far saturation as invalid
+        # Metric depth in meters: mask near clamp (<= d_min + eps) and far saturation as invalid
         if val <= (config.d_min + eps) or val >= (config.d_max - eps):
             return False, float(val), "invalid_depth"
         return True, float(val), None
@@ -336,9 +360,10 @@ def unproject_depth_image(
 
     z_vals = depth_image[grid_y, grid_x].astype(np.float64)
 
+    min_obs_d = getattr(config, "min_obstacle_depth", 0.05)
     valid_mask = (
-        (z_vals > config.d_min + eps)
-        & (z_vals < config.d_max - eps)
+        (z_vals >= min_obs_d)
+        & (z_vals <= (config.d_max - eps))
         & (~np.isnan(z_vals))
         & (~np.isinf(z_vals))
     )
@@ -405,8 +430,9 @@ def extract_view_obstacle_and_free_points(
     gy_flat = grid_y.flatten()
     z_flat = z_vals.flatten()
 
-    # Mask invalid depth: NaN, Inf, non-positive, and near-clipping clamp <= d_min + eps
-    valid_mask = (~np.isnan(z_flat)) & (~np.isinf(z_flat)) & (z_flat > (config.d_min + eps))
+    min_obs_d = getattr(config, "min_obstacle_depth", 0.05)
+    # Valid depth: not NaN, not Inf, and >= min_obs_d - eps
+    valid_mask = (~np.isnan(z_flat)) & (~np.isinf(z_flat)) & (z_flat >= (min_obs_d - eps))
     if not np.any(valid_mask):
         return np.empty((0, 3), dtype=np.float64), np.empty((0, 2), dtype=np.float64)
 
@@ -414,8 +440,8 @@ def extract_view_obstacle_and_free_points(
     gy_v = gy_flat[valid_mask]
     z_v_raw = z_flat[valid_mask]
 
-    # Clip to d_max for projection
-    z_c = np.clip(z_v_raw, config.d_min + eps, config.d_max)
+    # Clip to [min_obs_d, d_max] for projection
+    z_c = np.clip(z_v_raw, min_obs_d, config.d_max)
     x_c = (gx_v + 0.5 - config.cx) * z_c / config.fx
     y_c = (gy_v + 0.5 - config.cy) * z_c / config.fy
 

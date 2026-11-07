@@ -1,0 +1,57 @@
+{
+  "episode_id": "1876",
+  "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+  "instruction": {
+    "instruction_text": "Walk through through doorway right of the mirror. Turn right and walk towards the door. Wait there. ",
+    "instruction_tokens": [
+      2584,
+      2418,
+      2418,
+      766,
+      1968,
+      1605,
+      2389,
+      1515,
+      15,
+      2494,
+      1968,
+      119,
+      2584,
+      2452,
+      2389,
+      757,
+      15,
+      2579,
+      2395,
+      15
+    ]
+  },
+  "model": "qwen3.5:4b",
+  "called_stop": true,
+  "terminated_deadlock": false,
+  "terminated_protocol_violation": false,
+  "total_steps": 8,
+  "arrival_verification_steps": 0,
+  "failure_category": "stop_premature",
+  "metrics": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 5.816350936889648,
+    "trajectory_length_m": 10.373501865482531,
+    "simulator_action_count": 73
+  },
+  "metrics_dataclass": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 5.816350936889648,
+    "trajectory_length_m": 10.373501865482531,
+    "shortest_path_distance_m": 5.627921104431152,
+    "total_steps": 74,
+    "simulator_action_count": 73,
+    "ndtw": 0.0
+  },
+  "shortest_path_distance_m": 0.0,
+  "goal_radius_m": 3.0
+}

@@ -14,6 +14,7 @@ from agenticnav_paper_replica.geometry.pinhole import (
     extract_depth_patch,
     normalize_to_pixel,
     convert_raw_depth,
+    parse_view_index,
 )
 from agenticnav_paper_replica.geometry.safety_region import (
     GroundCorridorChecker,
@@ -77,7 +78,7 @@ class ToolExecutor:
             if not isinstance(pt, dict):
                 continue
 
-            view = int(pt.get("view", 0))
+            view = parse_view_index(pt.get("view", 0))
             u = float(pt.get("u", 0.5))
             v = float(pt.get("v", 0.5))
 
