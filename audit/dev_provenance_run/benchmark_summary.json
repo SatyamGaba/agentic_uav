@@ -1,0 +1,144 @@
+{
+  "episode_count": 1,
+  "primary_metrics": {
+    "success_rate": {
+      "mean": 0.0,
+      "ci_95": [
+        0.0,
+        0.0
+      ],
+      "wilson_ci_95_pct": [
+        0.0,
+        79.35
+      ]
+    },
+    "spl": {
+      "mean": 0.0,
+      "ci_95": [
+        0.0,
+        0.0
+      ]
+    },
+    "oracle_success_rate": {
+      "mean": 100.0,
+      "ci_95": [
+        100.0,
+        100.0
+      ],
+      "wilson_ci_95_pct": [
+        20.65,
+        100.0
+      ]
+    },
+    "navigation_error_m": {
+      "mean": 3.7853,
+      "ci_95": [
+        3.7853,
+        3.7853
+      ]
+    },
+    "trajectory_length_m": {
+      "mean": 18.5467,
+      "ci_95": [
+        18.5467,
+        18.5467
+      ]
+    },
+    "simulator_actions": {
+      "mean": 124.0,
+      "ci_95": [
+        124.0,
+        124.0
+      ]
+    }
+  },
+  "failure_taxonomy": {
+    "success": 0,
+    "safety_deadlock": 0,
+    "stop_premature": 0,
+    "stop_after_reach": 1,
+    "missed_stop": 0,
+    "budget_exceeded": 0,
+    "protocol_violation": 0,
+    "infrastructure_failure": 0,
+    "unclassified": 0
+  },
+  "config": {
+    "model": "qwen3.5:4b",
+    "max_simulator_actions": 500,
+    "max_decision_steps": 25,
+    "max_evidence_queries_per_step": 4,
+    "max_consecutive_reselects": 5,
+    "max_malformed_calls_per_step": 3,
+    "success_distance_m": 3.0,
+    "temperature": 0.0,
+    "seed": 42
+  },
+  "episodes": [
+    {
+      "episode_id": "2022",
+      "scene_id": "mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
+      "instruction": {
+        "instruction_text": "Take a right down the lane through the two sets of pews, walk towards the left corner of the church and stop at the one step. ",
+        "instruction_tokens": [
+          2352,
+          73,
+          1968,
+          780,
+          2389,
+          1331,
+          2418,
+          2389,
+          2509,
+          2075,
+          1605,
+          1764,
+          2584,
+          2452,
+          2389,
+          1360,
+          589,
+          1605,
+          2389,
+          494,
+          119,
+          2278,
+          178,
+          2389,
+          1616,
+          2260,
+          15
+        ]
+      },
+      "model": "qwen3.5:4b",
+      "called_stop": true,
+      "terminated_deadlock": false,
+      "terminated_protocol_violation": false,
+      "total_steps": 11,
+      "arrival_verification_steps": 1,
+      "failure_category": "stop_after_reach",
+      "metrics": {
+        "success": false,
+        "spl": 0.0,
+        "oracle_success": true,
+        "navigation_error_m": 3.785252571105957,
+        "trajectory_length_m": 18.54673879311821,
+        "simulator_action_count": 124
+      },
+      "metrics_dataclass": {
+        "success": false,
+        "spl": 0.0,
+        "oracle_success": true,
+        "navigation_error_m": 3.785252571105957,
+        "trajectory_length_m": 18.54673879311821,
+        "shortest_path_distance_m": 4.841162204742432,
+        "total_steps": 125,
+        "simulator_action_count": 124,
+        "ndtw": 0.0
+      },
+      "shortest_path_distance_m": 0.0,
+      "goal_radius_m": 3.0
+    }
+  ],
+  "infrastructure_errors": []
+}

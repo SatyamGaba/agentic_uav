@@ -1,0 +1,40 @@
+{
+  "timestamp_utc": "2026-11-07T22:02:50.716759+00:00",
+  "commit_hash": "5feaec9b1373c1dc5ddfd43599ad4dcfe9bc054f",
+  "prompt_hash": "607528c3876ac5739ddeb1c6c8397786237694ff9802836287b6140bdc821528",
+  "dataset_hash": "098fc76bcb968b61498078c126243ba0c81ac388c9d530bc4384358c5f8037e3",
+  "model_id": "qwen3.5:4b",
+  "git_revision": "5feaec9b1373c1dc5ddfd43599ad4dcfe9bc054f",
+  "python": "3.9.23 | packaged by conda-forge | (main, Jun  4 2025, 17:57:12) \n[GCC 13.3.0]",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "habitat_sim_available": true,
+  "ollama_base_url": "http://172.25.208.1:11434",
+  "dataset": {},
+  "episode_ids": [
+    2022
+  ],
+  "config": {
+    "arm": "L",
+    "obstacle_point_threshold": 5,
+    "floor_grounding_prompt": true,
+    "arrival_verification": true,
+    "max_simulator_actions": 500,
+    "max_decision_steps": 25,
+    "max_evidence_queries_per_step": 4,
+    "max_consecutive_reselects": 5,
+    "max_malformed_calls_per_step": 3,
+    "success_distance_m": 3.0,
+    "temperature": 0.0,
+    "inference_seed": 42,
+    "thinking": false
+  },
+  "source_hashes": {
+    "executor": "41c765359fbcd80b3e7c2775d4d6395e4dc9f56884e03443f2c56f82693d4ec3",
+    "step_loop": "4193dac3e4ce12b6b58dd8f79db9b4002e1c108dfd1c5e80c9545ebf3de8d5d2",
+    "runner": "78f14f33254fda3e9fdaa5595905b0f16b46dea0850aabac96d938b708a6d0cf",
+    "prompts": "607528c3876ac5739ddeb1c6c8397786237694ff9802836287b6140bdc821528",
+    "failure_classifier": "16469ce99224846b59b7fe2ecc03332d3974562e12fe3e2bc1719ef14bfe5206",
+    "config": "81c9f14c672fd7dfa1b8da4433c8ce64217301c778652efbb5b1379ca0eccad8",
+    "vlm_client": "d130e63724f89a0d28ec9ad7cdd86e4df3d768b33b2ea1cd3581bf2400d315de"
+  }
+}
