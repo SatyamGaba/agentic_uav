@@ -1,0 +1,15 @@
+{
+  "manifest_version": "1.0",
+  "created_at": "2026-11-06T14:03:08.557048Z",
+  "benchmark_set": "locked_100_val_unseen",
+  "model": "qwen3.5:4b",
+  "hardware": "NVIDIA GeForce RTX 4050 Laptop GPU / Driver 592.82",
+  "simulator": "Habitat-Sim 0.3.3 (D3D12/OpenGL 4.6)",
+  "inference": {
+    "temperature": 0.0,
+    "seed": 42,
+    "thinking": false,
+    "num_ctx": 8192
+  },
+  "code_freeze_hash": "1c4f1e9c6b4a81695a729e4fc3f0826393193ab4f4735e4ca0f9050b981cbc01"
+}

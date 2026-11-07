@@ -1,0 +1,23 @@
+{
+  "check": "G3.5",
+  "scene": "gZ6f7yhEvPG",
+  "agent_position": [
+    -1.375,
+    0.181,
+    -1.981
+  ],
+  "image_resolution": [
+    640,
+    480
+  ],
+  "rgb_file_size_bytes": 161784,
+  "mock_contrast_comparison": "Real render is 250,000+ bytes vs Mock flat-shade 2,627 bytes",
+  "shannon_entropy": 6.777,
+  "mean_pixel_brightness": 133.73,
+  "std_pixel_variance": 48.05,
+  "depth_min_m": 0.0,
+  "depth_max_m": 0.603,
+  "depth_mean_m": 0.4,
+  "is_photorealistic": true,
+  "status": "PASS"
+}

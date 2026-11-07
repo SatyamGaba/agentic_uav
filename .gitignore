@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Runtime / generated evidence
+runs/
+audit/phase9_postfix_pilot*/
+audit/phase9_postfix/run*.log
+*.log
+
+# Large media and model/data artifacts
+*.mp4
+*.avi
+*.zip
+*.gz
+
+# Legacy dependencies are preserved locally but not committed
+archive/legacy_airsim_uav/dependencies/
+archive/legacy_airsim_uav/**/dependencies/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,12 @@
+{
+  "check": "G2.5",
+  "model": "qwen3.5:4b",
+  "sentinel": "SENTINEL_ALPHA_62402_VERIFIED",
+  "sentinel_recalled": true,
+  "done_reason": "stop",
+  "prompt_tokens_evaluated": 1904,
+  "tokens_per_image_approx": 301,
+  "eval_tokens_generated": 150,
+  "wall_time_s": 13.888367891311646,
+  "status": "PASS"
+}

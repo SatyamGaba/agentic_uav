@@ -1,0 +1,114 @@
+{
+  "benchmark": "OpenFly (ICLR 2026)",
+  "split": "unseen",
+  "episodes_evaluated": 25,
+  "provider": "lmstudio",
+  "metrics": {
+    "NE (meters) \u2193": 53.48,
+    "SR (%) \u2191": 12.0,
+    "OSR (%) \u2191": 12.0,
+    "SPL (%) \u2191": 11.33
+  },
+  "detailed_samples": [
+    {
+      "episode": 0,
+      "instruction": "Proceed towards a medium - sized light beige commercial building characterized by an art deco design with palm trees on ...",
+      "gt_len_m": 15.0,
+      "pred_len_m": 18.0,
+      "ne_m": 8.24,
+      "success": true,
+      "oracle": true,
+      "spl": 0.8333
+    },
+    {
+      "episode": 1,
+      "instruction": "Proceed directly ahead toward the dark gray structure , distinguished by its tall , modern glass facade . This very larg...",
+      "gt_len_m": 54.0,
+      "pred_len_m": 10.0,
+      "ne_m": 44.0,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 2,
+      "instruction": "Walk straight towards the large , white building characterized by many windows . Then , slightly turn left and move forw...",
+      "gt_len_m": 60.0,
+      "pred_len_m": 25.0,
+      "ne_m": 34.84,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 3,
+      "instruction": "Walk directly towards the large beige building with a tile roof , slightly turn right , and proceed to the medium light ...",
+      "gt_len_m": 48.0,
+      "pred_len_m": 10.0,
+      "ne_m": 41.8,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 4,
+      "instruction": "Advance forward toward the large gray cable - stayed bridge , slightly turn left , and then proceed straight to the medi...",
+      "gt_len_m": 18.0,
+      "pred_len_m": 18.0,
+      "ne_m": 6.7,
+      "success": true,
+      "oracle": true,
+      "spl": 1.0
+    },
+    {
+      "episode": 5,
+      "instruction": "Proceed forward slightly , then turn right to the beige / cream , tall rectangular structure with windows , which is a l...",
+      "gt_len_m": 66.0,
+      "pred_len_m": 1.0,
+      "ne_m": 62.94,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 6,
+      "instruction": "Proceed directly towards the large grey building with rectangular windows , then slightly turn left and continue ahead t...",
+      "gt_len_m": 75.0,
+      "pred_len_m": 15.0,
+      "ne_m": 58.22,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 7,
+      "instruction": "Advance forward towards a large , gray and beige building with a grid - like facade , then slightly turn right and head ...",
+      "gt_len_m": 81.0,
+      "pred_len_m": 25.0,
+      "ne_m": 71.88,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 8,
+      "instruction": "Proceed directly to the large white building with a sign , then slightly turn left and continue straight towards the med...",
+      "gt_len_m": 60.0,
+      "pred_len_m": 25.0,
+      "ne_m": 34.07,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 9,
+      "instruction": "Proceed towards a tall building characterized by large windows and a light gray color , then slightly turn left . Contin...",
+      "gt_len_m": 66.0,
+      "pred_len_m": 25.0,
+      "ne_m": 39.52,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    }
+  ]
+}

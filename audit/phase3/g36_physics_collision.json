@@ -1,0 +1,7 @@
+{
+  "check": "G3.6",
+  "collision_arrest_verified": true,
+  "step_filter_active": true,
+  "sliding_supported": true,
+  "status": "PASS"
+}

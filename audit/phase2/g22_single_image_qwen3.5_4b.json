@@ -1,0 +1,33 @@
+{
+  "check": "G2.2",
+  "model": "qwen3.5:4b",
+  "correct_runs": "5/5",
+  "runs": [
+    {
+      "run": 1,
+      "reply": "1. red square\n2. blue circle\n3. 73",
+      "correct": true
+    },
+    {
+      "run": 2,
+      "reply": "1. red square\n2. blue circle\n3. 73",
+      "correct": true
+    },
+    {
+      "run": 3,
+      "reply": "1. red square\n2. blue circle\n3. 73",
+      "correct": true
+    },
+    {
+      "run": 4,
+      "reply": "1. red square\n2. blue circle\n3. 73",
+      "correct": true
+    },
+    {
+      "run": 5,
+      "reply": "1. red square\n2. blue circle\n3. 73",
+      "correct": true
+    }
+  ],
+  "status": "PASS"
+}

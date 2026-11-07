@@ -1,0 +1,21 @@
+{
+  "benchmark": "OpenFly (ICLR 2026) - Complete 3,000 Trajectories",
+  "model": "qwen/qwen3-vl-4b",
+  "provider": "lmstudio",
+  "test_seen": {
+    "NE (meters) \u2193": 59.08,
+    "SR (%) \u2191": 16.67,
+    "SR 95% CI (%)": "[15.02%, 18.46%]",
+    "OSR (%) \u2191": 21.22,
+    "OSR 95% CI (%)": "[19.4%, 23.17%]",
+    "SPL (%) \u2191": 14.96
+  },
+  "test_unseen": {
+    "NE (meters) \u2193": 61.91,
+    "SR (%) \u2191": 12.67,
+    "SR 95% CI (%)": "[10.9%, 14.67%]",
+    "OSR (%) \u2191": 15.83,
+    "OSR 95% CI (%)": "[13.88%, 18.01%]",
+    "SPL (%) \u2191": 11.44
+  }
+}

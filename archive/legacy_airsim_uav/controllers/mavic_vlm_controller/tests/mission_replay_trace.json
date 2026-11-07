@@ -1,0 +1,312 @@
+[
+  {
+    "step": 1,
+    "name": "InstructionDecomposition",
+    "sim_time": 100.0,
+    "telemetry": {
+      "position": [
+        0.0,
+        0.0,
+        6.0
+      ],
+      "velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "yaw": 0.0,
+      "gimbal_pitch": 0.0,
+      "timestamp": 100.0
+    },
+    "data": {
+      "instruction": "Fly past the red water tower to inspect the solar array on the left.",
+      "stages": [
+        {
+          "stage_id": 1,
+          "text": "Approach and pass the red water tower",
+          "detector_queries": [
+            "water tower",
+            "red tower"
+          ],
+          "condition": "target_reached",
+          "fallback_stage_id": null
+        },
+        {
+          "stage_id": 2,
+          "text": "Inspect the solar array on the left",
+          "detector_queries": [
+            "solar array",
+            "solar panels"
+          ],
+          "condition": "inspection_complete",
+          "fallback_stage_id": null
+        }
+      ]
+    }
+  },
+  {
+    "step": 2,
+    "name": "CandidateGenerationAndMarking",
+    "sim_time": 100.0,
+    "telemetry": {
+      "position": [
+        0.0,
+        0.0,
+        6.0
+      ],
+      "velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "yaw": 0.0,
+      "gimbal_pitch": 0.0,
+      "timestamp": 100.0
+    },
+    "data": {
+      "candidates_count": 2,
+      "candidates": [
+        {
+          "mark_id": 1,
+          "label_guess": "water tower",
+          "bbox": [
+            0.4,
+            0.35,
+            0.6,
+            0.65
+          ],
+          "conf": 0.92
+        },
+        {
+          "mark_id": 2,
+          "label_guess": "red barn",
+          "bbox": [
+            0.05,
+            0.4,
+            0.25,
+            0.7
+          ],
+          "conf": 0.85
+        }
+      ]
+    }
+  },
+  {
+    "step": 3,
+    "name": "VLMSelectionResolution",
+    "sim_time": 100.0,
+    "telemetry": {
+      "position": [
+        0.0,
+        0.0,
+        6.0
+      ],
+      "velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "yaw": 0.0,
+      "gimbal_pitch": 0.0,
+      "timestamp": 100.0
+    },
+    "data": {
+      "vlm_selection": {
+        "selected_mark_id": 1,
+        "confidence": 0.94,
+        "reasoning": "Mark #1 corresponds to the requested red water tower."
+      },
+      "resolved_mark_id": 1
+    }
+  },
+  {
+    "step": 4,
+    "name": "SceneGraphBackprojection",
+    "sim_time": 100.0,
+    "telemetry": {
+      "position": [
+        0.0,
+        0.0,
+        6.0
+      ],
+      "velocity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "yaw": 0.0,
+      "gimbal_pitch": 0.0,
+      "timestamp": 100.0
+    },
+    "data": {
+      "node_id": 1,
+      "centroid_world": [
+        14.0,
+        0.175,
+        6.0875
+      ],
+      "dimensions_3d": [
+        0.3,
+        5.075,
+        5.514687499999998
+      ],
+      "confidence": 0.552
+    }
+  },
+  {
+    "step": 5,
+    "name": "SubgoalArbitrationAndCommandValidation",
+    "sim_time": 100.05,
+    "telemetry": {
+      "position": [
+        0.0007499267685395902,
+        9.374084606744877e-06,
+        6.000004687042304
+      ],
+      "velocity": [
+        0.014998535370791802,
+        0.00018748169213489755,
+        9.37408460674485e-05
+      ],
+      "yaw": 0.0009374511764521642,
+      "gimbal_pitch": 0.0,
+      "timestamp": 100.05
+    },
+    "data": {
+      "subgoal": {
+        "subgoal_id": 1,
+        "intent": "INTENT_TARGET_APPROACH",
+        "waypoint_xyz": [
+          10.0,
+          0.0,
+          6.0
+        ],
+        "target_node_id": 1,
+        "v_target": 2.5,
+        "caution_level": "medium",
+        "termination_condition": "distance_within_2m",
+        "issued_at": 100.0,
+        "expiry_s": 6.0,
+        "detector_queries": []
+      },
+      "commanded_vel": [
+        0.014998535370791802,
+        0.00018748169213489755,
+        9.37408460674485e-05
+      ]
+    }
+  },
+  {
+    "step": 6,
+    "name": "FastLoopProgress",
+    "sim_time": 102.04999999999988,
+    "telemetry": {
+      "position": [
+        3.450583032280648,
+        0.043132287903508114,
+        6.021566143951754
+      ],
+      "velocity": [
+        2.4969062392658903,
+        0.031211327990823632,
+        0.01560566399541222
+      ],
+      "yaw": 0.011988022358902839,
+      "gimbal_pitch": 0.0,
+      "timestamp": 102.04999999999988
+    },
+    "data": {
+      "new_position": [
+        3.450583032280648,
+        0.043132287903508114,
+        6.021566143951754
+      ],
+      "active_safety_state": "REACQUISITION"
+    }
+  },
+  {
+    "step": 7,
+    "name": "TargetLossSafeStandoffReacquisition",
+    "sim_time": 102.04999999999988,
+    "telemetry": {
+      "position": [
+        3.450583032280648,
+        0.043132287903508114,
+        6.021566143951754
+      ],
+      "velocity": [
+        2.4969062392658903,
+        0.031211327990823632,
+        0.01560566399541222
+      ],
+      "yaw": 0.011988022358902839,
+      "gimbal_pitch": 0.0,
+      "timestamp": 102.04999999999988
+    },
+    "data": {
+      "recovery_state": "METRIC_3D_REACQUISITION",
+      "velocity_cmd": [
+        2.4997558951319667,
+        0.03124694868914958,
+        0.015623474344574966
+      ]
+    }
+  },
+  {
+    "step": 8,
+    "name": "StaleResponseFallbackTrigger",
+    "sim_time": 109.09999999999988,
+    "telemetry": {
+      "position": [
+        3.574714038173729,
+        0.04468392547717163,
+        6.022341962738586
+      ],
+      "velocity": [
+        2.4826201178616176,
+        0.031032751473270226,
+        0.015516375736635507
+      ],
+      "yaw": 0.011988022358902839,
+      "gimbal_pitch": 0.0,
+      "timestamp": 109.09999999999988
+    },
+    "data": {
+      "active_safety_state": "HOVER_REPLAN",
+      "trigger_event_set": true
+    }
+  },
+  {
+    "step": 9,
+    "name": "StageCompletionAndAdvancement",
+    "sim_time": 109.09999999999988,
+    "telemetry": {
+      "position": [
+        3.574714038173729,
+        0.04468392547717163,
+        6.022341962738586
+      ],
+      "velocity": [
+        2.4826201178616176,
+        0.031032751473270226,
+        0.015516375736635507
+      ],
+      "yaw": 0.011988022358902839,
+      "gimbal_pitch": 0.0,
+      "timestamp": 109.09999999999988
+    },
+    "data": {
+      "advanced": true,
+      "new_active_stage": {
+        "stage_id": 2,
+        "text": "Inspect the solar array on the left",
+        "detector_queries": [
+          "solar array",
+          "solar panels"
+        ],
+        "condition": "inspection_complete",
+        "fallback_stage_id": null
+      }
+    }
+  }
+]

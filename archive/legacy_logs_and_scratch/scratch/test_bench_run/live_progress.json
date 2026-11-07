@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-11-02T18:53:27.982864",
+  "ablation_arm": "full",
+  "current_k": 1,
+  "repetitions_K": 1,
+  "current_ep_idx": 2,
+  "total_episodes": 2,
+  "completed_runs": 2,
+  "total_runs": 2,
+  "percent_complete": 100.0,
+  "running_sr_percent": 50.0,
+  "running_spl_percent": 50.0,
+  "elapsed_minutes": 0.0,
+  "eta_minutes": 0.0,
+  "last_run": {
+    "key": "k0_epr2r_ce_val_unseen_0002",
+    "episode_id": "r2r_ce_val_unseen_0002",
+    "success": false,
+    "spl": 0.0,
+    "ne_m": 3.13,
+    "failure_category": "stop_premature"
+  }
+}

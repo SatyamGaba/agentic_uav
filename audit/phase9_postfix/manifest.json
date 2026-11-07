@@ -1,0 +1,70 @@
+{
+  "timestamp_utc": "2026-11-06T17:43:59.794437+00:00",
+  "git_revision": "c3e5715f510488e04c69f918ed7157547fd56810",
+  "python": "3.9.23 | packaged by conda-forge | (main, Jun  4 2025, 17:57:12) \n[GCC 13.3.0]",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "habitat_sim_available": true,
+  "model": "qwen3.5:4b",
+  "ollama_base_url": "http://172.25.208.1:11434",
+  "dataset": {
+    "dataset": "R2R-CE",
+    "version": "R2R_VLNCE_v1-3",
+    "split": "val_unseen",
+    "source_file": "/home/krutik/data/datasets/R2R_VLNCE_v1-3/R2R_VLNCE_v1-3/val_unseen/val_unseen.json.gz",
+    "source_sha256": "d173d8028537f30ab652dc5d24ead737e2b6010b6a4599f974351685710d18e8",
+    "selection": "stratified random sample without replacement",
+    "selection_seed": 42,
+    "scene_quotas": {
+      "EU6Fwq7SyZv": 7,
+      "oLBMNvg9in8": 7,
+      "pLe4wQe7qrG": 3
+    },
+    "available_scene_ids": [
+      "EU6Fwq7SyZv",
+      "JF19kD82Mey",
+      "gZ6f7yhEvPG",
+      "oLBMNvg9in8",
+      "pLe4wQe7qrG",
+      "sT4fr6TAbpF"
+    ],
+    "note": "Subset of the official 1,839-episode R2R-CE val_unseen split. Only episodes whose Matterport3D scene is locally available are used."
+  },
+  "episode_ids": [
+    "r2r_ce_val_unseen_0110",
+    "r2r_ce_val_unseen_0111",
+    "r2r_ce_val_unseen_0202",
+    "r2r_ce_val_unseen_0348",
+    "r2r_ce_val_unseen_0389",
+    "r2r_ce_val_unseen_0414",
+    "r2r_ce_val_unseen_0437",
+    "r2r_ce_val_unseen_0444",
+    "r2r_ce_val_unseen_0637",
+    "r2r_ce_val_unseen_0681",
+    "r2r_ce_val_unseen_0764",
+    "r2r_ce_val_unseen_1342",
+    "r2r_ce_val_unseen_1483",
+    "r2r_ce_val_unseen_1484",
+    "r2r_ce_val_unseen_1547",
+    "r2r_ce_val_unseen_1673",
+    "r2r_ce_val_unseen_1833"
+  ],
+  "config": {
+    "max_simulator_actions": 25,
+    "max_evidence_queries_per_step": 4,
+    "max_consecutive_reselects": 5,
+    "max_malformed_calls_per_step": 3,
+    "success_distance_m": 3.0,
+    "temperature": 0.0,
+    "inference_seed": 42,
+    "thinking": false
+  },
+  "source_hashes": {
+    "executor": "6ac29bfbcf9a10b182e2bab9ebb2701b3add73fcdef224a83c01b5006d68bb44",
+    "step_loop": "f72fba7573039cc1cf632bdbc0b668d3c3655fe1c2ae84c7f25d40a1e323c86d",
+    "runner": "d383adc69efb9778e336cde97e5c0cae9dab3eba53c3aaac93909fc415435d6b",
+    "prompts": "8d4ea15d079e7df5617e936f083f04d5ff079912cd541de4345e00ed24230a67",
+    "failure_classifier": "16469ce99224846b59b7fe2ecc03332d3974562e12fe3e2bc1719ef14bfe5206",
+    "config": "e46f8416dacc5715f205d2e622298bf1c90fce162196266efdebee9b7eaf9a32",
+    "vlm_client": "4da00939d9ddc5f1ba68790ca42447eb04b9e9df4f04ba6abc459591372a37f4"
+  }
+}

@@ -1,0 +1,1028 @@
+{
+  "metadata": {
+    "dataset": "R2R-CE",
+    "version": "R2R_VLNCE_v1-3",
+    "split": "val_unseen",
+    "source_file": "/home/krutik/data/datasets/R2R_VLNCE_v1-3/R2R_VLNCE_v1-3/val_unseen/val_unseen.json.gz",
+    "source_sha256": "d173d8028537f30ab652dc5d24ead737e2b6010b6a4599f974351685710d18e8",
+    "selection": "stratified random sample without replacement",
+    "selection_seed": 42,
+    "scene_quotas": {
+      "EU6Fwq7SyZv": 7,
+      "oLBMNvg9in8": 7,
+      "pLe4wQe7qrG": 3
+    },
+    "available_scene_ids": [
+      "EU6Fwq7SyZv",
+      "JF19kD82Mey",
+      "gZ6f7yhEvPG",
+      "oLBMNvg9in8",
+      "pLe4wQe7qrG",
+      "sT4fr6TAbpF"
+    ],
+    "note": "Subset of the official 1,839-episode R2R-CE val_unseen split. Only episodes whose Matterport3D scene is locally available are used."
+  },
+  "episodes": [
+    {
+      "episode_id": "r2r_ce_val_unseen_0110",
+      "original_episode_id": 110,
+      "trajectory_id": 384,
+      "scene_id": "oLBMNvg9in8",
+      "source_scene_id": "mp3d/oLBMNvg9in8/oLBMNvg9in8.glb",
+      "instruction": "Walk down stairs.  Walk down second set of stairs. stop at doorway.",
+      "start_position": [
+        -0.028195099905133247,
+        6.076022624969482,
+        0.6258389949798584
+      ],
+      "start_rotation": [
+        -0.0,
+        0.7071067811865475,
+        0.0,
+        0.7071067811865476
+      ],
+      "goal_position": [
+        -2.899660110473633,
+        1.8099963665008545,
+        0.5650439858436584
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 8.494880676269531,
+      "reference_path": [
+        [
+          -0.028195099905133247,
+          6.076022624969482,
+          0.6258389949798584
+        ],
+        [
+          -1.4758100509643555,
+          5.587279796600342,
+          0.7573310136795044
+        ],
+        [
+          -2.9938900470733643,
+          4.655344486236572,
+          0.24299000203609467
+        ],
+        [
+          -1.3050899505615234,
+          3.641975164413452,
+          -0.31452101469039917
+        ],
+        [
+          -0.02547769993543625,
+          3.009996175765991,
+          0.16229799389839172
+        ],
+        [
+          -1.9966200590133667,
+          2.29975962638855,
+          0.7608219981193542
+        ],
+        [
+          -2.899660110473633,
+          1.8099963665008545,
+          0.5650439858436584
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0111",
+      "original_episode_id": 111,
+      "trajectory_id": 384,
+      "scene_id": "oLBMNvg9in8",
+      "source_scene_id": "mp3d/oLBMNvg9in8/oLBMNvg9in8.glb",
+      "instruction": "Go down the stairs to the next floor. On the next floor take another right and go down the first section of stairs and stop on the landing in front of the room with the radiator visible.",
+      "start_position": [
+        -0.028195099905133247,
+        6.076022624969482,
+        0.6258389949798584
+      ],
+      "start_rotation": [
+        -0.0,
+        0.7071067811865475,
+        0.0,
+        0.7071067811865476
+      ],
+      "goal_position": [
+        -2.899660110473633,
+        1.8099963665008545,
+        0.5650439858436584
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 8.494880676269531,
+      "reference_path": [
+        [
+          -0.028195099905133247,
+          6.076022624969482,
+          0.6258389949798584
+        ],
+        [
+          -1.4758100509643555,
+          5.587279796600342,
+          0.7573310136795044
+        ],
+        [
+          -2.9938900470733643,
+          4.655344486236572,
+          0.24299000203609467
+        ],
+        [
+          -1.3050899505615234,
+          3.641975164413452,
+          -0.31452101469039917
+        ],
+        [
+          -0.02547769993543625,
+          3.009996175765991,
+          0.16229799389839172
+        ],
+        [
+          -1.9966200590133667,
+          2.29975962638855,
+          0.7608219981193542
+        ],
+        [
+          -2.899660110473633,
+          1.8099963665008545,
+          0.5650439858436584
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0202",
+      "original_episode_id": 202,
+      "trajectory_id": 810,
+      "scene_id": "EU6Fwq7SyZv",
+      "source_scene_id": "mp3d/EU6Fwq7SyZv/EU6Fwq7SyZv.glb",
+      "instruction": "Make a left at the end of the bed. Walk to the banister. Walk to the bottom of the stairs to the left of this point. Make a right and move to the panoramic checker doors.",
+      "start_position": [
+        -1.0733000040054321,
+        3.6180613040924072,
+        6.670690059661865
+      ],
+      "start_rotation": [
+        -0.0,
+        0.49999999999999983,
+        0.0,
+        0.8660254037844387
+      ],
+      "goal_position": [
+        3.352720022201538,
+        0.018061161041259766,
+        1.594849944114685
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 11.12297248840332,
+      "reference_path": [
+        [
+          -1.0733000040054321,
+          3.6180613040924072,
+          6.670690059661865
+        ],
+        [
+          -0.4661020040512085,
+          3.6180613040924072,
+          7.627699851989746
+        ],
+        [
+          1.7788499593734741,
+          3.6180613040924072,
+          8.126489639282227
+        ],
+        [
+          1.839750051498413,
+          3.0015664100646973,
+          6.6598801612854
+        ],
+        [
+          1.8436000347137451,
+          1.780763030052185,
+          5.152299880981445
+        ],
+        [
+          1.7635400295257568,
+          0.7309625744819641,
+          3.8554399013519287
+        ],
+        [
+          3.352720022201538,
+          0.018061161041259766,
+          1.594849944114685
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0348",
+      "original_episode_id": 348,
+      "trajectory_id": 1345,
+      "scene_id": "EU6Fwq7SyZv",
+      "source_scene_id": "mp3d/EU6Fwq7SyZv/EU6Fwq7SyZv.glb",
+      "instruction": "Go up the stairs and take a left. Walk towards the couch and chairs in the sitting area. Walk through the sitting area and stop in front of the first door to the balcony on your left.",
+      "start_position": [
+        -0.9050229787826538,
+        -1.214440107345581,
+        9.788660049438477
+      ],
+      "start_rotation": [
+        -0.0,
+        0.8660254037844385,
+        -0.0,
+        -0.5000000000000002
+      ],
+      "goal_position": [
+        3.352720022201538,
+        0.018061161041259766,
+        1.594849944114685
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 11.22248649597168,
+      "reference_path": [
+        [
+          -0.9050229787826538,
+          -1.214440107345581,
+          9.788660049438477
+        ],
+        [
+          0.12950299680233002,
+          -0.6060321927070618,
+          9.819129943847656
+        ],
+        [
+          1.7519199848175049,
+          0.09474099427461624,
+          9.418530464172363
+        ],
+        [
+          3.5328099727630615,
+          0.12173577398061752,
+          5.949250221252441
+        ],
+        [
+          3.6060099601745605,
+          0.16623695194721222,
+          4.208889961242676
+        ],
+        [
+          3.352720022201538,
+          0.018061161041259766,
+          1.594849944114685
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0389",
+      "original_episode_id": 389,
+      "trajectory_id": 1567,
+      "scene_id": "EU6Fwq7SyZv",
+      "source_scene_id": "mp3d/EU6Fwq7SyZv/EU6Fwq7SyZv.glb",
+      "instruction": "Walk next to the first white chair on its right side, walk straight towards the older floral chair, take a right towards the stairs and stop.",
+      "start_position": [
+        4.898630142211914,
+        0.018061161041259766,
+        1.4939299821853638
+      ],
+      "start_rotation": [
+        -0.0,
+        0.7071067811865476,
+        -0.0,
+        -0.7071067811865475
+      ],
+      "goal_position": [
+        1.7459499835968018,
+        0.044711098074913025,
+        8.031970024108887
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 7.706804275512695,
+      "reference_path": [
+        [
+          4.898630142211914,
+          0.018061161041259766,
+          1.4939299821853638
+        ],
+        [
+          3.2838799953460693,
+          0.04100741818547249,
+          2.9237799644470215
+        ],
+        [
+          3.6060099601745605,
+          0.16623695194721222,
+          4.208889961242676
+        ],
+        [
+          3.5328099727630615,
+          0.12173577398061752,
+          5.949250221252441
+        ],
+        [
+          1.7459499835968018,
+          0.044711098074913025,
+          8.031970024108887
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0414",
+      "original_episode_id": 414,
+      "trajectory_id": 1654,
+      "scene_id": "pLe4wQe7qrG",
+      "source_scene_id": "mp3d/pLe4wQe7qrG/pLe4wQe7qrG.glb",
+      "instruction": "Walk down the aisle to your right, and walk forward. Take the first right and stop between the first two pillars.",
+      "start_position": [
+        4.564879894256592,
+        0.07521799951791763,
+        -2.0490400791168213
+      ],
+      "start_rotation": [
+        -0.0,
+        0.7071067811865475,
+        0.0,
+        0.7071067811865476
+      ],
+      "goal_position": [
+        1.37214994430542,
+        0.07521799951791763,
+        -0.12002599984407425
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 4.52250337600708,
+      "reference_path": [
+        [
+          4.564879894256592,
+          0.07521799951791763,
+          -2.0490400791168213
+        ],
+        [
+          3.250969886779785,
+          0.07521799951791763,
+          -2.1264100074768066
+        ],
+        [
+          2.467989921569824,
+          0.07521799951791763,
+          -2.042030096054077
+        ],
+        [
+          2.4118900299072266,
+          0.07521799951791763,
+          -0.09141170233488083
+        ],
+        [
+          1.37214994430542,
+          0.07521799951791763,
+          -0.12002599984407425
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0437",
+      "original_episode_id": 437,
+      "trajectory_id": 1716,
+      "scene_id": "oLBMNvg9in8",
+      "source_scene_id": "mp3d/oLBMNvg9in8/oLBMNvg9in8.glb",
+      "instruction": "Go down the stairs. Once down the stairs go forward down the hall, and take the first left into the dining room. Stop on the rug between the credenza, and the door frame.",
+      "start_position": [
+        -1.9966200590133667,
+        2.29975962638855,
+        0.7608219981193542
+      ],
+      "start_rotation": [
+        -0.0,
+        1.0,
+        0.0,
+        6.123233995736766e-17
+      ],
+      "goal_position": [
+        2.168910026550293,
+        0.009996175765991211,
+        -1.1104999780654907
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 6.762453079223633,
+      "reference_path": [
+        [
+          -1.9966200590133667,
+          2.29975962638855,
+          0.7608219981193542
+        ],
+        [
+          -2.899660110473633,
+          1.8099963665008545,
+          0.5650439858436584
+        ],
+        [
+          -2.8018898963928223,
+          1.8121471405029297,
+          -0.250230997800827
+        ],
+        [
+          -0.8512570261955261,
+          0.6106142401695251,
+          -0.22932100296020508
+        ],
+        [
+          0.11870399862527847,
+          0.058393243700265884,
+          0.1747169941663742
+        ],
+        [
+          1.41048002243042,
+          0.009996175765991211,
+          0.4961029887199402
+        ],
+        [
+          2.168910026550293,
+          0.009996175765991211,
+          -1.1104999780654907
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0444",
+      "original_episode_id": 444,
+      "trajectory_id": 1775,
+      "scene_id": "EU6Fwq7SyZv",
+      "source_scene_id": "mp3d/EU6Fwq7SyZv/EU6Fwq7SyZv.glb",
+      "instruction": "Turn right and walk towards the living room area. Walk towards the fireplace and wait by the stool and table.",
+      "start_position": [
+        -1.7239899635314941,
+        0.018061161041259766,
+        2.410949945449829
+      ],
+      "start_rotation": [
+        -0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        8.546409606933594,
+        0.21806097030639648,
+        3.6844799518585205
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 11.29076862335205,
+      "reference_path": [
+        [
+          -1.7239899635314941,
+          0.018061161041259766,
+          2.410949945449829
+        ],
+        [
+          0.1756249964237213,
+          0.018061161041259766,
+          0.7117030024528503
+        ],
+        [
+          1.6530699729919434,
+          0.03596791625022888,
+          1.2204099893569946
+        ],
+        [
+          3.352720022201538,
+          0.018061161041259766,
+          1.594849944114685
+        ],
+        [
+          4.898630142211914,
+          0.018061161041259766,
+          1.4939299821853638
+        ],
+        [
+          8.546409606933594,
+          0.21806097030639648,
+          3.6844799518585205
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0637",
+      "original_episode_id": 637,
+      "trajectory_id": 2658,
+      "scene_id": "EU6Fwq7SyZv",
+      "source_scene_id": "mp3d/EU6Fwq7SyZv/EU6Fwq7SyZv.glb",
+      "instruction": "Continue down the wood staircase, turn right at the bottom and walk behind the two chairs toward the pool table. Turn right at the pool table and stop in front of the red chair with a brown leather foot stool.",
+      "start_position": [
+        1.839750051498413,
+        3.0015664100646973,
+        6.6598801612854
+      ],
+      "start_rotation": [
+        -0.0,
+        1.0,
+        0.0,
+        6.123233995736766e-17
+      ],
+      "goal_position": [
+        8.546409606933594,
+        0.21806097030639648,
+        3.6844799518585205
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 11.711601257324219,
+      "reference_path": [
+        [
+          1.839750051498413,
+          3.0015664100646973,
+          6.6598801612854
+        ],
+        [
+          1.8436000347137451,
+          1.780763030052185,
+          5.152299880981445
+        ],
+        [
+          1.7635400295257568,
+          0.7309625744819641,
+          3.8554399013519287
+        ],
+        [
+          3.352720022201538,
+          0.018061161041259766,
+          1.594849944114685
+        ],
+        [
+          4.898630142211914,
+          0.018061161041259766,
+          1.4939299821853638
+        ],
+        [
+          8.546409606933594,
+          0.21806097030639648,
+          3.6844799518585205
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0681",
+      "original_episode_id": 681,
+      "trajectory_id": 2777,
+      "scene_id": "EU6Fwq7SyZv",
+      "source_scene_id": "mp3d/EU6Fwq7SyZv/EU6Fwq7SyZv.glb",
+      "instruction": "Walk across the large room to the stairs. Wait under the stairs that lead downstairs.",
+      "start_position": [
+        11.572799682617188,
+        0.018061161041259766,
+        8.038370132446289
+      ],
+      "start_rotation": [
+        -0.0,
+        1.0,
+        0.0,
+        6.123233995736766e-17
+      ],
+      "goal_position": [
+        1.7459499835968018,
+        0.044711098074913025,
+        8.031970024108887
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 9.872648239135742,
+      "reference_path": [
+        [
+          11.572799682617188,
+          0.018061161041259766,
+          8.038370132446289
+        ],
+        [
+          9.428110122680664,
+          0.018061161041259766,
+          8.412870407104492
+        ],
+        [
+          7.775400161743164,
+          0.06606321036815643,
+          8.427889823913574
+        ],
+        [
+          6.092879772186279,
+          0.018061161041259766,
+          8.393610000610352
+        ],
+        [
+          4.631959915161133,
+          0.018061161041259766,
+          8.365900039672852
+        ],
+        [
+          3.159980058670044,
+          0.018061161041259766,
+          8.25706958770752
+        ],
+        [
+          1.7459499835968018,
+          0.044711098074913025,
+          8.031970024108887
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0764",
+      "original_episode_id": 764,
+      "trajectory_id": 3149,
+      "scene_id": "EU6Fwq7SyZv",
+      "source_scene_id": "mp3d/EU6Fwq7SyZv/EU6Fwq7SyZv.glb",
+      "instruction": "walk across living room behind couch to pool table. Stop at pool table.",
+      "start_position": [
+        1.7150399684906006,
+        0.018061161041259766,
+        2.549030065536499
+      ],
+      "start_rotation": [
+        -0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        7.799039840698242,
+        0.018061161041259766,
+        0.8808019757270813
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 6.308568477630615,
+      "reference_path": [
+        [
+          1.7150399684906006,
+          0.018061161041259766,
+          2.549030065536499
+        ],
+        [
+          3.352720022201538,
+          0.018061161041259766,
+          1.594849944114685
+        ],
+        [
+          4.898630142211914,
+          0.018061161041259766,
+          1.4939299821853638
+        ],
+        [
+          6.3001298904418945,
+          0.018061161041259766,
+          1.3675600290298462
+        ],
+        [
+          7.799039840698242,
+          0.018061161041259766,
+          0.8808019757270813
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_1342",
+      "original_episode_id": 1342,
+      "trajectory_id": 5246,
+      "scene_id": "oLBMNvg9in8",
+      "source_scene_id": "mp3d/oLBMNvg9in8/oLBMNvg9in8.glb",
+      "instruction": "Head down first flight of stairs and at landing turn right to go down next second flight of stairs. At landing of second flight of stairs veer to the right and turn right into first door way. Stop just inside of doorway.",
+      "start_position": [
+        -0.02547769993543625,
+        3.009996175765991,
+        0.16229799389839172
+      ],
+      "start_rotation": [
+        -0.0,
+        0.258819045102521,
+        -0.0,
+        -0.9659258262890682
+      ],
+      "goal_position": [
+        1.624169945716858,
+        0.009996175765991211,
+        1.653439998626709
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 8.715005874633789,
+      "reference_path": [
+        [
+          -0.02547769993543625,
+          3.009996175765991,
+          0.16229799389839172
+        ],
+        [
+          -1.9966200590133667,
+          2.29975962638855,
+          0.7608219981193542
+        ],
+        [
+          -2.899660110473633,
+          1.8099963665008545,
+          0.5650439858436584
+        ],
+        [
+          -2.8018898963928223,
+          1.8121471405029297,
+          -0.250230997800827
+        ],
+        [
+          -0.8512570261955261,
+          0.6106142401695251,
+          -0.22932100296020508
+        ],
+        [
+          0.11870399862527847,
+          0.058393243700265884,
+          0.1747169941663742
+        ],
+        [
+          1.624169945716858,
+          0.009996175765991211,
+          1.653439998626709
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_1483",
+      "original_episode_id": 1483,
+      "trajectory_id": 5873,
+      "scene_id": "pLe4wQe7qrG",
+      "source_scene_id": "mp3d/pLe4wQe7qrG/pLe4wQe7qrG.glb",
+      "instruction": "Turn around and walk along the wooden hallway.Wait the the wooden doorway.",
+      "start_position": [
+        2.4795100688934326,
+        0.07521799951791763,
+        2.233870029449463
+      ],
+      "start_rotation": [
+        -0.0,
+        0.49999999999999983,
+        0.0,
+        0.8660254037844387
+      ],
+      "goal_position": [
+        8.517580032348633,
+        0.07521799951791763,
+        -0.14364999532699585
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 6.819198131561279,
+      "reference_path": [
+        [
+          2.4795100688934326,
+          0.07521799951791763,
+          2.233870029449463
+        ],
+        [
+          3.6215600967407227,
+          0.07521799951791763,
+          2.1024200916290283
+        ],
+        [
+          4.7978901863098145,
+          0.07521799951791763,
+          2.051719903945923
+        ],
+        [
+          5.965390205383301,
+          0.07521799951791763,
+          2.0332300662994385
+        ],
+        [
+          6.895890235900879,
+          0.07521799951791763,
+          1.0786399841308594
+        ],
+        [
+          8.517580032348633,
+          0.07521799951791763,
+          -0.14364999532699585
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_1484",
+      "original_episode_id": 1484,
+      "trajectory_id": 5873,
+      "scene_id": "pLe4wQe7qrG",
+      "source_scene_id": "mp3d/pLe4wQe7qrG/pLe4wQe7qrG.glb",
+      "instruction": "With the low stone or concrete barrier behind you, walk parallel to the board covering the floor and turn left before reaching the end. Move forward to leave the wooden flooring and when on the stone flooring, turn right and stand in front of the doors leading out of the room.",
+      "start_position": [
+        2.4795100688934326,
+        0.07521799951791763,
+        2.233870029449463
+      ],
+      "start_rotation": [
+        -0.0,
+        0.49999999999999983,
+        0.0,
+        0.8660254037844387
+      ],
+      "goal_position": [
+        8.517580032348633,
+        0.07521799951791763,
+        -0.14364999532699585
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 6.819198131561279,
+      "reference_path": [
+        [
+          2.4795100688934326,
+          0.07521799951791763,
+          2.233870029449463
+        ],
+        [
+          3.6215600967407227,
+          0.07521799951791763,
+          2.1024200916290283
+        ],
+        [
+          4.7978901863098145,
+          0.07521799951791763,
+          2.051719903945923
+        ],
+        [
+          5.965390205383301,
+          0.07521799951791763,
+          2.0332300662994385
+        ],
+        [
+          6.895890235900879,
+          0.07521799951791763,
+          1.0786399841308594
+        ],
+        [
+          8.517580032348633,
+          0.07521799951791763,
+          -0.14364999532699585
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_1547",
+      "original_episode_id": 1547,
+      "trajectory_id": 6068,
+      "scene_id": "oLBMNvg9in8",
+      "source_scene_id": "mp3d/oLBMNvg9in8/oLBMNvg9in8.glb",
+      "instruction": "Go past the pillars and turn left. Exit the room and  turn left to go downstairs. Stop halfway down the stairs.",
+      "start_position": [
+        -3.0204899311065674,
+        0.009996175765991211,
+        4.515500068664551
+      ],
+      "start_rotation": [
+        -0.0,
+        0.7071067811865476,
+        -0.0,
+        -0.7071067811865475
+      ],
+      "goal_position": [
+        -1.9272899627685547,
+        -0.08229398727416992,
+        0.600820004940033
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 9.431220054626465,
+      "reference_path": [
+        [
+          -3.0204899311065674,
+          0.009996175765991211,
+          4.515500068664551
+        ],
+        [
+          -0.1433980017900467,
+          0.009996175765991211,
+          3.802229881286621
+        ],
+        [
+          1.570680022239685,
+          0.009996175765991211,
+          3.4537899494171143
+        ],
+        [
+          1.624169945716858,
+          0.009996175765991211,
+          1.653439998626709
+        ],
+        [
+          0.11870399862527847,
+          0.058393243700265884,
+          0.1747169941663742
+        ],
+        [
+          -0.9444180130958557,
+          0.09279800206422806,
+          0.6414679884910583
+        ],
+        [
+          -1.9272899627685547,
+          -0.08229398727416992,
+          0.600820004940033
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_1673",
+      "original_episode_id": 1673,
+      "trajectory_id": 6649,
+      "scene_id": "oLBMNvg9in8",
+      "source_scene_id": "mp3d/oLBMNvg9in8/oLBMNvg9in8.glb",
+      "instruction": "Continue up the stairs and wait atop the red door mat in front of the door with the black handle on the right.",
+      "start_position": [
+        -1.9272899627685547,
+        -0.08229398727416992,
+        0.600820004940033
+      ],
+      "start_rotation": [
+        -0.0,
+        0.8660254037844387,
+        0.0,
+        0.4999999999999999
+      ],
+      "goal_position": [
+        -2.899660110473633,
+        1.8099963665008545,
+        0.5650439858436584
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 5.3430304527282715,
+      "reference_path": [
+        [
+          -1.9272899627685547,
+          -0.08229398727416992,
+          0.600820004940033
+        ],
+        [
+          -0.9444180130958557,
+          0.09279800206422806,
+          0.6414679884910583
+        ],
+        [
+          0.11870399862527847,
+          0.058393243700265884,
+          0.1747169941663742
+        ],
+        [
+          -0.8512570261955261,
+          0.6106142401695251,
+          -0.22932100296020508
+        ],
+        [
+          -2.8018898963928223,
+          1.8121471405029297,
+          -0.250230997800827
+        ],
+        [
+          -2.899660110473633,
+          1.8099963665008545,
+          0.5650439858436584
+        ]
+      ]
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_1833",
+      "original_episode_id": 1833,
+      "trajectory_id": 7295,
+      "scene_id": "oLBMNvg9in8",
+      "source_scene_id": "mp3d/oLBMNvg9in8/oLBMNvg9in8.glb",
+      "instruction": "Go out the second door on the left. Turn right and go down the stairs. Wait on the third step to the bottom.",
+      "start_position": [
+        3.0406200885772705,
+        0.10021285712718964,
+        -3.9201700687408447
+      ],
+      "start_rotation": [
+        -0.0,
+        0.9659258262890682,
+        0.0,
+        0.25881904510252096
+      ],
+      "goal_position": [
+        -1.9272899627685547,
+        -0.08229398727416992,
+        0.600820004940033
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 7.125628471374512,
+      "reference_path": [
+        [
+          3.0406200885772705,
+          0.10021285712718964,
+          -3.9201700687408447
+        ],
+        [
+          0.44042500853538513,
+          0.052977267652750015,
+          -1.3784500360488892
+        ],
+        [
+          0.11870399862527847,
+          0.058393243700265884,
+          0.1747169941663742
+        ],
+        [
+          -0.9444180130958557,
+          0.09279800206422806,
+          0.6414679884910583
+        ],
+        [
+          -1.9272899627685547,
+          -0.08229398727416992,
+          0.600820004940033
+        ]
+      ]
+    }
+  ]
+}

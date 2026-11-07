@@ -1,0 +1,14 @@
+{
+  "check": "G1.3",
+  "topology": "Windows Ollama server (GPU native), WSL client via NAT adapter IP",
+  "host_ip": "172.25.208.1",
+  "endpoint": "http://172.25.208.1:11434/api/tags",
+  "latency_seconds": 0.1938,
+  "models_accessible_from_wsl": [
+    "moondream:latest",
+    "lukey03/qwen3.5-9b-abliterated:32k",
+    "lukey03/qwen3.5-9b-abliterated:latest",
+    "qwen3.5:latest"
+  ],
+  "status": "PASS"
+}

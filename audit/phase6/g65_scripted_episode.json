@@ -1,0 +1,10 @@
+{
+  "check": "G6.4 & G6.5",
+  "episode_id": "g65_scripted_ep",
+  "success": true,
+  "failure_category": null,
+  "trajectory_length_m": 0.75,
+  "spl": 1.0,
+  "navigation_error_m": 0.75,
+  "status": "PASS"
+}

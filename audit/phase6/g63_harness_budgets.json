@@ -1,0 +1,9 @@
+{
+  "check": "G6.3",
+  "max_evidence_budget": 4,
+  "evidence_query_count_observed": 4,
+  "evidence_budget_enforced": true,
+  "max_consecutive_reselects_limit": 5,
+  "max_malformed_calls_limit": 3,
+  "status": "PASS"
+}

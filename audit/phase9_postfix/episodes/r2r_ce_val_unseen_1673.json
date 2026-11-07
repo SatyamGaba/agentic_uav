@@ -1,0 +1,32 @@
+{
+  "episode_id": "r2r_ce_val_unseen_1673",
+  "scene_id": "oLBMNvg9in8",
+  "instruction": "Continue up the stairs and wait atop the red door mat in front of the door with the black handle on the right.",
+  "model": "qwen3.5:4b",
+  "called_stop": false,
+  "terminated_deadlock": true,
+  "terminated_protocol_violation": false,
+  "total_steps": 2,
+  "arrival_verification_steps": 1,
+  "failure_category": "safety_deadlock",
+  "metrics": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 5.257543563842773,
+    "trajectory_length_m": 1.8207964344079208,
+    "simulator_action_count": 7
+  },
+  "metrics_dataclass": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 5.257543563842773,
+    "trajectory_length_m": 1.8207964344079208,
+    "shortest_path_distance_m": 5.3430304527282715,
+    "total_steps": 8,
+    "simulator_action_count": 7
+  },
+  "shortest_path_distance_m": 5.3430304527282715,
+  "goal_radius_m": 3.0
+}

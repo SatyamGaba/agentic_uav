@@ -1,0 +1,16 @@
+{
+  "check": "G5.3",
+  "agent_origin": [
+    0.0,
+    0.0
+  ],
+  "obstacle_target": [
+    0.0,
+    -3.0
+  ],
+  "intermediate_cell_free_255": true,
+  "intermediate_cell_log_odds": -0.8109,
+  "endpoint_cell_occupied_0": true,
+  "endpoint_cell_log_odds": 1.6946,
+  "status": "PASS"
+}

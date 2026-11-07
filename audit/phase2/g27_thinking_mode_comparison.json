@@ -1,0 +1,23 @@
+{
+  "check": "G2.7",
+  "model": "qwen3.5:4b",
+  "comparison": {
+    "think_on": {
+      "mean_latency_s": 42.5,
+      "mean_eval_tokens": 1650,
+      "est_100_episodes_time_hr": 2.5,
+      "notes": "Burns 1500+ thinking tokens per turn in reasoning loop, causes timeouts on coordinate tasks"
+    },
+    "think_off": {
+      "mean_latency_s": 0.89,
+      "mean_eval_tokens": 15,
+      "est_100_episodes_time_min": 14.8,
+      "api_parameter": {
+        "think": false
+      },
+      "notes": "25x speedup, 98% token reduction, 100% parsing success, exact JSON output"
+    }
+  },
+  "harness_decision": "THINK_OFF_ENFORCED (pass think: false in Ollama payload)",
+  "status": "PASS"
+}

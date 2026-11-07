@@ -1,0 +1,10 @@
+{
+  "check": "G4.6 & G4.7",
+  "camera_mount_height_m": 1.25,
+  "floor_mask_pixels": 9600,
+  "floor_y_mean_m": -0.076,
+  "floor_y_std_m": 0.11,
+  "floor_plane_at_datum": true,
+  "coordinate_convention": "Right-handed (X right, Y up, -Z camera forward)",
+  "status": "PASS"
+}

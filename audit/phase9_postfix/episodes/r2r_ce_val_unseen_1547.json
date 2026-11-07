@@ -1,0 +1,32 @@
+{
+  "episode_id": "r2r_ce_val_unseen_1547",
+  "scene_id": "oLBMNvg9in8",
+  "instruction": "Go past the pillars and turn left. Exit the room and  turn left to go downstairs. Stop halfway down the stairs.",
+  "model": "qwen3.5:4b",
+  "called_stop": false,
+  "terminated_deadlock": false,
+  "terminated_protocol_violation": false,
+  "total_steps": 3,
+  "arrival_verification_steps": 0,
+  "failure_category": "budget_exceeded",
+  "metrics": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 7.062082290649414,
+    "trajectory_length_m": 6.570796326794897,
+    "simulator_action_count": 26
+  },
+  "metrics_dataclass": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 7.062082290649414,
+    "trajectory_length_m": 6.570796326794897,
+    "shortest_path_distance_m": 9.431220054626465,
+    "total_steps": 27,
+    "simulator_action_count": 26
+  },
+  "shortest_path_distance_m": 9.431220054626465,
+  "goal_radius_m": 3.0
+}

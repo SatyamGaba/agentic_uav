@@ -1,0 +1,10 @@
+{
+  "check": "G6.2",
+  "quantized_rho_m": 1.25,
+  "quantized_theta_deg": 0.0,
+  "quantization_verified": true,
+  "corridor_blocked_detected": true,
+  "corridor_clear_detected": true,
+  "corridor_verified": true,
+  "status": "PASS"
+}

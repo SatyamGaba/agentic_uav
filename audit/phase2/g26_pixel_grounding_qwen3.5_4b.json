@@ -1,0 +1,12 @@
+{
+  "check": "G2.6",
+  "model": "qwen3.5:4b",
+  "num_samples": 50,
+  "mean_latency_s": 0.887,
+  "median_error_px": 29.84,
+  "median_error_pct_of_width": 4.66,
+  "p90_error_px": 60.89,
+  "p90_error_pct_of_width": 9.51,
+  "coordinate_convention": "Normalized [0.0, 1.0] floating point with (0,0) top-left",
+  "status": "PASS"
+}

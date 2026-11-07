@@ -1,0 +1,247 @@
+"""Tool execution layer for AgenticNav (v7 Specification)."""
+
+import json
+import math
+from typing import Any, Dict, List, Optional, Tuple, Union
+import numpy as np
+
+from agenticnav_paper_replica.geometry.pinhole import (
+    CameraConfig,
+    deproject_pixel,
+    camera_to_agent_frame,
+    estimate_corridor_surface_slope,
+    compute_effective_margin,
+    extract_depth_patch,
+    normalize_to_pixel,
+    convert_raw_depth,
+)
+from agenticnav_paper_replica.geometry.safety_region import (
+    GroundCorridorChecker,
+    SafetyCheckResult,
+)
+from agenticnav_paper_replica.memory.image_cache import EpisodicImageCache, RecallResult
+
+
+class ToolExecutor:
+    """Dispatches and validates AgenticNav tool calls against active sensor frames."""
+
+    def __init__(
+        self,
+        camera_config: CameraConfig,
+        corridor_checker: GroundCorridorChecker,
+        image_cache: EpisodicImageCache,
+        standoff_mode: str = "fixed",  # "fixed" (default), "slope" (ablation)
+    ):
+        self.config = camera_config
+        self.checker = corridor_checker
+        self.image_cache = image_cache
+        self.standoff_mode = standoff_mode
+
+    def execute_query_depth(
+        self,
+        points: Union[List[Any], Dict[str, Any], str],
+        depth_views: Dict[int, np.ndarray],
+    ) -> Dict[str, Any]:
+        """Execute batched query_depth (Section 5.1).
+
+        Returns center depth and 5x5 statistics in meters for each query point.
+        """
+        # Normalize points input
+        if isinstance(points, str):
+            try:
+                points = json.loads(points)
+            except Exception:
+                points = []
+        if isinstance(points, dict):
+            points = [points]
+        if not isinstance(points, list):
+            points = []
+
+        results = []
+        for pt in points:
+            if isinstance(pt, str):
+                try:
+                    pt = json.loads(pt)
+                except Exception:
+                    # Try regex extraction of view, u, v
+                    import re
+                    args = {}
+                    vm = re.search(r'view[:=\s]+([0-3])', pt, re.I)
+                    if vm: args["view"] = int(vm.group(1))
+                    um = re.search(r'u[:=\s]+([0-9.]+)', pt, re.I)
+                    if um: args["u"] = float(um.group(1))
+                    vm2 = re.search(r'v[:=\s]+([0-9.]+)', pt, re.I)
+                    if vm2: args["v"] = float(vm2.group(1))
+                    pt = args if args else {}
+
+            if not isinstance(pt, dict):
+                continue
+
+            view = int(pt.get("view", 0))
+            u = float(pt.get("u", 0.5))
+            v = float(pt.get("v", 0.5))
+
+            if view not in depth_views:
+                results.append({
+                    "view": view,
+                    "u": round(u, 2),
+                    "v": round(v, 2),
+                    "error": "invalid_depth",
+                })
+                continue
+
+            depth_img = depth_views[view]
+            x0, y0 = normalize_to_pixel(u, v, self.config)
+
+            raw_val = float(depth_img[y0, x0])
+            is_valid, z_center, error_cause = convert_raw_depth(raw_val, self.config)
+            if not is_valid:
+                results.append({
+                    "view": view,
+                    "u": round(u, 2),
+                    "v": round(v, 2),
+                    "error": error_cause or "invalid_depth",
+                })
+                continue
+
+            patch = extract_depth_patch(depth_img, x0, y0, patch_size=5)
+            valid_patch_depths = []
+            for r in range(5):
+                for c in range(5):
+                    pv = float(patch[r, c])
+                    ok, d_met, _ = convert_raw_depth(pv, self.config)
+                    if ok:
+                        valid_patch_depths.append(d_met)
+
+            if len(valid_patch_depths) >= 3:
+                min_m = float(np.min(valid_patch_depths))
+                mean_m = float(np.mean(valid_patch_depths))
+                median_m = float(np.median(valid_patch_depths))
+                results.append({
+                    "view": view,
+                    "u": round(u, 2),
+                    "v": round(v, 2),
+                    "depth_m": round(z_center, 2),
+                    "min_m": round(min_m, 2),
+                    "mean_m": round(mean_m, 2),
+                    "median_m": round(median_m, 2),
+                })
+            else:
+                results.append({
+                    "view": view,
+                    "u": round(u, 2),
+                    "v": round(v, 2),
+                    "depth_m": round(z_center, 2),
+                    "min_m": None,
+                    "mean_m": None,
+                    "median_m": None,
+                    "sparse_patch": True,
+                })
+
+        return {"query_results": results}
+
+    def execute_recall(
+        self,
+        node: int,
+        view: int,
+    ) -> Dict[str, Any]:
+        """Execute recall tool (Section 5.2)."""
+        recall_res: RecallResult = self.image_cache.recall(node, view)
+        if not recall_res.success:
+            return {
+                "status": "error",
+                "message": recall_res.error_message,
+                "node": node,
+                "view": view,
+            }
+
+        return {
+            "status": "success",
+            "node": node,
+            "view": view,
+            "image": recall_res.image,
+        }
+
+    def execute_move_to(
+        self,
+        view: int,
+        u: float,
+        v: float,
+        reason: str,
+        depth_views: Dict[int, np.ndarray],
+        obstacle_points_agent_xz: np.ndarray,
+    ) -> Dict[str, Any]:
+        """Execute move_to tool (Section 5.3)."""
+        if view not in depth_views:
+            return {
+                "status": "reselect",
+                "cause": "invalid_depth",
+            }
+
+        depth_img = depth_views[view]
+        x0, y0 = normalize_to_pixel(u, v, self.config)
+
+        raw_val = float(depth_img[y0, x0])
+        is_valid, z_c, error_cause = convert_raw_depth(raw_val, self.config)
+        if not is_valid:
+            return {
+                "status": "reselect",
+                "cause": error_cause or "invalid_depth",
+            }
+
+        # Step 2: Deproject to camera optical vector and canonical agent frame
+        p_c = deproject_pixel(x0, y0, z_c, self.config, is_normalized=False)
+        p_agent = camera_to_agent_frame(p_c, view, self.config)
+        p_x, p_y, p_z = float(p_agent[0]), float(p_agent[1]), float(p_agent[2])
+
+        # Step 3: Margin mode (fixed by default, slope in corridor frame if ablation on)
+        if self.standoff_mode == "slope":
+            patch = extract_depth_patch(depth_img, x0, y0, patch_size=5)
+            raw_theta_deg = math.degrees(math.atan2(-p_x, -p_z))
+            theta_q_init = 15.0 * round(raw_theta_deg / 15.0)
+            tan_alpha = estimate_corridor_surface_slope(
+                patch, view, x0, y0, theta_q_init, self.config
+            )
+            m_eff = compute_effective_margin(
+                tan_alpha,
+                base_margin=self.checker.base_margin,
+                robot_radius=self.checker.r_a,
+                standoff_mode="slope",
+            )
+        else:
+            m_eff = self.checker.base_margin
+
+        # Step 4, 5, 6: Corridor check and quantization
+        safety_res: SafetyCheckResult = self.checker.evaluate(
+            p_x=p_x,
+            p_z=p_z,
+            obstacles_2d=obstacle_points_agent_xz,
+            m_eff=m_eff,
+        )
+
+        if safety_res.status == "executed":
+            return {
+                "status": "executed",
+                "theta_deg": round(safety_res.quantized_theta_deg, 1),
+                "rho_m": round(safety_res.quantized_rho_m, 2),
+                "moved_m": round(safety_res.quantized_rho_m, 2),
+                "collided": False,
+                "turn_steps": safety_res.turn_steps,
+                "forward_steps": safety_res.forward_steps,
+                "view": view,
+                "u": u,
+                "v": v,
+                "reason": reason,
+            }
+        else:
+            return {
+                "status": "reselect",
+                "cause": safety_res.cause,
+            }
+
+    def execute_stop(self, reason: str) -> Dict[str, Any]:
+        """Execute stop tool (Section 5.4)."""
+        return {
+            "status": "stopped",
+            "reason": reason,
+        }

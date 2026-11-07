@@ -1,0 +1,7 @@
+{
+  "check": "G1.5",
+  "windows_python_version": "3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]",
+  "windows_pip_freeze": "C:\\Users\\Kruti\\Desktop\\PROG\\UAV\\audit\\phase1\\pip_freeze_windows.txt",
+  "wsl_system": "Linux OMEN 6.6.87.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux",
+  "status": "PASS"
+}

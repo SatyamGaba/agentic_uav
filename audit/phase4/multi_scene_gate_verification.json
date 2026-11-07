@@ -1,0 +1,69 @@
+{
+  "timestamp": 1793978133.0302742,
+  "scenes": {
+    "gZ6f7yhEvPG": {
+      "scene_id": "gZ6f7yhEvPG",
+      "g43_loop_closure": {
+        "pass": true,
+        "pos_drift": 0.0,
+        "rot_drift": 0.0
+      },
+      "g44_forward_step": {
+        "pass": true,
+        "actual_disp": 0.25
+      },
+      "g45_continuity": {
+        "pass": true,
+        "mean_diff_px": 0.0013248697916666667
+      },
+      "g46_floor_datum": {
+        "pass": true,
+        "floor_mean_y": -0.07593558213176826
+      },
+      "all_passed": true
+    },
+    "pLe4wQe7qrG": {
+      "scene_id": "pLe4wQe7qrG",
+      "g43_loop_closure": {
+        "pass": true,
+        "pos_drift": 0.0,
+        "rot_drift": 0.0
+      },
+      "g44_forward_step": {
+        "pass": true,
+        "actual_disp": 0.25
+      },
+      "g45_continuity": {
+        "pass": true,
+        "mean_diff_px": 0.0012196180555555556
+      },
+      "g46_floor_datum": {
+        "pass": true,
+        "floor_mean_y": -0.06912775339869161
+      },
+      "all_passed": true
+    },
+    "sT4fr6TAbpF": {
+      "scene_id": "sT4fr6TAbpF",
+      "g43_loop_closure": {
+        "pass": true,
+        "pos_drift": 0.0,
+        "rot_drift": 0.0
+      },
+      "g44_forward_step": {
+        "pass": true,
+        "actual_disp": 0.25
+      },
+      "g45_continuity": {
+        "pass": true,
+        "mean_diff_px": 0.0005143229166666666
+      },
+      "g46_floor_datum": {
+        "pass": true,
+        "floor_mean_y": -0.04824496940729787
+      },
+      "all_passed": true
+    }
+  },
+  "overall_status": "PASS"
+}

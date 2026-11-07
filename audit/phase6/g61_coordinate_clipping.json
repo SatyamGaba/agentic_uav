@@ -1,0 +1,15 @@
+{
+  "check": "G6.1",
+  "clip_min": [
+    0,
+    0
+  ],
+  "clip_max": [
+    639,
+    479
+  ],
+  "clip_pass": true,
+  "roundtrip_error_px": 0.0,
+  "roundtrip_pass": true,
+  "status": "PASS"
+}

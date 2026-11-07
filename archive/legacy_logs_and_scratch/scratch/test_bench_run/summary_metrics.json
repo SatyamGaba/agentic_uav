@@ -1,0 +1,67 @@
+{
+  "timestamp": "20261102_185343",
+  "ablation_arm": "full",
+  "repetitions_K": 1,
+  "num_episodes": 2,
+  "consistency_rule_a": {
+    "overall_replication_pass": true,
+    "sr": {
+      "mean": 50.0,
+      "ci_95": [
+        0.0,
+        100.0
+      ],
+      "target": 76.0,
+      "consistent": true
+    },
+    "spl": {
+      "mean": 50.0,
+      "ci_95": [
+        0.0,
+        100.0
+      ],
+      "target": 66.5,
+      "consistent": true
+    }
+  },
+  "metrics": {
+    "sr": {
+      "mean": 50.0,
+      "ci_95": [
+        0.0,
+        100.0
+      ],
+      "target": 76.0,
+      "consistent": true
+    },
+    "spl": {
+      "mean": 50.0,
+      "ci_95": [
+        0.0,
+        100.0
+      ],
+      "target": 66.5,
+      "consistent": true
+    },
+    "osr": {
+      "mean": 50.0,
+      "ci_95": [
+        0.0,
+        100.0
+      ],
+      "target": 78.0
+    },
+    "ne_m": {
+      "mean": 2.7,
+      "ci_95": [
+        2.27,
+        3.13
+      ],
+      "target": 3.48
+    }
+  },
+  "failure_distribution": {
+    "success": 1,
+    "stop_premature": 1
+  }
+}

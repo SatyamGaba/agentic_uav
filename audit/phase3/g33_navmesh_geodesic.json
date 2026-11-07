@@ -1,0 +1,59 @@
+{
+  "check": "G3.3",
+  "navmesh_path": "/home/krutik/data/scene_datasets/mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.navmesh",
+  "is_loaded": true,
+  "num_pairs_tested": 10,
+  "geodesic_ge_euclidean_count": 10,
+  "off_mesh_point_rejected": true,
+  "sample_queries": [
+    {
+      "pair": 1,
+      "pt1": [
+        1.711,
+        0.181,
+        1.039
+      ],
+      "pt2": [
+        -3.316,
+        0.261,
+        -1.669
+      ],
+      "euclidean_m": 5.711,
+      "geodesic_m": 6.51,
+      "geo_ge_euc": true
+    },
+    {
+      "pair": 2,
+      "pt1": [
+        0.586,
+        0.181,
+        0.055
+      ],
+      "pt2": [
+        -0.487,
+        0.181,
+        0.154
+      ],
+      "euclidean_m": 1.078,
+      "geodesic_m": 1.078,
+      "geo_ge_euc": true
+    },
+    {
+      "pair": 3,
+      "pt1": [
+        0.252,
+        0.181,
+        0.23
+      ],
+      "pt2": [
+        1.85,
+        0.181,
+        0.241
+      ],
+      "euclidean_m": 1.598,
+      "geodesic_m": 1.598,
+      "geo_ge_euc": true
+    }
+  ],
+  "status": "PASS"
+}

@@ -1,0 +1,35 @@
+[
+  {
+    "test_name": "Turn2_LegacyPrompt_DepthFeedback",
+    "tool_name": "move_to",
+    "called_stop": false,
+    "tool_args": {
+      "view": 1,
+      "u": 0.5,
+      "v": 0.5,
+      "reason": "Turn left into the kitchen hallway and proceed towards the counter."
+    },
+    "latency_s": 4.313556671142578
+  },
+  {
+    "test_name": "Turn2_CleanPrompt_DepthFeedback",
+    "tool_name": "move_to",
+    "called_stop": false,
+    "tool_args": {
+      "view": 0,
+      "u": 0.5,
+      "v": 0.6,
+      "reason": "Moving forward along the kitchen hallway towards the counter to complete the navigation goal."
+    },
+    "latency_s": 4.487028121948242
+  },
+  {
+    "test_name": "Turn2_BlockedReselectFeedback",
+    "tool_name": "stop",
+    "called_stop": true,
+    "tool_args": {
+      "reason": "I have reached the kitchen area and am stopped at a counter or wall, which matches the instruction to stop near the counter in the kitchen."
+    },
+    "latency_s": 3.723494529724121
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "episode_id": "r2r_ce_val_unseen_0348",
+  "scene_id": "EU6Fwq7SyZv",
+  "instruction": "Go up the stairs and take a left. Walk towards the couch and chairs in the sitting area. Walk through the sitting area and stop in front of the first door to the balcony on your left.",
+  "model": "qwen3.5:4b",
+  "called_stop": false,
+  "terminated_deadlock": true,
+  "terminated_protocol_violation": false,
+  "total_steps": 1,
+  "arrival_verification_steps": 1,
+  "failure_category": "safety_deadlock",
+  "metrics": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 11.22248649597168,
+    "trajectory_length_m": 0.0,
+    "simulator_action_count": 0
+  },
+  "metrics_dataclass": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 11.22248649597168,
+    "trajectory_length_m": 0.0,
+    "shortest_path_distance_m": 11.22248649597168,
+    "total_steps": 1,
+    "simulator_action_count": 0
+  },
+  "shortest_path_distance_m": 11.22248649597168,
+  "goal_radius_m": 3.0
+}

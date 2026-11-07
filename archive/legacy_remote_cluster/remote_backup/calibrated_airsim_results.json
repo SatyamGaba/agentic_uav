@@ -1,0 +1,24 @@
+{
+  "adapter_name": "CalibratedNavAdapter",
+  "model_name": "qwen3-vl:8b",
+  "environment_name": "AirSimUnrealEnv",
+  "total_episodes": 5,
+  "success_rate_percent": 0.0,
+  "sr_ci_95": [
+    0.0,
+    43.45
+  ],
+  "oracle_success_rate_percent": 0.0,
+  "osr_ci_95": [
+    0.0,
+    43.45
+  ],
+  "mean_navigation_error_m": 29.19,
+  "mean_oracle_ne_m": 27.82,
+  "mean_spl": 0.0,
+  "mean_pred_length_m": 35.55,
+  "mean_gt_length_m": 45.0,
+  "mean_duration_s": 16.58,
+  "mean_steps": 6.0,
+  "timestamp": "2026-10-25T17:10:08.136334+00:00"
+}

@@ -1,0 +1,11 @@
+{
+  "spec/spec_ledger.yaml": "bfce0946f11ae7bd747b14a913e1e722c765aff2e5f674001380857406729a9e",
+  "agenticnav_paper_replica/configs/default_config.py": "e46f8416dacc5715f205d2e622298bf1c90fce162196266efdebee9b7eaf9a32",
+  "agenticnav_paper_replica/harness/prompts.py": "8f643d387e925e3c095a859591b24e39dd8c8e5453388d4645b6719b28629e5e",
+  "agenticnav_paper_replica/harness/runner.py": "6774db81bdd5732ec3721439c9377c29a43f020486e62433055489e639306f50",
+  "agenticnav_paper_replica/harness/step_loop.py": "6720346a13fc2cac40f7ee40ff20378e0e657fc75192d99d3d427650371ca61b",
+  "agenticnav_paper_replica/harness/executor.py": "a1b746a1818329b83258d73f2dab101d850aaf8663aec9e807f71045235e587b",
+  "agenticnav_paper_replica/embodiment/habitat_ground.py": "b82805867adcec0f04de245d77aaca5cbc4f60430edae2e96985576999d66390",
+  "agenticnav_paper_replica/mapping/occupancy_grid.py": "8e739a8a0d28989802adcc9c1fc34f95b36c470753c82eb4f23f79e4bbfff90e",
+  "agenticnav_paper_replica/mapping/bev_renderer.py": "4313dabd629ae769b9d52567d43ceb965313091c3e6d32b525a9fa4e10f630cc"
+}

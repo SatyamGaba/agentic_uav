@@ -1,0 +1,8 @@
+{
+  "check": "G2.3 & G2.4",
+  "model": "qwen3.5:4b",
+  "g23_score": "20/20",
+  "g23_status": "PASS",
+  "g24_blind_score": "5/5",
+  "g24_status": "PASS"
+}

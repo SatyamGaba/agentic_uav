@@ -1,0 +1,7 @@
+{
+  "model": "qwen3.5:4b",
+  "G2.1": "PASS",
+  "G2.2": "PASS",
+  "G2.3_2.4": "PASS",
+  "all_pass": true
+}

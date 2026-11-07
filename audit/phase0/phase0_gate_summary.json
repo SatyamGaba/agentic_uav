@@ -1,0 +1,11 @@
+{
+  "phase": 0,
+  "name": "Source of Truth",
+  "checks": {
+    "G0.1": "PASS",
+    "G0.2": "PASS",
+    "G0.3": "PASS",
+    "G0.4": "PASS"
+  },
+  "gate_closed": true
+}

@@ -1,0 +1,46 @@
+=== 1. NVIDIA-SMI OUTPUT ===
+Thu Oct 22 21:16:19 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.99.02              Driver Version: 595.99.02      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA L40S                    Off |   00000000:26:00.0 Off |                    0 |
+| N/A   52C    P0            147W /  350W |   28240MiB /  46068MiB |     75%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+
+
+=== PROFILING CALL: Simple Greeting ('hi') ===
+Wall Clock Time:       6.83s
+Ollama Total Duration: 6.82s
+1. Model Load Time:    4.87s (71.3%)
+2. Prompt Eval:        0.06s for 11 tokens (5.72 ms/tok)
+3. Token Generation:   1.88s for 128 tokens (14.71 ms/tok)
+Generated Token Count: 128
+Raw message keys: ['role', 'content', 'thinking']
+Raw message repr: {'role': 'assistant', 'content': '', 'thinking': 'Okay, the user just said "hi". That\'s pretty straightforward. They\'re probably greeting me, maybe testing if I\'m working or just starting a conversation.\n\nI should respond politely. Let me check if there\'s a standard way to handle a simple "hi". In the example response, they used "Hello! How can I assist you today?" which is friendly and offers help. That seems good.\n\nWait, maybe the user wants a more casual reply? But the example uses "Hello!" so it\'s polite but friendly. Maybe they want to keep it simple. Since they just said "hi", they might be looking for a quick'}
+Tool Calls:
+[]
+
+=== PROFILING CALL: Full Tool Schema + System Prompt ===
+Wall Clock Time:       12.32s
+Ollama Total Duration: 12.32s
+1. Model Load Time:    4.69s (38.1%)
+2. Prompt Eval:        0.22s for 1029 tokens (0.22 ms/tok)
+3. Token Generation:   7.40s for 512 tokens (14.45 ms/tok)
+Generated Token Count: 512
+Raw message keys: ['role', 'content', 'thinking']
+Raw message repr: {'role': 'assistant', 'content': '', 'thinking': 'Okay, let\'s see. The user wants me to navigate to a large gray rectangular building and then turn right. The current pose is at X=270.4, Y=143.3, Z=-0.4, which is probably a 3D coordinate. But the BEV trajectory state is starting at (0.0, 0.0), so maybe the camera is centered there.\n\nSince this is the first step, there\'s no history. I need to figure out where the building is. The instruction mentions a large gray rectangular building, so I should look for that in the camera view. But wait, how do I know where it is? The tools available include move_to, which requires selecting a pixel to fly toward.\n\nThe problem is that without seeing the actual image, I can\'t determine the building\'s position. However, the user is probably expecting me to simulate this. Maybe I should assume the building is in a certain direction. The instruction says to proceed to the building then turn right, so maybe the building is in front of me, and turning right would adjust the heading.\n\nBut since I\'m just starting, maybe the first step is to move towards the building. Let\'s think: the camera view\'s horizontal center is 960, vertical 540. If the building is visible, I need to choose a pixel that\'s part of the building. However, without an image, perhaps the system expects me to use move_to with some coordinates. Wait, but how can I know where the building is?\n\nWait, maybe the user expects me to first query the depth to find a safe path. But the instruction says to "query depth where needed." So perhaps I should check the depth of the building\'s location first. But without knowing where the building is, maybe I should make an initial move towards the direction where the building is expected.\n\nAlternatively, maybe the building is in front, so moving towards the center. But the user says "slightly turn right" after reaching, so the building might be slightly to the left or right. Hmm.\n\nWait, the BEV map is starting at (0.0, 0.0), which might indicate the current position in a bird\'s eye view. If the building is the target, maybe it\'s in a certain direction. Since the instruction is to proceed to the building, I need to move towards it. But how?\n\nSince the tools require specifying a pixel (x, y) in the camera view, perhaps'}
+Tool Calls:
+[]

@@ -1,0 +1,35 @@
+{
+  "completed_keys": [
+    "k0_epr2r_ce_val_unseen_0001",
+    "k0_epr2r_ce_val_unseen_0002"
+  ],
+  "sr_matrix": [
+    [
+      1.0,
+      0.0
+    ]
+  ],
+  "spl_matrix": [
+    [
+      1.0,
+      0.0
+    ]
+  ],
+  "ne_matrix": [
+    [
+      2.2671568097509267,
+      3.132091952673165
+    ]
+  ],
+  "osr_matrix": [
+    [
+      1.0,
+      0.0
+    ]
+  ],
+  "failure_counts": {
+    "success": 1,
+    "stop_premature": 1
+  },
+  "timestamp": "2026-11-02T18:53:27.933308"
+}

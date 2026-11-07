@@ -1,0 +1,7 @@
+{
+  "check": "G2.10",
+  "model": "qwen3.5:4b",
+  "protocol": "formatted_json_code_block",
+  "justification": "Paper-aligned schema, universal across Ollama/vLLM/Gemini, allows 100% deterministic parsing",
+  "status": "PASS"
+}

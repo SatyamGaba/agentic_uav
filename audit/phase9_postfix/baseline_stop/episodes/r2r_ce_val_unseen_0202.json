@@ -1,0 +1,32 @@
+{
+  "episode_id": "r2r_ce_val_unseen_0202",
+  "scene_id": "EU6Fwq7SyZv",
+  "instruction": "Make a left at the end of the bed. Walk to the banister. Walk to the bottom of the stairs to the left of this point. Make a right and move to the panoramic checker doors.",
+  "model": "stop_immediately",
+  "called_stop": true,
+  "terminated_deadlock": false,
+  "terminated_protocol_violation": false,
+  "total_steps": 1,
+  "arrival_verification_steps": 0,
+  "failure_category": "stop_premature",
+  "metrics": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 11.12297248840332,
+    "trajectory_length_m": 0.0,
+    "simulator_action_count": 0
+  },
+  "metrics_dataclass": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 11.12297248840332,
+    "trajectory_length_m": 0.0,
+    "shortest_path_distance_m": 11.12297248840332,
+    "total_steps": 1,
+    "simulator_action_count": 0
+  },
+  "shortest_path_distance_m": 11.12297248840332,
+  "goal_radius_m": 3.0
+}

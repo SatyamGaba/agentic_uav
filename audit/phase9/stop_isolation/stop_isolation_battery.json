@@ -1,0 +1,98 @@
+{
+  "episode_id": "r2r_ce_val_unseen_0012",
+  "instruction": "Exit the room and turn left. Walk forward towards the kitchen and stop near the counter.",
+  "geodesic_distance_to_goal_m": 0.5500000715255737,
+  "test_conditions": [
+    {
+      "condition": "Cond1_LegacyPrompt_ThinkingFalse",
+      "thinking_enabled": false,
+      "called_stop": false,
+      "tool_name": "query_depth",
+      "tool_args": {
+        "points": [
+          {
+            "u": 0.5,
+            "v": 0.5,
+            "view": 0
+          },
+          {
+            "u": 0.3,
+            "v": 0.5,
+            "view": 0
+          },
+          {
+            "u": 0.7,
+            "v": 0.5,
+            "view": 0
+          }
+        ]
+      },
+      "raw_text": "",
+      "thinking_content": "",
+      "latency_s": 4.79689359664917
+    },
+    {
+      "condition": "Cond2_CleanPrompt_ThinkingFalse",
+      "thinking_enabled": false,
+      "called_stop": false,
+      "tool_name": "query_depth",
+      "tool_args": {
+        "points": [
+          {
+            "u": 0.5,
+            "v": 0.6,
+            "view": 0
+          },
+          {
+            "u": 0.5,
+            "v": 0.5,
+            "view": 1
+          },
+          {
+            "u": 0.5,
+            "v": 0.5,
+            "view": 2
+          },
+          {
+            "u": 0.5,
+            "v": 0.5,
+            "view": 3
+          }
+        ]
+      },
+      "raw_text": "",
+      "thinking_content": "",
+      "latency_s": 3.9166996479034424
+    },
+    {
+      "condition": "Cond3_CleanPrompt_ThinkingTrue",
+      "thinking_enabled": true,
+      "called_stop": false,
+      "tool_name": "query_depth",
+      "tool_args": {
+        "points": [
+          {
+            "u": 0.5,
+            "v": 0.6,
+            "view": 3
+          }
+        ]
+      },
+      "raw_text": "",
+      "thinking_content": "",
+      "latency_s": 30.44565176963806
+    },
+    {
+      "condition": "Cond4_ExplicitArrivalMilestone_ThinkingFalse",
+      "thinking_enabled": false,
+      "called_stop": true,
+      "tool_name": "stop",
+      "tool_args": {
+        "reason": "Goal 'Exit the room and turn left. Walk forward towards the kitchen and stop near the counter' is complete. I am currently in the hallway, which corresponds to the location of the kitchen counter as indicated by the navigation instruction. All milestones have been satisfied."
+      },
+      "raw_text": "",
+      "thinking_content": "",
+      "latency_s": 3.892238140106201
+    }
+  ]
+}

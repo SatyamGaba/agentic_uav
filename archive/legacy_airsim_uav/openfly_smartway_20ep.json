@@ -1,0 +1,24 @@
+{
+  "adapter_name": "WaypointCandidateAdapter",
+  "model_name": "qwen3-vl:8b",
+  "environment_name": "OpenFlyBenchmarkEnv",
+  "total_episodes": 20,
+  "success_rate_percent": 0.0,
+  "sr_ci_95": [
+    0.0,
+    16.11
+  ],
+  "oracle_success_rate_percent": 0.0,
+  "osr_ci_95": [
+    0.0,
+    16.11
+  ],
+  "mean_navigation_error_m": 181.01,
+  "mean_oracle_ne_m": 64.76,
+  "mean_spl": 0.0,
+  "mean_pred_length_m": 180.0,
+  "mean_gt_length_m": 107.31,
+  "mean_duration_s": 0.0,
+  "mean_steps": 30.0,
+  "timestamp": "2026-10-25T20:07:15.674282+00:00"
+}

@@ -1,0 +1,366 @@
+# AgenticNav Specification Ledger
+# Ground Truth Parameter Ledger for Local & Cluster Replication
+# Every constant in code must map to an entry in this ledger.
+# Source types: paper_text, paper_appendix, vln_ce_standard, habitat_standard, assumption, engineering_choice
+
+version: "1.0.0"
+created_at: "2026-11-06"
+owner: "Antigravity Engineering"
+
+parameters:
+  # --- SENSORS & OPTICS ---
+  image_width:
+    value: 640
+    source: "paper_text (Sec 3)"
+    status: "verified"
+    owner: "Perception"
+    description: "Panoramic camera image width in pixels"
+
+  image_height:
+    value: 480
+    source: "paper_text (Sec 3)"
+    status: "verified"
+    owner: "Perception"
+    description: "Panoramic camera image height in pixels"
+
+  hfov_deg:
+    value: 90.0
+    source: "paper_text (Sec 3)"
+    status: "verified"
+    owner: "Perception"
+    description: "Horizontal field of view per camera in degrees"
+
+  camera_height:
+    value: 1.25
+    source: "paper_text (Sec 3)"
+    status: "verified"
+    owner: "Perception"
+    description: "Camera mount height above floor datum in meters"
+
+  num_panoramic_views:
+    value: 4
+    source: "paper_text (Sec 1, Sec 3)"
+    status: "verified"
+    owner: "Perception"
+    description: "Number of heading-indexed panoramic cameras (Front, Right, Back, Left)"
+
+  view_azimuths_deg:
+    value: [0.0, -90.0, 180.0, 90.0]
+    source: "paper_text (Sec 3)"
+    status: "verified"
+    owner: "Perception"
+    description: "Camera yaw azimuth offsets in degrees [Front, Right, Back, Left]"
+
+  d_min:
+    value: 0.5
+    source: "vln_ce_standard / paper_text (Sec 3)"
+    status: "verified"
+    owner: "Perception"
+    description: "Minimum valid depth sensor reading in meters"
+
+  d_max:
+    value: 5.0
+    source: "vln_ce_standard / paper_text (Sec 3)"
+    status: "verified"
+    owner: "Perception"
+    description: "Maximum valid depth sensor reading in meters"
+
+  # --- ACTUATION & KINEMATICS ---
+  turn_step_deg:
+    value: 15.0
+    source: "vln_ce_standard / paper_text (Sec 1)"
+    status: "verified"
+    owner: "Kinematics"
+    description: "Discrete primitive turn step in degrees (turn_left / turn_right)"
+
+  forward_step_m:
+    value: 0.25
+    source: "vln_ce_standard / paper_text (Sec 1)"
+    status: "verified"
+    owner: "Kinematics"
+    description: "Discrete primitive forward step in meters (move_forward)"
+
+  base_margin:
+    value: 0.30
+    source: "paper_text (Sec 4.4)"
+    status: "verified"
+    owner: "Kinematics"
+    description: "Standoff distance subtracted from target distance before move"
+
+  rho_max:
+    value: 2.5
+    source: "paper_text (Sec 4.4)"
+    status: "verified"
+    owner: "Kinematics"
+    description: "Maximum single-step forward motion clamp in meters"
+
+  robot_radius:
+    value: 0.18
+    source: "vln_ce_standard (Habitat agent radius)"
+    status: "verified"
+    owner: "Safety"
+    description: "Robot physical radius in meters"
+
+  corridor_half_width_m:
+    value: 0.48
+    source: "assumption"
+    status: "assumed"
+    owner: "Safety"
+    description: "Half-width of swept rectangular corridor checker (total width = 0.96m = robot_radius + margin)"
+    ablation_plan: "Ablate corridor width from 0.40m to 1.10m on dev split to measure collision vs false-block rate"
+
+  chassis_y_min:
+    value: 0.10
+    source: "paper_text (Sec 4.5)"
+    status: "verified"
+    owner: "Safety"
+    description: "Minimum height above floor datum for obstacle pointcloud slice"
+
+  chassis_y_max:
+    value: 1.25
+    source: "paper_text (Sec 4.5)"
+    status: "verified"
+    owner: "Safety"
+    description: "Maximum height above floor datum for obstacle pointcloud slice"
+
+  zero_rho_policy:
+    value: "rotate"
+    source: "assumption"
+    status: "assumed"
+    owner: "Kinematics"
+    description: "Policy when commanded rho rounds to 0: 'rotate' executes pure turn; 'reject' returns no_motion"
+    ablation_plan: "Compare rotate vs reject on 20 dev episodes"
+
+  standoff_mode:
+    value: "fixed"
+    source: "paper_text (Sec 4.4)"
+    status: "verified"
+    owner: "Kinematics"
+    description: "Fixed standoff subtraction (0.30m) vs slope ablation"
+
+  adjacent_bin_snap:
+    value: false
+    source: "paper_text (default un-snapped)"
+    status: "verified"
+    owner: "Kinematics"
+    description: "Adjacent bin snap switch (false by default)"
+
+  max_snap_deg:
+    value: 9.0
+    source: "assumption"
+    status: "assumed"
+    owner: "Kinematics"
+    description: "Max snap angular threshold in degrees"
+    ablation_plan: "Ablation only when adjacent_bin_snap is True"
+
+  max_snap_drift_m:
+    value: 0.35
+    source: "assumption"
+    status: "assumed"
+    owner: "Kinematics"
+    description: "Max snap drift in meters"
+    ablation_plan: "Ablation only when adjacent_bin_snap is True"
+
+  obstacle_source:
+    value: "current_frame"
+    source: "paper_text (Sec 4.5)"
+    status: "verified"
+    owner: "Safety"
+    description: "Source for corridor checking: current_frame pointcloud"
+
+  # --- SPATIAL MEMORY & BEV MAPPING ---
+  bev_grid_size:
+    value: 256
+    source: "paper_text (Sec 5.1)"
+    status: "verified"
+    owner: "Memory"
+    description: "Allocentric occupancy grid resolution (256x256 pixels)"
+
+  bev_resolution_m:
+    value: 0.15
+    source: "paper_text (Sec 5.1)"
+    status: "verified"
+    owner: "Memory"
+    description: "Meters per pixel in BEV occupancy grid (256 * 0.15 = 38.4m span)"
+
+  bev_recenter_margin_px:
+    value: 32
+    source: "assumption"
+    status: "assumed"
+    owner: "Memory"
+    description: "Padding threshold in pixels before dynamic grid recentering rolls buffer"
+    ablation_plan: "Verify zero landmark drift during canvas roll in G5.4"
+
+  bev_log_odds_free:
+    value: -0.405
+    source: "paper_text (Sec 5.2, miss prob 0.4)"
+    status: "verified"
+    owner: "Memory"
+    description: "Log-odds update decrement for free space ray points"
+
+  bev_log_odds_occ:
+    value: 0.847
+    source: "paper_text (Sec 5.2, hit prob 0.7)"
+    status: "verified"
+    owner: "Memory"
+    description: "Log-odds update increment for confirmed obstacle points"
+
+  max_history_steps:
+    value: 6
+    source: "paper_text (Sec 1, Sec 2.2 Table 2)"
+    status: "verified"
+    owner: "Memory"
+    description: "Sliding-window size for action history and rationales (K=6)"
+
+  # --- MULTI-TURN DECISION HARNESS & BUDGETS ---
+  max_evidence_queries_per_step:
+    value: 4
+    source: "paper_text (Sec 1, E_max = 4)"
+    status: "verified"
+    owner: "Harness"
+    description: "Maximum query_depth and recall calls permitted before forced motion commit"
+
+  max_consecutive_reselects:
+    value: 5
+    source: "paper_text (Sec 1, R_max = 5)"
+    status: "verified"
+    owner: "Harness"
+    description: "Maximum consecutive reselect iterations for blocked corridor targets"
+
+  max_malformed_calls_per_step:
+    value: 3
+    source: "assumption"
+    status: "assumed"
+    owner: "Harness"
+    description: "Maximum retries on syntax/JSON errors before fallback"
+    ablation_plan: "Test 1 vs 3 vs 5 retries on dev split"
+
+  max_simulator_actions:
+    value: 500
+    source: "vln_ce_standard / paper_text (Sec 3)"
+    status: "verified"
+    owner: "Harness"
+    description: "Total primitive simulator discrete actions allowed before episode budget timeout"
+
+  # --- EVALUATION & GROUND TRUTH ---
+  success_distance_m:
+    value: 3.0
+    source: "vln_ce_standard / paper_text (Sec 3)"
+    status: "verified"
+    owner: "Evaluation"
+    description: "Distance threshold in meters to goal for success (R2R-CE standard: 3.0m)"
+
+  require_stop_for_success:
+    value: true
+    source: "paper_text (Sec 3) / vln_ce_standard"
+    status: "verified"
+    owner: "Evaluation"
+    description: "Episode requires explicit stop() call within success threshold"
+
+  num_test_episodes:
+    value: 100
+    source: "paper_text (Sec 2.1, standard R2R-CE val_unseen subset)"
+    status: "verified"
+    owner: "Evaluation"
+    description: "Locked test episode count"
+
+  test_episodes_file:
+    value: "agenticnav_paper_replica/data/episode_list_100.json"
+    source: "paper_replication_artifact"
+    status: "verified"
+    owner: "Evaluation"
+    description: "Locked 100-episode JSON file path"
+
+  # --- VLM INFERENCE & CAPABILITIES ---
+  vlm_model:
+    value: "qwen3.5:4b"
+    source: "engineering_choice (Fits 6GB VRAM on RTX 4050)"
+    status: "verified"
+    owner: "VLM"
+    description: "Primary development model tag in official Ollama library"
+
+  vlm_thinking:
+    value: false
+    source: "calibrated (G2.7 audit: 25x speedup, 98% token reduction, zero truncation timeout)"
+    status: "verified"
+    owner: "VLM"
+    description: "Disable thinking tokens via top-level think: false in Ollama payload"
+
+  coordinate_convention:
+    value: "normalized_0_to_1"
+    source: "calibrated (G2.6 audit: 50 points median error 4.66%)"
+    status: "verified"
+    owner: "VLM"
+    description: "Pixel-grounding coordinate format [0.0, 1.0] with (0,0) top-left"
+
+  tool_calling_protocol:
+    value: "formatted_json_code_block"
+    source: "paper_text (Sec 2.2 / G2.10 protocol decision)"
+    status: "verified"
+    owner: "VLM"
+    description: "Tool calling schema via prompt-level JSON code block"
+
+  fallback_model:
+    value: "qwen3-vl:8b"
+    source: "engineering_choice (Cluster match, partial offload)"
+    status: "verified"
+    owner: "VLM"
+    description: "Cluster parity model tag in official Ollama library"
+
+  temperature:
+    value: 0.0
+    source: "paper_text (Sec 2.3, deterministic evaluation)"
+    status: "verified"
+    owner: "VLM"
+    description: "Sampling temperature for VLM generation"
+
+  inference_seed:
+    value: 42
+    source: "engineering_choice"
+    status: "assumed"
+    owner: "VLM"
+    description: "RNG seed for reproducibility"
+    ablation_plan: "Test seed sensitivity across 3 seeds in Phase 9"
+
+  # --- ABLATION TOGGLES ---
+  depth_tool:
+    value: "on"
+    source: "paper_text (Sec 2.2 Table 2)"
+    status: "verified"
+    owner: "Ablation"
+    description: "Depth tool active state: 'on', 'off', 'depth_image'"
+
+  recall_tool:
+    value: true
+    source: "paper_text (Sec 2.2 Table 2)"
+    status: "verified"
+    owner: "Ablation"
+    description: "Recall tool active state (boolean)"
+
+  history_mode:
+    value: "reasoning"
+    source: "paper_text (Sec 2.2 Table 2)"
+    status: "verified"
+    owner: "Ablation"
+    description: "History mode: 'reasoning', 'task_progress', 'none'"
+
+  bev_image:
+    value: true
+    source: "paper_text (Sec 2.2 Table 2)"
+    status: "verified"
+    owner: "Ablation"
+    description: "BEV map image generation active (boolean)"
+
+  image_history:
+    value: "on_demand"
+    source: "paper_text (Sec 2.2 Table 2)"
+    status: "verified"
+    owner: "Ablation"
+    description: "Image history mode: 'on_demand' (recall tool) vs 'accumulate_all'"
+
+  action_mode:
+    value: "pixel"
+    source: "paper_text (Sec 2.2 Table 2)"
+    status: "verified"
+    owner: "Ablation"
+    description: "Action selection mode: 'pixel' (click) vs 'waypoint_predictor'"

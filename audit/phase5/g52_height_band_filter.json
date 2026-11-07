@@ -1,0 +1,45 @@
+{
+  "check": "G5.2",
+  "chassis_y_min": 0.1,
+  "chassis_y_max": 1.25,
+  "stats_by_step": [
+    {
+      "step": 1,
+      "floor_pts_below_0.10m": 372,
+      "ceiling_pts_above_1.25m": 2147,
+      "chassis_obstacle_pts": 1894,
+      "total_explored_pixels": 898
+    },
+    {
+      "step": 2,
+      "floor_pts_below_0.10m": 378,
+      "ceiling_pts_above_1.25m": 2215,
+      "chassis_obstacle_pts": 1957,
+      "total_explored_pixels": 959
+    },
+    {
+      "step": 3,
+      "floor_pts_below_0.10m": 396,
+      "ceiling_pts_above_1.25m": 2218,
+      "chassis_obstacle_pts": 1939,
+      "total_explored_pixels": 1014
+    },
+    {
+      "step": 4,
+      "floor_pts_below_0.10m": 398,
+      "ceiling_pts_above_1.25m": 2183,
+      "chassis_obstacle_pts": 1936,
+      "total_explored_pixels": 1035
+    },
+    {
+      "step": 5,
+      "floor_pts_below_0.10m": 404,
+      "ceiling_pts_above_1.25m": 2186,
+      "chassis_obstacle_pts": 1931,
+      "total_explored_pixels": 1053
+    }
+  ],
+  "floor_points_excluded_from_obstacles": true,
+  "ceiling_points_excluded_from_obstacles": true,
+  "status": "PASS"
+}

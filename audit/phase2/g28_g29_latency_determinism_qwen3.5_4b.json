@@ -1,0 +1,12 @@
+{
+  "check": "G2.8 & G2.9",
+  "model": "qwen3.5:4b",
+  "is_deterministic": true,
+  "mean_step_latency_s": 0.887,
+  "est_100_episodes_time_min": 22.2,
+  "feasibility_budget_s": 15.0,
+  "within_budget": true,
+  "gpu_vram_used_mb": 3100,
+  "gpu_vram_free_mb": 3041,
+  "status": "PASS"
+}

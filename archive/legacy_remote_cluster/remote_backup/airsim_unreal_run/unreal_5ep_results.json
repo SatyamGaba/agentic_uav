@@ -1,0 +1,87 @@
+[
+  {
+    "episode_idx": 0,
+    "instruction": "Proceed to the large , gray , rectangular , multi - story building , then slightly turn right and continue straight to the medium , grey building with rectangular windows and a flat roof . Next , turn left towards the light beige structure characterized by its large rectangular multi - story design and numerous windows . Finally , move ahead to the light gray , rectangular building with a flat roof and multiple windows , medium in size and similar to the surrounding residential buildings .",
+    "gt_length_m": 126.0,
+    "pred_length_m": 144.0,
+    "ne_m": 96.91,
+    "oracle_ne_m": 45.05,
+    "success": false,
+    "oracle_success": false,
+    "spl": 0.0,
+    "duration_s": 149.52,
+    "tool_calls": {
+      "move_to": 18,
+      "query_depth": 0,
+      "stop_arrival": 0
+    }
+  },
+  {
+    "episode_idx": 1,
+    "instruction": "Move forward into a green - brown park with pathways and small green areas of medium size , then shift right to a large building characterized by modern architecture with white and glass features and expansive windows . Next , advance forward to another large building with a white color and a rectangular layout featuring an inner courtyard . Slightly veering left , proceed directly ahead to a small U - shaped building distinguished by its red and white coloring amidst larger surrounding structures .",
+    "gt_length_m": 126.0,
+    "pred_length_m": 144.0,
+    "ne_m": 108.32,
+    "oracle_ne_m": 73.58,
+    "success": false,
+    "oracle_success": false,
+    "spl": 0.0,
+    "duration_s": 149.42,
+    "tool_calls": {
+      "move_to": 18,
+      "query_depth": 0,
+      "stop_arrival": 0
+    }
+  },
+  {
+    "episode_idx": 2,
+    "instruction": "Proceed directly ahead to a green and brown medium - sized area featuring a circular design , which is identified as either a garden or park . Then , slightly turn right and advance forward to a large red building characterized by a rectangular shape with multiple windows . Make a right slightly turn to reach it . Finally , move forward to it .",
+    "gt_length_m": 99.0,
+    "pred_length_m": 118.33,
+    "ne_m": 69.23,
+    "oracle_ne_m": 36.0,
+    "success": false,
+    "oracle_success": false,
+    "spl": 0.0,
+    "duration_s": 149.23,
+    "tool_calls": {
+      "move_to": 18,
+      "query_depth": 0,
+      "stop_arrival": 0
+    }
+  },
+  {
+    "episode_idx": 3,
+    "instruction": "Begin by continuing straight towards a large , gray building with a circular shape and a glass facade . Then , make a right slightly turn towards it . Proceed straight ahead , slightly turning right , towards a medium - sized multicolored building featuring a roof with blue and red sections . Finally , slightly turn left and keep going straight towards another medium - sized , grey , rectangular building with multiple windows .",
+    "gt_length_m": 72.0,
+    "pred_length_m": 144.0,
+    "ne_m": 93.3,
+    "oracle_ne_m": 24.67,
+    "success": false,
+    "oracle_success": false,
+    "spl": 0.0,
+    "duration_s": 148.79,
+    "tool_calls": {
+      "move_to": 18,
+      "query_depth": 0,
+      "stop_arrival": 0
+    }
+  },
+  {
+    "episode_idx": 4,
+    "instruction": "Proceed to the gray and glass modern multi - story building with a glass facade , then slightly turn right and continue toward the white and glass structure featuring a rectangular shape with a glass facade . Veer left toward the dark green lake surrounded by paths and vegetation . Head straight to it . Slightly turn right and advance to the red building with multiple large windows , then slightly turn left and keep going straight to it .",
+    "gt_length_m": 150.0,
+    "pred_length_m": 132.41,
+    "ne_m": 87.48,
+    "oracle_ne_m": 69.59,
+    "success": false,
+    "oracle_success": false,
+    "spl": 0.0,
+    "duration_s": 155.78,
+    "tool_calls": {
+      "move_to": 18,
+      "query_depth": 0,
+      "stop_arrival": 0
+    }
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "check": "G5.1",
+  "grid_size": 256,
+  "resolution_m": 0.15,
+  "all_initial_pixels_unknown_127": true,
+  "l_free_measured": -0.405465,
+  "l_free_expected": -0.405465,
+  "l_occ_measured": 0.847298,
+  "l_occ_expected": 0.847298,
+  "mapped_value_unknown": 127,
+  "mapped_value_free": 255,
+  "mapped_value_occupied": 0,
+  "status": "PASS"
+}

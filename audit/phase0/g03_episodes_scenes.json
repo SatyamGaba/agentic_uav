@@ -1,0 +1,22 @@
+{
+  "check": "G0.3",
+  "file_path": "agenticnav_paper_replica/data/episode_list_100.json",
+  "sha256": "98b980704a701458eef01441771642e724ac3f9d5a12429b1e9d2144a27cc24e",
+  "total_episodes": 100,
+  "total_unique_scenes": 11,
+  "scenes": [
+    "EU6Fwq7SyZv",
+    "JF19kD82Mey",
+    "X7NsGo2t5Ab",
+    "Z6R7ygndpVU",
+    "cVre9nv62Rh",
+    "dhjEzFoEJ8e",
+    "gZ6f7yhEvPG",
+    "oLBMNvg9in8",
+    "pLe4wQe7qrG",
+    "r1Q1Z4BcVte",
+    "sT4fr6TAbpF"
+  ],
+  "scenes_match_expected_11": true,
+  "status": "PASS"
+}

@@ -1,0 +1,9 @@
+{
+  "check": "G4.3",
+  "num_turns": 24,
+  "turn_amount_deg": 15.0,
+  "total_nominal_rotation_deg": 360.0,
+  "position_drift_m": 0.0,
+  "rotation_drift_deg": 0.0,
+  "status": "PASS"
+}

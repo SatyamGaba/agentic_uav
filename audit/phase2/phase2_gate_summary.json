@@ -1,0 +1,20 @@
+{
+  "phase": 2,
+  "name": "Vision Model Layer",
+  "model": "qwen3.5:4b",
+  "checks": {
+    "G2.1": "PASS",
+    "G2.2": "PASS",
+    "G2.3": "PASS",
+    "G2.4": "PASS",
+    "G2.5": "PASS",
+    "G2.6": "PASS",
+    "G2.7": "PASS",
+    "G2.8": "PASS",
+    "G2.9": "PASS",
+    "G2.10": "PASS"
+  },
+  "gate_status": "PASS",
+  "timestamp": "2026-11-06T12:51:43Z",
+  "evidence_directory": "C:\\Users\\Kruti\\Desktop\\PROG\\UAV\\audit\\phase2"
+}

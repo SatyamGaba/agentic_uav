@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # SERVICE 1: VLM INFERENCE ENGINE (Ollama on GPU)
+  # ============================================================================
+  vlm-engine:
+    image: ollama/ollama:latest
+    container_name: uav-vlm-engine
+    restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ollama_models:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - uav-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:11434/api/tags || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================================
+  # SERVICE 2: 3D SIMULATION & CLOSED-LOOP BENCHMARK RUNNER
+  # ============================================================================
+  sim-benchmark:
+    build:
+      context: .
+      dockerfile: dependencies/docker/Dockerfile.openfly_sim
+    container_name: uav-sim-benchmark
+    depends_on:
+      vlm-engine:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    ipc: host
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all,graphics,utility,compute
+      - VLM_API_URL=http://vlm-engine:11434/v1/chat/completions
+      - MODEL_NAME=qwen3-vl:8b
+    volumes:
+      - .:/workspace
+      - openfly_cache:/root/.cache/huggingface
+    working_dir: /workspace
+    networks:
+      - uav-net
+    command: >
+      bash -c "
+        echo 'Pulling qwen3-vl:8b inside vlm-engine...' &&
+        curl -X POST http://vlm-engine:11434/api/pull -d '{\"name\": \"qwen3-vl:8b\"}' &&
+        echo 'Starting Full 3,000-Episode Evaluation...' &&
+        python3 benchmark/run_closed_loop_docker.py
+      "
+
+volumes:
+  ollama_models:
+  openfly_cache:
+
+networks:
+  uav-net:
+    driver: bridge

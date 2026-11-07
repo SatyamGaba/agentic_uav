@@ -1,0 +1,39 @@
+{
+  "benchmark_dataset": "R2R-CE val_unseen (15 episodes subset)",
+  "total_episodes": 15,
+  "primary_metrics": {
+    "success_rate_pct": {
+      "mean": 0.0,
+      "ci_95_pct": [
+        0.0,
+        0.0
+      ]
+    },
+    "spl_pct": {
+      "mean": 0.0,
+      "ci_95_pct": [
+        0.0,
+        0.0
+      ]
+    },
+    "oracle_success_rate_pct": {
+      "mean": 100.0,
+      "ci_95_pct": [
+        100.0,
+        100.0
+      ]
+    },
+    "navigation_error_meters": 2.33,
+    "trajectory_length_meters": 5.37
+  },
+  "failure_taxonomy": {
+    "deadlock": 0,
+    "budget_exhausted": 0,
+    "wrong_landmark": 0,
+    "missed_stop": 0,
+    "protocol_violation": 0,
+    "stop_after_reach": 15,
+    "infrastructure_error": 0,
+    "none_success": 0
+  }
+}

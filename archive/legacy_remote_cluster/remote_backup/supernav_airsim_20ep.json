@@ -1,0 +1,24 @@
+{
+  "adapter_name": "SuperNavAdapter",
+  "model_name": "qwen3-vl:8b",
+  "environment_name": "AirSimUnrealEnv",
+  "total_episodes": 20,
+  "success_rate_percent": 5.0,
+  "sr_ci_95": [
+    0.89,
+    23.61
+  ],
+  "oracle_success_rate_percent": 5.0,
+  "osr_ci_95": [
+    0.89,
+    23.61
+  ],
+  "mean_navigation_error_m": 42.92,
+  "mean_oracle_ne_m": 24.28,
+  "mean_spl": 0.0497,
+  "mean_pred_length_m": 34.93,
+  "mean_gt_length_m": 28.0,
+  "mean_duration_s": 85.25,
+  "mean_steps": 5.8,
+  "timestamp": "2026-10-25T22:55:14.697342+00:00"
+}

@@ -1,0 +1,65 @@
+Published as a conference paper at ICLR 2026
+OpenFly: A COMPREHENSIVE PLATFORM FOR AERIAL
+VISION-LANGUAGE NAVIGATION
+Yunpeng Gao1,2*, Chenhui Li1*, Zhongrui You1,3*, Junli Liu1,2*, Zhen Li1,4*,
+Pengan Chen1,5, Qizhi Chen1,6,Zhonghan Tang1,7, Liansheng Wang1, Penghui Yang1,8,
+Yiwen Tang1,2, Yuhang Tang1,2, Shuai Liang1,9, Songyi Zhu1, Ziqin Xiong1,9, Yifei Su1,10,
+Xinyi Ye1, Jianan Li1, Yan Ding1, Dong Wang1, Xuelong Li11, Zhigang Wang1†, Bin Zhao1,2†
+1Shanghai AI Laboratory, 2Northwestern Polytechnical University,
+3Beihang University, 4Shanghai Jiao Tong University,
+5The University of Hong Kong, 6Zhejiang University,
+7University of Science and Technology of China,
+8East China University of Science and Technology, 9Fudan University,
+10Institute of Automation, Chinese Academy of Sciences, 11TeleAI
+Unreal Engine
+GTA Ⅴ
+3D GS
+Google Earth
+OpenFly
+100K Trajectories
+ 15.6K Vocabulary
+ 18 Scenes
+ 4 Rendering Engines
+Real2Sim Reconstruction
+Automatic Toolchain
+Keyframe-aware VLN Model
+Figure 1: Overview of OpenFly. This work consists of (1) the integration of 4 rendering engines, significantly
+enhancing the diversity of scenario resources for aerial vision-language navigation; (2) an automatic data gen-
+eration toolchain, eliminating reliance on labor-intensive annotations; (3) the largest aerial VLN dataset to date,
+comprising 100K trajectories; and (4) a keyframe-aware VLN model, achieving superior performance in both
+simulated and real-world scenes.
+ABSTRACT
+Aerial Vision-Language Navigation (VLN) seeks to guide UAVs by leveraging
+language instructions and visual cues, establishing a new paradigm for human-
+UAV interaction. However, the collection of VLN data demands extensive human
+effort to construct trajectories and corresponding instructions, hindering the de-
+velopment of large-scale datasets and capable models. To address this problem,
+we propose OpenFly, a comprehensive platform for aerial VLN. Firstly, OpenFly
+integrates 4 rendering engines and advanced techniques for diverse environment
+simulation, including Unreal Engine, GTA V, Google Earth, and 3D Gaussian
+Splatting (3D GS). Particularly, 3D GS supports real-to-sim rendering, further
+enhancing the realism of our environments. Secondly, we develop a highly au-
+tomated toolchain for aerial VLN data collection, streamlining point cloud ac-
+*Equal Contribution.
+†Corresponding Author.
+1
+
+Published as a conference paper at ICLR 2026
+Lidar Acquisition API
+Agent Movement API 
+Image Acquisition API
+Unified Interface
+Rendering Engine
+UE5 & UE4
+Google Earth 
+GTA V 
+3D GS 
+Toolchain
+3D Point Cloud Acquisition
+Semantic Segmentation
+Trajectory Generation
+First, go up slightly and turn right. Proceed straight toward a building labeled ‘China Ping An’. 
+After reaching it, turn left to face a futuristic tower with a large spherical middle section supported 
+by several columns. Move forward to it. Next, turn left and continue straight toward a tall building 
+featuring a circular structure at its top.
+Instruc

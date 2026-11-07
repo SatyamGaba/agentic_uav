@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dual-Rate Cognitive UAV Architecture - Technical Blueprint</title>
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #121826;
+            --bg-card: #182234;
+            --accent-cyan: #00f0ff;
+            --accent-amber: #ffaa00;
+            --accent-purple: #a855f7;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #24344d;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
+        }
+        h1 {
+            font-size: 2.2rem;
+            color: var(--accent-cyan);
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+        p.subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+        .fragment-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        h2 {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .tag {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .tag-cyan { background: rgba(0, 240, 255, 0.15); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+        .tag-amber { background: rgba(255, 170, 0, 0.15); color: var(--accent-amber); border: 1px solid var(--accent-amber); }
+        .tag-purple { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
+        
+        .img-container {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            background: #000;
+        }
+        .img-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+        }
+        .card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        .card p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .card ul {
+            margin-top: 0.5rem;
+            padding-left: 1.25rem;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Iteration 6 Dual-Rate Cognitive UAV Architecture</h1>
+            <p class="subtitle">Decoupling High-Frequency Reflex Control (10 Hz) from Asynchronous VLM Deliberation (~0.02 Hz)</p>
+        </header>
+
+        <!-- FRAGMENT 1 -->
+        <section class="fragment-section">
+            <h2>Fragment 1: Dual-Rate Cognitive UAV Architecture <span class="tag tag-cyan">High-Level Split</span></h2>
+            <div class="img-container">
+                <img src="../assets/frag1_dual_rate_highlevel.jpg" alt="Fragment 1: Dual-Rate Cognitive UAV Architecture">
+            </div>
+            <div class="module-grid">
+                <div class="card">
+                    <h3 style="color: var(--accent-cyan);">System 2: Cognitive Deliberation</h3>
+                    <p>Operates asynchronously at ~0.02 Hz (every 45-60s or event-triggered). Formulates high-level navigation strategy, performs visual CoT reasoning, and projects 3D waypoints.</p>
+                    <ul>
+                        <li><strong>Mission Planner:</strong> Decomposes complex language goals into sequential topological stages.</li>
+                        <li><strong>VLM Engine:</strong> Runs local Qwen3-VL 8B to inspect pixels and locate landmarks.</li>
+                        <li><strong>3D Waypoint Generator:</strong> Transforms selected 2D pixels into 3D world coordinates.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--accent-amber);">Asynchronous Bridge & Buffer</h3>
+                    <p>Completely isolates the 10 Hz flight thread from cognitive reasoning delays.</p>
+                    <ul>
+                        <li><strong>Subgoal Ring Buffer:</strong> Hands down valid metric targets without blocking.</li>
+                        <li><strong>Telemetry Feedback:</strong> Streams live 10 Hz odometry pose, travel progress, and safety alerts upwards to trigger deliberation.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 style="color: #38bdf8;">System 1: Reflex & Safety Controller</h3>
+                    <p>Operates strictly at 10 Hz (100 ms loop). Guarantees flight stability and collision prevention regardless of VLM status.</p>
+                    <ul>
+                        <li><strong>Perception Shield:</strong> Evaluates zone depths and strips sky sentinels.</li>
+                        <li><strong>Safety FSM:</strong> Overrides flight motion with hover/climb upon proximity breaches.</li>
+                        <li><strong>Flight Motion Controller:</strong> Generates continuous body velocity vectors via potential fields.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- FRAGMENT 2 -->
+        <section class="fragment-section">
+            <h2>Fragment 2: System 1 Real-Time Reflex Controller <span class="tag tag-amber">10 Hz Fast Loop</span></h2>
+            <div class="img-container">
+                <img src="../assets/frag2_system1_highlevel.jpg" alt="Fragment 2: System 1 Real-Time Reflex Controller">
+            </div>
+            <div class="module-grid">
+                <div class="card">
+                    <h3>1. Depth & Obstacle Perception</h3>
+                    <p>Processes raw forward depth into 3x3 sectors. Replaces infinite sky rays (>100m) with 100.0m sentinels to avoid false walls, and computes frontal obstacle clearance <code>d_frontal</code>.</p>
+                </div>
+                <div class="card">
+                    <h3>2. Safety Supervisory FSM</h3>
+                    <p>FSM with 4 strict states: <code>NORMAL</code> (clear cruise at 3.0 m/s), <code>HOVER_REPLAN</code> (station-keeping hover while awaiting subgoals), <code>AVOID_EMERGENCY_CLIMB</code> (immediate vertical ascent if obstacle &le; 1.5m), and <code>LAND</code>.</p>
+                </div>
+                <div class="card">
+                    <h3>3. Reactive Motion & Actuation</h3>
+                    <p>Blends target attraction with repulsive potential fields into body velocities <code>[vx, vy, vz, yaw_rate]</code>. Dispatches via non-blocking RPC while strictly preserving the 25cm camera nose mount offset.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FRAGMENT 3 -->
+        <section class="fragment-section">
+            <h2>Fragment 3: System 2 Cognitive Reasoning Pipeline <span class="tag tag-purple">Uncapped CoT Deliberation</span></h2>
+            <div class="img-container">
+                <img src="../assets/frag3_system2_pipeline.jpg" alt="Fragment 3: System 2 Cognitive Reasoning Pipeline">
+            </div>
+            <div class="module-grid">
+                <div class="card">
+                    <h3>5-Condition Event Trigger Monitor</h3>
+                    <p>Evaluates every 100ms and fires an async deliberation task only upon: (1) Mission Start, (2) Subgoal Arrival &le; 2.0m, (3) Displacement &ge; 8.0m, (4) Heading Rotation &ge; 45&deg;, or (5) Heartbeat Expiry.</p>
+                </div>
+                <div class="card">
+                    <h3>Local Qwen3-VL 8B Engine</h3>
+                    <p>Operates with uncapped reasoning tokens so the model can freely deliberate its chain of thought. Protected by a generous 180-second deadman watchdog to avoid premature timeouts.</p>
+                </div>
+                <div class="card">
+                    <h3>3D World Coordinate Projector</h3>
+                    <p>Converts selected pixel coordinate <code>(u, v)</code> and metric depth <code>Z</code> using pinhole intrinsic and drone extrinsic matrices into an absolute world coordinate <code>[Xw, Yw, Zw]</code>.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

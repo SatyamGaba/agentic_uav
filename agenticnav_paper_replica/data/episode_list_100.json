@@ -1,0 +1,2213 @@
+{
+  "metadata": {
+    "deprecated": true,
+    "not_r2rce": true,
+    "reason": "Synthetic/templated episodes: every start is [0,0,0], goals are generated along -Z, and 5/11 scene IDs are invalid. Do not use as R2R-CE evidence.",
+    "replacement": "agenticnav_paper_replica/data/r2rce_val_unseen_17.json"
+  },
+  "episodes": [
+    {
+      "episode_id": "r2r_ce_val_unseen_0001",
+      "scene_id": "gZ6f7yhEvPG",
+      "instruction": "Walk past the bed and out the door. Take a right down the hallway and stop near the table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0002",
+      "scene_id": "pLe4wQe7qrG",
+      "instruction": "Exit the room and turn left. Walk forward towards the kitchen and stop near the counter.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0003",
+      "scene_id": "r1Q1Z4BcVte",
+      "instruction": "Head out the door into the corridor. Go straight past the stairs and stop in the entryway.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0004",
+      "scene_id": "sT4fr6TAbpF",
+      "instruction": "Leave the bathroom, turn left, and walk past the dining area. Stop by the sofa.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0005",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Walk straight down the hallway, turn right into the living area, and wait next to the fireplace.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0006",
+      "scene_id": "Z6R7ygndpVU",
+      "instruction": "Turn right and walk past the chairs into the open room. Stop in front of the window.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0007",
+      "scene_id": "dhjEzFoEJ8e",
+      "instruction": "Proceed through the archway into the dining room. Walk around the table and stop.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0008",
+      "scene_id": "JF19kD82Mey",
+      "instruction": "Go out of the bedroom and make an immediate left. Walk down the hallway and stop near the mirror.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0009",
+      "scene_id": "oLBMNvg9in8",
+      "instruction": "Walk down the steps, turn left into the living room, and stop by the coffee table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0010",
+      "scene_id": "X7NsGo2t5Ab",
+      "instruction": "Walk forward past the kitchen island, exit through the door on the right, and wait outside.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0011",
+      "scene_id": "cVre9nv62Rh",
+      "instruction": "Walk past the bed and out the door. Take a right down the hallway and stop near the table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0012",
+      "scene_id": "gZ6f7yhEvPG",
+      "instruction": "Exit the room and turn left. Walk forward towards the kitchen and stop near the counter.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0013",
+      "scene_id": "pLe4wQe7qrG",
+      "instruction": "Head out the door into the corridor. Go straight past the stairs and stop in the entryway.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0014",
+      "scene_id": "r1Q1Z4BcVte",
+      "instruction": "Leave the bathroom, turn left, and walk past the dining area. Stop by the sofa.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0015",
+      "scene_id": "sT4fr6TAbpF",
+      "instruction": "Walk straight down the hallway, turn right into the living area, and wait next to the fireplace.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0016",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Turn right and walk past the chairs into the open room. Stop in front of the window.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0017",
+      "scene_id": "Z6R7ygndpVU",
+      "instruction": "Proceed through the archway into the dining room. Walk around the table and stop.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0018",
+      "scene_id": "dhjEzFoEJ8e",
+      "instruction": "Go out of the bedroom and make an immediate left. Walk down the hallway and stop near the mirror.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0019",
+      "scene_id": "JF19kD82Mey",
+      "instruction": "Walk down the steps, turn left into the living room, and stop by the coffee table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0020",
+      "scene_id": "oLBMNvg9in8",
+      "instruction": "Walk forward past the kitchen island, exit through the door on the right, and wait outside.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0021",
+      "scene_id": "X7NsGo2t5Ab",
+      "instruction": "Walk past the bed and out the door. Take a right down the hallway and stop near the table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0022",
+      "scene_id": "cVre9nv62Rh",
+      "instruction": "Exit the room and turn left. Walk forward towards the kitchen and stop near the counter.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0023",
+      "scene_id": "gZ6f7yhEvPG",
+      "instruction": "Head out the door into the corridor. Go straight past the stairs and stop in the entryway.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0024",
+      "scene_id": "pLe4wQe7qrG",
+      "instruction": "Leave the bathroom, turn left, and walk past the dining area. Stop by the sofa.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0025",
+      "scene_id": "r1Q1Z4BcVte",
+      "instruction": "Walk straight down the hallway, turn right into the living area, and wait next to the fireplace.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0026",
+      "scene_id": "sT4fr6TAbpF",
+      "instruction": "Turn right and walk past the chairs into the open room. Stop in front of the window.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0027",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Proceed through the archway into the dining room. Walk around the table and stop.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0028",
+      "scene_id": "Z6R7ygndpVU",
+      "instruction": "Go out of the bedroom and make an immediate left. Walk down the hallway and stop near the mirror.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0029",
+      "scene_id": "dhjEzFoEJ8e",
+      "instruction": "Walk down the steps, turn left into the living room, and stop by the coffee table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0030",
+      "scene_id": "JF19kD82Mey",
+      "instruction": "Walk forward past the kitchen island, exit through the door on the right, and wait outside.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0031",
+      "scene_id": "oLBMNvg9in8",
+      "instruction": "Walk past the bed and out the door. Take a right down the hallway and stop near the table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0032",
+      "scene_id": "X7NsGo2t5Ab",
+      "instruction": "Exit the room and turn left. Walk forward towards the kitchen and stop near the counter.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0033",
+      "scene_id": "cVre9nv62Rh",
+      "instruction": "Head out the door into the corridor. Go straight past the stairs and stop in the entryway.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0034",
+      "scene_id": "gZ6f7yhEvPG",
+      "instruction": "Leave the bathroom, turn left, and walk past the dining area. Stop by the sofa.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0035",
+      "scene_id": "pLe4wQe7qrG",
+      "instruction": "Walk straight down the hallway, turn right into the living area, and wait next to the fireplace.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0036",
+      "scene_id": "r1Q1Z4BcVte",
+      "instruction": "Turn right and walk past the chairs into the open room. Stop in front of the window.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0037",
+      "scene_id": "sT4fr6TAbpF",
+      "instruction": "Proceed through the archway into the dining room. Walk around the table and stop.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0038",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Go out of the bedroom and make an immediate left. Walk down the hallway and stop near the mirror.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0039",
+      "scene_id": "Z6R7ygndpVU",
+      "instruction": "Walk down the steps, turn left into the living room, and stop by the coffee table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0040",
+      "scene_id": "dhjEzFoEJ8e",
+      "instruction": "Walk forward past the kitchen island, exit through the door on the right, and wait outside.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0041",
+      "scene_id": "JF19kD82Mey",
+      "instruction": "Walk past the bed and out the door. Take a right down the hallway and stop near the table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0042",
+      "scene_id": "oLBMNvg9in8",
+      "instruction": "Exit the room and turn left. Walk forward towards the kitchen and stop near the counter.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0043",
+      "scene_id": "X7NsGo2t5Ab",
+      "instruction": "Head out the door into the corridor. Go straight past the stairs and stop in the entryway.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0044",
+      "scene_id": "cVre9nv62Rh",
+      "instruction": "Leave the bathroom, turn left, and walk past the dining area. Stop by the sofa.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0045",
+      "scene_id": "gZ6f7yhEvPG",
+      "instruction": "Walk straight down the hallway, turn right into the living area, and wait next to the fireplace.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0046",
+      "scene_id": "pLe4wQe7qrG",
+      "instruction": "Turn right and walk past the chairs into the open room. Stop in front of the window.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0047",
+      "scene_id": "r1Q1Z4BcVte",
+      "instruction": "Proceed through the archway into the dining room. Walk around the table and stop.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0048",
+      "scene_id": "sT4fr6TAbpF",
+      "instruction": "Go out of the bedroom and make an immediate left. Walk down the hallway and stop near the mirror.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0049",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Walk down the steps, turn left into the living room, and stop by the coffee table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0050",
+      "scene_id": "Z6R7ygndpVU",
+      "instruction": "Walk forward past the kitchen island, exit through the door on the right, and wait outside.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0051",
+      "scene_id": "dhjEzFoEJ8e",
+      "instruction": "Walk past the bed and out the door. Take a right down the hallway and stop near the table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0052",
+      "scene_id": "JF19kD82Mey",
+      "instruction": "Exit the room and turn left. Walk forward towards the kitchen and stop near the counter.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0053",
+      "scene_id": "oLBMNvg9in8",
+      "instruction": "Head out the door into the corridor. Go straight past the stairs and stop in the entryway.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0054",
+      "scene_id": "X7NsGo2t5Ab",
+      "instruction": "Leave the bathroom, turn left, and walk past the dining area. Stop by the sofa.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0055",
+      "scene_id": "cVre9nv62Rh",
+      "instruction": "Walk straight down the hallway, turn right into the living area, and wait next to the fireplace.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0056",
+      "scene_id": "gZ6f7yhEvPG",
+      "instruction": "Turn right and walk past the chairs into the open room. Stop in front of the window.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0057",
+      "scene_id": "pLe4wQe7qrG",
+      "instruction": "Proceed through the archway into the dining room. Walk around the table and stop.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0058",
+      "scene_id": "r1Q1Z4BcVte",
+      "instruction": "Go out of the bedroom and make an immediate left. Walk down the hallway and stop near the mirror.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0059",
+      "scene_id": "sT4fr6TAbpF",
+      "instruction": "Walk down the steps, turn left into the living room, and stop by the coffee table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0060",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Walk forward past the kitchen island, exit through the door on the right, and wait outside.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0061",
+      "scene_id": "Z6R7ygndpVU",
+      "instruction": "Walk past the bed and out the door. Take a right down the hallway and stop near the table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0062",
+      "scene_id": "dhjEzFoEJ8e",
+      "instruction": "Exit the room and turn left. Walk forward towards the kitchen and stop near the counter.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0063",
+      "scene_id": "JF19kD82Mey",
+      "instruction": "Head out the door into the corridor. Go straight past the stairs and stop in the entryway.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0064",
+      "scene_id": "oLBMNvg9in8",
+      "instruction": "Leave the bathroom, turn left, and walk past the dining area. Stop by the sofa.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0065",
+      "scene_id": "X7NsGo2t5Ab",
+      "instruction": "Walk straight down the hallway, turn right into the living area, and wait next to the fireplace.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0066",
+      "scene_id": "cVre9nv62Rh",
+      "instruction": "Turn right and walk past the chairs into the open room. Stop in front of the window.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0067",
+      "scene_id": "gZ6f7yhEvPG",
+      "instruction": "Proceed through the archway into the dining room. Walk around the table and stop.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0068",
+      "scene_id": "pLe4wQe7qrG",
+      "instruction": "Go out of the bedroom and make an immediate left. Walk down the hallway and stop near the mirror.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0069",
+      "scene_id": "r1Q1Z4BcVte",
+      "instruction": "Walk down the steps, turn left into the living room, and stop by the coffee table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0070",
+      "scene_id": "sT4fr6TAbpF",
+      "instruction": "Walk forward past the kitchen island, exit through the door on the right, and wait outside.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0071",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Walk past the bed and out the door. Take a right down the hallway and stop near the table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0072",
+      "scene_id": "Z6R7ygndpVU",
+      "instruction": "Exit the room and turn left. Walk forward towards the kitchen and stop near the counter.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0073",
+      "scene_id": "dhjEzFoEJ8e",
+      "instruction": "Head out the door into the corridor. Go straight past the stairs and stop in the entryway.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0074",
+      "scene_id": "JF19kD82Mey",
+      "instruction": "Leave the bathroom, turn left, and walk past the dining area. Stop by the sofa.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0075",
+      "scene_id": "oLBMNvg9in8",
+      "instruction": "Walk straight down the hallway, turn right into the living area, and wait next to the fireplace.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0076",
+      "scene_id": "X7NsGo2t5Ab",
+      "instruction": "Turn right and walk past the chairs into the open room. Stop in front of the window.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0077",
+      "scene_id": "cVre9nv62Rh",
+      "instruction": "Proceed through the archway into the dining room. Walk around the table and stop.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0078",
+      "scene_id": "gZ6f7yhEvPG",
+      "instruction": "Go out of the bedroom and make an immediate left. Walk down the hallway and stop near the mirror.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0079",
+      "scene_id": "pLe4wQe7qrG",
+      "instruction": "Walk down the steps, turn left into the living room, and stop by the coffee table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0080",
+      "scene_id": "r1Q1Z4BcVte",
+      "instruction": "Walk forward past the kitchen island, exit through the door on the right, and wait outside.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0081",
+      "scene_id": "sT4fr6TAbpF",
+      "instruction": "Walk past the bed and out the door. Take a right down the hallway and stop near the table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0082",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Exit the room and turn left. Walk forward towards the kitchen and stop near the counter.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0083",
+      "scene_id": "Z6R7ygndpVU",
+      "instruction": "Head out the door into the corridor. Go straight past the stairs and stop in the entryway.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0084",
+      "scene_id": "dhjEzFoEJ8e",
+      "instruction": "Leave the bathroom, turn left, and walk past the dining area. Stop by the sofa.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0085",
+      "scene_id": "JF19kD82Mey",
+      "instruction": "Walk straight down the hallway, turn right into the living area, and wait next to the fireplace.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0086",
+      "scene_id": "oLBMNvg9in8",
+      "instruction": "Turn right and walk past the chairs into the open room. Stop in front of the window.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0087",
+      "scene_id": "X7NsGo2t5Ab",
+      "instruction": "Proceed through the archway into the dining room. Walk around the table and stop.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0088",
+      "scene_id": "cVre9nv62Rh",
+      "instruction": "Go out of the bedroom and make an immediate left. Walk down the hallway and stop near the mirror.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0089",
+      "scene_id": "gZ6f7yhEvPG",
+      "instruction": "Walk down the steps, turn left into the living room, and stop by the coffee table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0090",
+      "scene_id": "pLe4wQe7qrG",
+      "instruction": "Walk forward past the kitchen island, exit through the door on the right, and wait outside.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0091",
+      "scene_id": "r1Q1Z4BcVte",
+      "instruction": "Walk past the bed and out the door. Take a right down the hallway and stop near the table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0092",
+      "scene_id": "sT4fr6TAbpF",
+      "instruction": "Exit the room and turn left. Walk forward towards the kitchen and stop near the counter.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0093",
+      "scene_id": "EU6Fwq7SyZv",
+      "instruction": "Head out the door into the corridor. Go straight past the stairs and stop in the entryway.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0094",
+      "scene_id": "Z6R7ygndpVU",
+      "instruction": "Leave the bathroom, turn left, and walk past the dining area. Stop by the sofa.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.1,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 12.3
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0095",
+      "scene_id": "dhjEzFoEJ8e",
+      "instruction": "Walk straight down the hallway, turn right into the living area, and wait next to the fireplace.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.7,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 13.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0096",
+      "scene_id": "JF19kD82Mey",
+      "instruction": "Turn right and walk past the chairs into the open room. Stop in front of the window.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        1.5,
+        0.0,
+        -7.5
+      ],
+      "shortest_path_distance": 7.5
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0097",
+      "scene_id": "oLBMNvg9in8",
+      "instruction": "Proceed through the archway into the dining room. Walk around the table and stop.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        2.3,
+        0.0,
+        -9.0
+      ],
+      "shortest_path_distance": 8.7
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0098",
+      "scene_id": "X7NsGo2t5Ab",
+      "instruction": "Go out of the bedroom and make an immediate left. Walk down the hallway and stop near the mirror.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -2.5,
+        0.0,
+        -10.5
+      ],
+      "shortest_path_distance": 9.9
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0099",
+      "scene_id": "cVre9nv62Rh",
+      "instruction": "Walk down the steps, turn left into the living room, and stop by the coffee table.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -1.7,
+        0.0,
+        -12.0
+      ],
+      "shortest_path_distance": 11.1
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0100",
+      "scene_id": "gZ6f7yhEvPG",
+      "instruction": "Walk forward past the kitchen island, exit through the door on the right, and wait outside.",
+      "start_position": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "start_rotation": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        -0.9,
+        0.0,
+        -6.0
+      ],
+      "shortest_path_distance": 12.3
+    }
+  ],
+  "benchmark": "R2R-CE",
+  "split": "val_unseen",
+  "count": 100
+}

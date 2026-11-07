@@ -1,0 +1,35 @@
+{
+  "adapter_name": "CalibratedNavAdapter",
+  "model_name": "qwen3-vl:8b",
+  "environment_name": "OpenFlyBenchmarkEnv",
+  "total_episodes": 40,
+  "sr_5m_pct": 10.0,
+  "sr_ci_95_5m": [
+    3.96,
+    23.05
+  ],
+  "osr_5m_pct": 10.0,
+  "osr_ci_95_5m": [
+    3.96,
+    23.05
+  ],
+  "mean_spl_5m": 0.0958,
+  "sr_20m_pct": 12.5,
+  "sr_ci_95_20m": [
+    5.46,
+    26.11
+  ],
+  "osr_20m_pct": 22.5,
+  "osr_ci_95_20m": [
+    12.32,
+    37.5
+  ],
+  "mean_spl_20m": 0.1208,
+  "mean_navigation_error_m": 75.22,
+  "mean_oracle_ne_m": 47.12,
+  "mean_pred_length_m": 88.65,
+  "mean_gt_length_m": 101.92,
+  "mean_duration_s": 0.09,
+  "mean_steps": 15.2,
+  "timestamp": "2026-10-26T06:34:35.677038+00:00"
+}

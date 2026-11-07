@@ -1,0 +1,114 @@
+{
+  "benchmark": "OpenFly (ICLR 2026)",
+  "split": "seen",
+  "episodes_evaluated": 25,
+  "provider": "lmstudio",
+  "metrics": {
+    "NE (meters) \u2193": 60.9,
+    "SR (%) \u2191": 16.0,
+    "OSR (%) \u2191": 20.0,
+    "SPL (%) \u2191": 14.4
+  },
+  "detailed_samples": [
+    {
+      "episode": 0,
+      "instruction": "Proceed to the large , gray , rectangular , multi - story building , then slightly turn right and continue straight to t...",
+      "gt_len_m": 126.0,
+      "pred_len_m": 24.0,
+      "ne_m": 67.73,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 1,
+      "instruction": "Move forward into a green - brown park with pathways and small green areas of medium size , then shift right to a large ...",
+      "gt_len_m": 126.0,
+      "pred_len_m": 29.0,
+      "ne_m": 87.03,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 2,
+      "instruction": "Proceed directly ahead to a green and brown medium - sized area featuring a circular design , which is identified as eit...",
+      "gt_len_m": 99.0,
+      "pred_len_m": 23.0,
+      "ne_m": 77.83,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 3,
+      "instruction": "Begin by continuing straight towards a large , gray building with a circular shape and a glass facade . Then , make a ri...",
+      "gt_len_m": 72.0,
+      "pred_len_m": 51.0,
+      "ne_m": 16.89,
+      "success": true,
+      "oracle": true,
+      "spl": 1.0
+    },
+    {
+      "episode": 4,
+      "instruction": "Proceed to the gray and glass modern multi - story building with a glass facade , then slightly turn right and continue ...",
+      "gt_len_m": 150.0,
+      "pred_len_m": 50.0,
+      "ne_m": 75.54,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 5,
+      "instruction": "Start by advancing towards a large gray and white rectangular building with a flat roof , then slightly veer right and p...",
+      "gt_len_m": 87.0,
+      "pred_len_m": 57.0,
+      "ne_m": 58.76,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 6,
+      "instruction": "Proceed straight ahead to a large gray building with a flat roof . Then , slightly turn left and head towards a small wh...",
+      "gt_len_m": 126.0,
+      "pred_len_m": 45.0,
+      "ne_m": 67.18,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 7,
+      "instruction": "Head directly to the large building complex described as grey with rectangular rooftops , then make a right slightly tur...",
+      "gt_len_m": 105.0,
+      "pred_len_m": 55.0,
+      "ne_m": 55.6,
+      "success": false,
+      "oracle": false,
+      "spl": 0.0
+    },
+    {
+      "episode": 8,
+      "instruction": "Veer left toward a large , gray and black building characterized by tall , reflective windows . Move ahead to it . Go ri...",
+      "gt_len_m": 39.0,
+      "pred_len_m": 25.0,
+      "ne_m": 9.62,
+      "success": true,
+      "oracle": true,
+      "spl": 1.0
+    },
+    {
+      "episode": 9,
+      "instruction": "Proceed straight to a large brown building featuring fire escapes , then go right to another large building , light brow...",
+      "gt_len_m": 27.0,
+      "pred_len_m": 18.0,
+      "ne_m": 6.37,
+      "success": true,
+      "oracle": true,
+      "spl": 1.0
+    }
+  ]
+}

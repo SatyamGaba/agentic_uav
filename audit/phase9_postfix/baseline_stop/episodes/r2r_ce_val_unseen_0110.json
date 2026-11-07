@@ -1,0 +1,32 @@
+{
+  "episode_id": "r2r_ce_val_unseen_0110",
+  "scene_id": "oLBMNvg9in8",
+  "instruction": "Walk down stairs.  Walk down second set of stairs. stop at doorway.",
+  "model": "stop_immediately",
+  "called_stop": true,
+  "terminated_deadlock": false,
+  "terminated_protocol_violation": false,
+  "total_steps": 1,
+  "arrival_verification_steps": 0,
+  "failure_category": "stop_premature",
+  "metrics": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 8.494878768920898,
+    "trajectory_length_m": 0.0,
+    "simulator_action_count": 0
+  },
+  "metrics_dataclass": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 8.494878768920898,
+    "trajectory_length_m": 0.0,
+    "shortest_path_distance_m": 8.494878768920898,
+    "total_steps": 1,
+    "simulator_action_count": 0
+  },
+  "shortest_path_distance_m": 8.494880676269531,
+  "goal_radius_m": 3.0
+}

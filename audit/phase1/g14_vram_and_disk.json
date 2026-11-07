@@ -1,0 +1,9 @@
+{
+  "check": "G1.4",
+  "vram_total_mb": 6141.0,
+  "vram_used_mb": 0.0,
+  "vram_free_mb": 5920.0,
+  "windows_c_free_gb": 169.46,
+  "wsl_root_free_gb": 945.0,
+  "status": "PASS"
+}

@@ -1,0 +1,8 @@
+{
+  "check": "G3.1",
+  "simulator": "habitat-sim",
+  "version": "0.3.3",
+  "built_with_bullet": true,
+  "cuda_enabled": false,
+  "status": "PASS"
+}

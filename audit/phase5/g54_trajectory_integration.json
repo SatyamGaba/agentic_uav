@@ -1,0 +1,54 @@
+{
+  "check": "G5.4",
+  "scene": "gZ6f7yhEvPG",
+  "steps_integrated": 5,
+  "node_poses_rel_xz_yaw": [
+    {
+      "node": 1,
+      "x_m": 0.0,
+      "z_m": 0.0,
+      "yaw_rad": 0.0
+    },
+    {
+      "node": 2,
+      "x_m": 0.0,
+      "z_m": -0.25,
+      "yaw_rad": 0.0
+    },
+    {
+      "node": 3,
+      "x_m": 0.0,
+      "z_m": -0.5,
+      "yaw_rad": 0.0
+    },
+    {
+      "node": 4,
+      "x_m": 0.0,
+      "z_m": -0.5,
+      "yaw_rad": -0.2618
+    },
+    {
+      "node": 5,
+      "x_m": 0.0647,
+      "z_m": -0.7415,
+      "yaw_rad": -0.2618
+    }
+  ],
+  "explored_cells_progression": [
+    898,
+    959,
+    1014,
+    1035,
+    1053
+  ],
+  "initial_explored_cells": 898,
+  "final_explored_cells": 1053,
+  "strictly_expanded": true,
+  "bev_image_shape": [
+    256,
+    256,
+    3
+  ],
+  "bev_image_file": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase5/g54_real_mp3d_bev.png",
+  "status": "PASS"
+}

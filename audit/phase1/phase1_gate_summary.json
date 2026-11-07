@@ -1,0 +1,12 @@
+{
+  "phase": 1,
+  "name": "Host Baseline",
+  "checks": {
+    "G1.1": "PASS",
+    "G1.2": "PASS",
+    "G1.3": "PASS",
+    "G1.4": "PASS",
+    "G1.5": "PASS"
+  },
+  "gate_closed": true
+}

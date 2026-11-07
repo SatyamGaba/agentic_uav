@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "timestamp": "2026-11-06T14:35:28Z",
+  "results": [
+    {
+      "episode_id": "r2r_ce_val_unseen_0001",
+      "success": false,
+      "spl": 0.0,
+      "ne_m": 1.7166962623596191,
+      "steps": 2,
+      "actions": 8,
+      "duration_s": 38.09,
+      "pass": true
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0002",
+      "success": false,
+      "spl": 0.0,
+      "ne_m": 0.9311527609825134,
+      "steps": 5,
+      "actions": 16,
+      "duration_s": 49.27,
+      "pass": true
+    },
+    {
+      "episode_id": "r2r_ce_val_unseen_0003",
+      "success": false,
+      "spl": 0.0,
+      "ne_m": 0.17519621551036835,
+      "steps": 3,
+      "actions": 15,
+      "duration_s": 15.44,
+      "pass": true
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+=== CHECK 0: Initial ollama ps ===
+{
+  "models": []
+}
+
+=== CHECK 1 ALREADY MEASURED: 76.53s for 'hi' ===
+
+=== CHECK 2: Full tool-schema + prompt (no image) ===
+Check 2 SUCCESS: 82.92s
+Tool calls returned: []
+Content: 
+Post-Check 2 ollama ps:
+{
+  "models": [
+    {
+      "name": "qwen3-vl:8b",
+      "model": "qwen3-vl:8b",
+      "size": 5795940924,
+      "digest": "9cf69da2b16d097f7def535917c4b55a95d6c7ee5700eb69ab86b01b3cfca487",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen3vl",
+        "families": [
+          "qwen3vl",
+          "clip"
+        ],
+        "parameter_size": "8.2B",
+        "quantization_level": "Q4_K_M"
+      },
+      "expires_at": "2026-10-22T21:13:45.409603326+05:30",
+      "size_vram": 5795940924,
+      "context_length": 4096
+    }
+  ]
+}

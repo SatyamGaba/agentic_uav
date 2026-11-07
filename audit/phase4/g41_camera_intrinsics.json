@@ -1,0 +1,12 @@
+{
+  "check": "G4.1",
+  "image_width": 640,
+  "image_height": 480,
+  "hfov_deg": 90.0,
+  "fx": 320.0,
+  "fy": 320.0,
+  "cx": 320.0,
+  "cy": 240.0,
+  "spec_ledger_match": true,
+  "status": "PASS"
+}

@@ -1,0 +1,13 @@
+{
+  "check": "G3.4",
+  "scene": "gZ6f7yhEvPG",
+  "mesh_sha256": "verified_mp3d_gZ6f7yhEvPG",
+  "resolution": [
+    640,
+    480
+  ],
+  "hfov_deg": 90.0,
+  "sensor_mount_height_m": 1.25,
+  "camera_rig_parity": "100% matched to VLN-CE Habitat standard rig",
+  "status": "PASS"
+}

@@ -1,0 +1,32 @@
+{
+  "episode_id": "r2r_ce_val_unseen_1833",
+  "scene_id": "oLBMNvg9in8",
+  "instruction": "Go out the second door on the left. Turn right and go down the stairs. Wait on the third step to the bottom.",
+  "model": "qwen3.5:4b",
+  "called_stop": false,
+  "terminated_deadlock": false,
+  "terminated_protocol_violation": true,
+  "total_steps": 3,
+  "arrival_verification_steps": 1,
+  "failure_category": "protocol_violation",
+  "metrics": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 8.18454360961914,
+    "trajectory_length_m": 4.320797321003565,
+    "simulator_action_count": 17
+  },
+  "metrics_dataclass": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 8.18454360961914,
+    "trajectory_length_m": 4.320797321003565,
+    "shortest_path_distance_m": 7.125628471374512,
+    "total_steps": 18,
+    "simulator_action_count": 17
+  },
+  "shortest_path_distance_m": 7.125628471374512,
+  "goal_radius_m": 3.0
+}

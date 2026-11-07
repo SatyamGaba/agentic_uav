@@ -1,0 +1,10 @@
+{
+  "check": "G5.5",
+  "valid_recalls_tested": 20,
+  "all_valid_recalls_succeeded": true,
+  "current_node_6_rejected": true,
+  "future_node_7_rejected": true,
+  "zero_node_rejected": true,
+  "invalid_view_5_rejected": true,
+  "status": "PASS"
+}

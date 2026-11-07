@@ -1,0 +1,15 @@
+{
+  "check": "G1.1",
+  "windows_gpu": [
+    "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "592.82",
+    "6141 MiB"
+  ],
+  "wsl_gpu": [
+    "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "592.82",
+    "6141 MiB"
+  ],
+  "match": true,
+  "status": "PASS"
+}

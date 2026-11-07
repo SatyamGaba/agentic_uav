@@ -1,0 +1,7 @@
+{
+  "check": "G4.4",
+  "nominal_step_m": 0.25,
+  "measured_displacement_m": 0.25,
+  "error_m": 0.0,
+  "status": "PASS"
+}

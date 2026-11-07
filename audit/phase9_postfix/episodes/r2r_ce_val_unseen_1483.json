@@ -1,0 +1,32 @@
+{
+  "episode_id": "r2r_ce_val_unseen_1483",
+  "scene_id": "pLe4wQe7qrG",
+  "instruction": "Turn around and walk along the wooden hallway.Wait the the wooden doorway.",
+  "model": "qwen3.5:4b",
+  "called_stop": false,
+  "terminated_deadlock": true,
+  "terminated_protocol_violation": false,
+  "total_steps": 3,
+  "arrival_verification_steps": 1,
+  "failure_category": "safety_deadlock",
+  "metrics": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 7.0554351806640625,
+    "trajectory_length_m": 1.8211047204291964,
+    "simulator_action_count": 8
+  },
+  "metrics_dataclass": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 7.0554351806640625,
+    "trajectory_length_m": 1.8211047204291964,
+    "shortest_path_distance_m": 6.819198131561279,
+    "total_steps": 9,
+    "simulator_action_count": 8
+  },
+  "shortest_path_distance_m": 6.819198131561279,
+  "goal_radius_m": 3.0
+}

@@ -1,0 +1,57 @@
+{
+  "step_results": [
+    {
+      "step": 1,
+      "latency_s": 9.06,
+      "u": 0.5,
+      "v": 0.5,
+      "heading_deg": 0.0,
+      "disp_m": 8.0,
+      "reason": "Proceed forward along path"
+    },
+    {
+      "step": 2,
+      "latency_s": 4.58,
+      "u": 0.5,
+      "v": 0.5,
+      "heading_deg": 0.0,
+      "disp_m": 8.0,
+      "reason": "Proceed forward along path"
+    },
+    {
+      "step": 3,
+      "latency_s": 4.59,
+      "u": 0.5,
+      "v": 0.5,
+      "heading_deg": 0.0,
+      "disp_m": 8.0,
+      "reason": "Proceed forward along path"
+    }
+  ],
+  "yaw_probe_results": [
+    {
+      "label": "Base Heading (0 deg)",
+      "yaw_offset_deg": 0.0,
+      "u": 0.5,
+      "v": 0.5,
+      "heading_delta_deg": 0.0,
+      "reason": "Proceed forward along path"
+    },
+    {
+      "label": "Yaw Right (+30 deg)",
+      "yaw_offset_deg": 30.0,
+      "u": 0.5,
+      "v": 0.5,
+      "heading_delta_deg": 0.0,
+      "reason": "Proceed forward along path"
+    },
+    {
+      "label": "Yaw Left (-30 deg)",
+      "yaw_offset_deg": -30.0,
+      "u": 0.5,
+      "v": 0.5,
+      "heading_delta_deg": 0.0,
+      "reason": "Proceed forward along path"
+    }
+  ]
+}

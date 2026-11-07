@@ -1,0 +1,15 @@
+{
+  "check": "G0.2",
+  "total_assumed_items": 7,
+  "assumed_items": [
+    "corridor_half_width_m",
+    "zero_rho_policy",
+    "max_snap_deg",
+    "max_snap_drift_m",
+    "bev_recenter_margin_px",
+    "max_malformed_calls_per_step",
+    "inference_seed"
+  ],
+  "missing_ablation_or_reason": [],
+  "status": "PASS"
+}

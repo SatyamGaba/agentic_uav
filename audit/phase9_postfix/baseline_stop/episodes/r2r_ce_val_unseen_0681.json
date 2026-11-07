@@ -1,0 +1,32 @@
+{
+  "episode_id": "r2r_ce_val_unseen_0681",
+  "scene_id": "EU6Fwq7SyZv",
+  "instruction": "Walk across the large room to the stairs. Wait under the stairs that lead downstairs.",
+  "model": "stop_immediately",
+  "called_stop": true,
+  "terminated_deadlock": false,
+  "terminated_protocol_violation": false,
+  "total_steps": 1,
+  "arrival_verification_steps": 0,
+  "failure_category": "stop_premature",
+  "metrics": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 9.872648239135742,
+    "trajectory_length_m": 0.0,
+    "simulator_action_count": 0
+  },
+  "metrics_dataclass": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": false,
+    "navigation_error_m": 9.872648239135742,
+    "trajectory_length_m": 0.0,
+    "shortest_path_distance_m": 9.872648239135742,
+    "total_steps": 1,
+    "simulator_action_count": 0
+  },
+  "shortest_path_distance_m": 9.872648239135742,
+  "goal_radius_m": 3.0
+}

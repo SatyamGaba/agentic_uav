@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UAV VLM Autonomous Command Center</title>
+  <style>
+    :root {
+      --bg-dark: #0a0e17;
+      --panel-bg: rgba(16, 22, 35, 0.7);
+      --accent-color: #00f0ff;
+      --accent-glow: rgba(0, 240, 255, 0.4);
+      --text-main: #e2e8f0;
+      --text-dim: #94a3b8;
+      --border-color: rgba(0, 240, 255, 0.2);
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --alert-color: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(16, 22, 35, 0.5) 0, transparent 50%),
+        radial-gradient(at 50% 0%, rgba(0, 240, 255, 0.15) 0, transparent 50%),
+        linear-gradient(rgba(18, 24, 38, 0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(18, 24, 38, 0.2) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+      color: var(--text-main);
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 15px 30px;
+      background: rgba(10, 14, 23, 0.85);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--success-color);
+      box-shadow: 0 0 10px var(--success-color);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.7; }
+      50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 16px var(--success-color); }
+      100% { transform: scale(0.95); opacity: 0.7; }
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .main-container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr 360px;
+      gap: 20px;
+      padding: 20px;
+      height: calc(100vh - 65px);
+      overflow: hidden;
+    }
+
+    .panel {
+      background: var(--panel-bg);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .panel-header {
+      padding: 12px 18px;
+      background: rgba(0, 240, 255, 0.07);
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-content {
+      padding: 18px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    /* Video Feed Panel */
+    .video-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 5/3;
+      background: #000;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .video-feed {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      border: 1px solid rgba(0, 240, 255, 0.15);
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10px;
+    }
+
+    .target-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(16, 185, 129, 0.1);
+      border: 3px dashed var(--success-color);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.25rem;
+      text-shadow: 0 0 10px rgba(0,0,0,0.8);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      pointer-events: none;
+      animation: flash 1.5s infinite;
+    }
+
+    @keyframes flash {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+
+    .crosshair {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 30px;
+      height: 30px;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      border-radius: 50%;
+    }
+    .crosshair::before, .crosshair::after {
+      content: '';
+      position: absolute;
+      background: rgba(0, 240, 255, 0.4);
+    }
+    .crosshair::before { top: 50%; left: -5px; width: 40px; height: 1px; }
+    .crosshair::after { left: 50%; top: -5px; height: 40px; width: 1px; }
+
+    /* Configuration Panel */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+    }
+
+    input, select, textarea {
+      background: rgba(10, 14, 23, 0.8);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: #fff;
+      padding: 10px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+    }
+
+    /* Manual Flight Panel */
+    .flight-pad-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 5px;
+    }
+
+    .dpad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 6px;
+      max-width: 150px;
+      margin: 0 auto;
+    }
+
+    .pad-btn {
+      background: rgba(16, 22, 35, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      aspect-ratio: 1;
+      transition: all 0.2s ease;
+    }
+
+    .pad-btn:hover {
+      background: var(--accent-color);
+      color: #000;
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .pad-btn:active {
+      transform: scale(0.95);
+    }
+
+    .control-actions-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .action-btn {
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--border-color);
+      color: var(--accent-color);
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: var(--accent-color);
+      color: #000;
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    /* Standard Buttons */
+    button.btn-primary {
+      background: linear-gradient(135deg, #00f0ff 0%, #0077ff 100%);
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      padding: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 119, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    button.btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(0, 240, 255, 0.4);
+      transform: translateY(-1px);
+    }
+
+    button.btn-secondary {
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      padding: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    button.btn-secondary:hover {
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+      transform: translateY(-1px);
+    }
+
+    /* Telemetry HUD (Left) */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .telemetry-card {
+      background: rgba(10, 14, 23, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .telemetry-val {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #fff;
+      margin-top: 4px;
+      font-family: monospace;
+    }
+
+    /* VLM Logs (Right) */
+    .vlm-log-container {
+      flex: 1;
+      background: rgba(10, 14, 23, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .vlm-entry {
+      border-left: 2px solid var(--accent-color);
+      padding-left: 8px;
+      margin-bottom: 8px;
+    }
+
+    .vlm-entry.target-found {
+      border-left-color: var(--success-color);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .vlm-timestamp {
+      color: var(--text-dim);
+      font-size: 0.7rem;
+    }
+
+    .vlm-reasoning {
+      color: var(--text-main);
+      margin-top: 4px;
+    }
+
+    .vlm-action {
+      color: var(--warning-color);
+      font-weight: bold;
+      margin-top: 2px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .status-active { background: rgba(16, 185, 129, 0.2); color: var(--success-color); }
+    .status-wait { background: rgba(245, 158, 11, 0.2); color: var(--warning-color); }
+    .status-critical { background: rgba(239, 68, 68, 0.2); color: var(--alert-color); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-container">
+      <div class="pulse-dot"></div>
+      <h1>UAV VLM Control Center</h1>
+    </div>
+    <div>
+      <span id="uav-mode" class="status-badge status-wait">DORMANT</span>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <!-- Config & Mission setup (Left) -->
+    <div class="panel">
+      <div class="panel-header">VLM Configuration</div>
+      <div class="panel-content">
+        <div class="form-group">
+          <label>API Provider</label>
+          <select id="api-provider">
+            <option value="lmstudio" selected>LM Studio (Local Qwen/OpenAI VL)</option>
+            <option value="gemini">Gemini API</option>
+            <option value="ollama">Local Ollama (Qwen-VL/Llava)</option>
+            <option value="qwen-dashscope">Qwen (DashScope Cloud API)</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="api-key-group">
+          <label>API Key / Endpoint</label>
+          <input type="password" id="api-key" placeholder="Enter API Key or URL">
+        </div>
+
+        <div class="form-group" id="model-name-group" style="display: none;">
+          <label>Model Name</label>
+          <input type="text" id="model-name" placeholder="e.g. qwen2-vl">
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+
+        <div class="form-group">
+          <label>Drone Telemetry</label>
+          <div class="telemetry-grid">
+            <div class="telemetry-card">
+              <label>Altitude</label>
+              <div class="telemetry-val" id="tele-alt">0.0 m</div>
+            </div>
+            <div class="telemetry-card">
+              <label>Battery</label>
+              <div class="telemetry-val" id="tele-bat">100%</div>
+            </div>
+            <div class="telemetry-card">
+              <label>Position (X, Y)</label>
+              <div class="telemetry-val" id="tele-pos">0.0, 0.0</div>
+            </div>
+            <div class="telemetry-card">
+              <label>Heading (Yaw)</label>
+              <div class="telemetry-val" id="tele-yaw">0°</div>
+            </div>
+            <div class="telemetry-card">
+              <label>Gimbal Tilt</label>
+              <div class="telemetry-val" id="tele-gimbal">0.5 (Down)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Current Target Waypoint</label>
+          <div class="telemetry-card" style="text-align: left;">
+            <div class="telemetry-val" id="tele-target" style="font-size: 0.85rem; word-break: break-all;">None</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Target Beliefs Tracker</label>
+          <div class="telemetry-card" style="text-align: left;">
+            <div id="tele-beliefs" style="font-size: 0.75rem; font-family: monospace; display: flex; flex-direction: column; gap: 4px; color: var(--text-main);">No active beliefs.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Camera Feed & Execution Controls -->
+    <div class="panel">
+      <div class="panel-header">Onboard Camera Stream & Manual Flight</div>
+      <div class="panel-content" style="gap: 15px;">
+        <div class="video-container">
+          <img id="camera-stream" class="video-feed" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Waiting for stream...">
+          <div class="video-overlay">
+            <span style="background: rgba(0,0,0,0.6); padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; width: fit-content; font-family: monospace;">CAM0_RAW</span>
+            <div class="crosshair"></div>
+          </div>
+          <div id="target-found-alert" class="target-overlay">
+            <span>Target Lock: Identified</span>
+          </div>
+        </div>
+
+        <!-- Manual Flight Pad Controls -->
+        <div class="flight-pad-container">
+          <div class="dpad-container">
+            <label style="display: block; text-align: center; margin-bottom: 5px;">Movement (Yaw / Pitch)</label>
+            <div class="dpad-grid">
+              <button class="pad-btn" id="m-yaw-left" title="Rotate Left">⟲</button>
+              <button class="pad-btn" id="m-forward" title="Move Forward">▲</button>
+              <button class="pad-btn" id="m-yaw-right" title="Rotate Right">⟳</button>
+              <button class="pad-btn" id="m-left" title="Move Left">◀</button>
+              <button class="pad-btn" id="m-hover" title="Stop & Hover" style="color: var(--accent-color); font-size: 0.7rem;">STOP</button>
+              <button class="pad-btn" id="m-right" title="Move Right">▶</button>
+              <div></div>
+              <button class="pad-btn" id="m-backward" title="Move Backward">▼</button>
+              <div></div>
+            </div>
+          </div>
+          
+          <div class="control-actions-col">
+            <label style="text-align: center; margin-bottom: 5px;">Altitude / System</label>
+            <div class="action-row">
+              <button class="action-btn" id="m-up" title="Increase Altitude">Climb ⯅</button>
+              <button class="action-btn" id="m-down" title="Decrease Altitude">Descend ⯆</button>
+            </div>
+            <div class="action-row" style="margin-top: 5px;">
+              <button class="action-btn" id="m-takeoff" style="color: var(--success-color); border-color: rgba(16, 185, 129, 0.4);">Take Off</button>
+              <button class="action-btn" id="m-land" style="color: var(--alert-color); border-color: rgba(239, 68, 68, 0.4);">Land</button>
+            </div>
+            
+            <label style="text-align: center; margin-top: 10px; margin-bottom: 5px; display: block;">Camera Gimbal Pitch</label>
+            <div class="action-row">
+              <button class="action-btn" id="m-tilt-horizon" title="Tilt to Horizon">Horizon (0°)</button>
+              <button class="action-btn" id="m-tilt-down45" title="Tilt to 45°">Tilt 45°</button>
+              <button class="action-btn" id="m-tilt-down90" title="Tilt to 90°">Down (90°)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: VLM Agent Prompt Console & Logs -->
+    <div class="panel">
+      <div class="panel-header">VLM Prompt Console</div>
+      <div class="panel-content">
+        <div class="form-group">
+          <label>Prompt Presets</label>
+          <select id="prompt-presets">
+            <option value="">-- Select a preset command --</option>
+            <option value="find the cardboard box">Find the Cardboard Box</option>
+            <option value="fly forward 5 meters">Fly Forward 5 meters</option>
+            <option value="turn left 90 degrees">Turn Left 90°</option>
+            <option value="patrol square of size 10m">Patrol in a square of 10m</option>
+            <option value="climb up to 6 meters altitude">Climb to 6 meters</option>
+            <option value="find the tesla car and hover near it">Find the Tesla Car</option>
+            <option value="land the drone immediately">Land immediately</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Human Mission Prompt</label>
+          <textarea id="mission-prompt" rows="3" placeholder="Enter instructions (e.g. 'find the cardboard box', 'fly forward 5m')"></textarea>
+        </div>
+
+        <button id="btn-submit" class="btn-primary">Launch VLM Mission</button>
+        <button id="btn-land" class="btn-secondary">Emergency Land</button>
+
+        <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+        
+        <label>Reasoning Log Stream</label>
+        <div class="vlm-log-container" id="vlm-logs">
+          <div style="color: var(--text-dim); text-align: center; margin-top: 20px;">Waiting for mission input...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const elStream = document.getElementById('camera-stream');
+    const elMode = document.getElementById('uav-mode');
+    const elTeleAlt = document.getElementById('tele-alt');
+    const elTeleBat = document.getElementById('tele-bat');
+    const elTelePos = document.getElementById('tele-pos');
+    const elTeleYaw = document.getElementById('tele-yaw');
+    const elTeleTarget = document.getElementById('tele-target');
+    const elLogs = document.getElementById('vlm-logs');
+    const elPrompt = document.getElementById('mission-prompt');
+    const elPresets = document.getElementById('prompt-presets');
+    const elBtnSubmit = document.getElementById('btn-submit');
+    const elBtnLand = document.getElementById('btn-land');
+    const elProvider = document.getElementById('api-provider');
+    const elApiKey = document.getElementById('api-key');
+    const elModelName = document.getElementById('model-name');
+    const elModelGroup = document.getElementById('model-name-group');
+    const elTargetAlert = document.getElementById('target-found-alert');
+
+    // Load saved API settings (with hardcoded fallback defaults for LM Studio qwen3-vl-4b)
+    elProvider.value = localStorage.getItem('vlm_api_provider') || 'lmstudio';
+    elApiKey.value = localStorage.getItem('vlm_api_key') || 'http://127.0.0.1:1234/v1/chat/completions';
+    elModelName.value = localStorage.getItem('vlm_model_name') || 'qwen/qwen3-vl-4b';
+
+    function updateKeyPlaceholder() {
+      if (elProvider.value === 'gemini') {
+        elApiKey.placeholder = "Enter Gemini API Key";
+        elModelGroup.style.display = 'none';
+      } else if (elProvider.value === 'ollama') {
+        elApiKey.placeholder = "Ollama URL (default: http://127.0.0.1:11434)";
+        elModelGroup.style.display = 'block';
+        if (!elModelName.value || elModelName.value === 'qwen/qwen3-vl-4b') elModelName.value = "qwen2-vl";
+        elModelName.placeholder = "e.g. qwen2-vl";
+      } else if (elProvider.value === 'lmstudio') {
+        elApiKey.placeholder = "LM Studio URL (default: http://127.0.0.1:1234/v1/chat/completions)";
+        elModelGroup.style.display = 'block';
+        if (!elModelName.value || elModelName.value === 'qwen2-vl') elModelName.value = "qwen/qwen3-vl-4b";
+        elModelName.placeholder = "e.g. qwen/qwen3-vl-4b";
+      } else if (elProvider.value === 'qwen-dashscope') {
+        elApiKey.placeholder = "Enter DashScope API Key";
+        elModelGroup.style.display = 'block';
+        if (!elModelName.value || elModelName.value === 'qwen2-vl') elModelName.value = "qwen-vl-plus";
+        elModelName.placeholder = "e.g. qwen-vl-plus";
+      }
+    }
+    elProvider.addEventListener('change', () => {
+      updateKeyPlaceholder();
+      localStorage.setItem('vlm_api_provider', elProvider.value);
+    });
+    updateKeyPlaceholder();
+
+    // Preset dropdown handler
+    elPresets.addEventListener('change', () => {
+      if (elPresets.value) {
+        elPrompt.value = elPresets.value;
+      }
+    });
+
+    // 10Hz Image streaming
+    setInterval(() => {
+      elStream.src = '/image?t=' + Date.now();
+    }, 100);
+
+    // Telemetry fetch loop (2Hz)
+    setInterval(() => {
+      fetch('/telemetry')
+        .then(r => r.json())
+        .then(data => {
+          elMode.textContent = data.state;
+          elMode.className = 'status-badge ' + 
+            (data.state === 'REASONING' ? 'status-active' : 
+             (data.state === 'DORMANT' ? 'status-wait' : 'status-critical'));
+          
+          elTeleAlt.textContent = data.altitude.toFixed(2) + ' m';
+          elTeleBat.textContent = data.battery.toFixed(0) + '%';
+          elTelePos.textContent = data.x.toFixed(2) + ', ' + data.y.toFixed(2);
+          elTeleYaw.textContent = (data.yaw * 180 / Math.PI).toFixed(0) + '°';
+          
+          const elTeleGimbal = document.getElementById('tele-gimbal');
+          if (elTeleGimbal && data.gimbal_pitch !== undefined) {
+            let label = "Horizon (0°)";
+            if (data.gimbal_pitch > 0.6) label = "Down (90°)";
+            else if (data.gimbal_pitch > 0.2) label = "Tilt 45°";
+            elTeleGimbal.textContent = `${data.gimbal_pitch.toFixed(1)} (${label})`;
+          }
+          
+          if (data.target) {
+            elTeleTarget.textContent = `X: ${data.target[0].toFixed(1)}, Y: ${data.target[1].toFixed(1)}, Alt: ${data.target[2].toFixed(1)}`;
+          } else {
+            elTeleTarget.textContent = 'None';
+          }
+
+          // Render target beliefs
+          const elBeliefs = document.getElementById('tele-beliefs');
+          if (elBeliefs && data.target_beliefs) {
+            if (data.target_beliefs.length > 0) {
+              elBeliefs.innerHTML = data.target_beliefs.map(tb => {
+                const confColor = tb.confidence >= 0.8 ? 'var(--success-color)' : 'var(--warning-color)';
+                const pos = tb.absolute_position ? tb.absolute_position : tb.last_seen_gps;
+                return `<div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 2px;">
+                  <strong style="color: ${confColor}">${tb.target_class.toUpperCase()}</strong>: ${tb.confidence.toFixed(2)} @ [${pos[0].toFixed(1)}, ${pos[1].toFixed(1)}]
+                </div>`;
+              }).join('');
+            } else {
+              elBeliefs.textContent = 'No active beliefs.';
+            }
+          }
+
+          // Toggle target identification overlay
+          let found = false;
+          if (data.vlm_logs && data.vlm_logs.length > 0) {
+            elLogs.innerHTML = '';
+            data.vlm_logs.forEach(log => {
+              const div = document.createElement('div');
+              // Highlight target found events in the log list
+              if (log.reasoning.toLowerCase().includes("target found") || log.reasoning.toLowerCase().includes("lock")) {
+                div.className = 'vlm-entry target-found';
+                found = true;
+              } else {
+                div.className = 'vlm-entry';
+              }
+              div.innerHTML = `
+                <div class="vlm-timestamp">[${log.time}]</div>
+                <div class="vlm-reasoning"><strong>Thoughts:</strong> ${log.reasoning}</div>
+                <div class="vlm-action">👉 Action: ${log.action} (${log.distance_or_angle})</div>
+              `;
+              elLogs.appendChild(div);
+            });
+          }
+          elTargetAlert.style.display = found ? 'flex' : 'none';
+        })
+        .catch(err => console.error('Error fetching telemetry:', err));
+    }, 500);
+
+    // Enter key submits prompt (Shift+Enter for newline)
+    elPrompt.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        elBtnSubmit.click();
+      }
+    });
+
+    // Event handlers
+    elBtnSubmit.addEventListener('click', () => {
+      const promptText = elPrompt.value.trim();
+      const provider = elProvider.value;
+      const key = elApiKey.value.trim();
+
+      if (!promptText) {
+        alert("Please enter a mission prompt.");
+        return;
+      }
+
+      localStorage.setItem('vlm_api_provider', provider);
+      localStorage.setItem('vlm_api_key', key);
+      localStorage.setItem('vlm_model_name', elModelName.value.trim());
+
+      elBtnSubmit.disabled = true;
+      elBtnSubmit.innerText = "DISPATCHING...";
+
+      fetch('/command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: promptText,
+          api_provider: provider,
+          api_key: key,
+          model_name: elModelName.value.trim()
+        })
+      })
+      .then(r => r.json())
+      .then(res => {
+        elBtnSubmit.disabled = false;
+        elBtnSubmit.innerText = "RUN VLM MISSION";
+        elLogs.innerHTML = '<div style="color: var(--text-dim); text-align: center; margin-top: 20px;">Triggering mission. Active VLM reasoning in progress...</div>';
+      })
+      .catch(err => {
+        elBtnSubmit.disabled = false;
+        elBtnSubmit.innerText = "RUN VLM MISSION";
+        alert('Failed to send command: ' + err);
+      });
+    });
+
+    elBtnLand.addEventListener('click', () => {
+      fetch('/land', { method: 'POST' })
+        .then(r => r.json())
+        .then(res => console.log('Land commanded:', res));
+    });
+
+    // Manual Flight Pad Triggers
+    const sendManual = (action) => {
+      fetch('/manual', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: action })
+      })
+      .then(r => r.json())
+      .then(res => console.log('Manual action:', action, res))
+      .catch(err => console.error('Manual command error:', err));
+    };
+
+    document.getElementById('m-forward').addEventListener('click', () => sendManual('forward'));
+    document.getElementById('m-backward').addEventListener('click', () => sendManual('backward'));
+    document.getElementById('m-left').addEventListener('click', () => sendManual('left'));
+    document.getElementById('m-right').addEventListener('click', () => sendManual('right'));
+    document.getElementById('m-yaw-left').addEventListener('click', () => sendManual('yaw_left'));
+    document.getElementById('m-yaw-right').addEventListener('click', () => sendManual('yaw_right'));
+    document.getElementById('m-hover').addEventListener('click', () => sendManual('hover'));
+    document.getElementById('m-up').addEventListener('click', () => sendManual('up'));
+    document.getElementById('m-down').addEventListener('click', () => sendManual('down'));
+    document.getElementById('m-takeoff').addEventListener('click', () => sendManual('takeoff'));
+    document.getElementById('m-land').addEventListener('click', () => sendManual('land'));
+    
+    // Camera Gimbal Tilt triggers
+    document.getElementById('m-tilt-horizon').addEventListener('click', () => sendManual('gimbal_pitch_0.0'));
+    document.getElementById('m-tilt-down45').addEventListener('click', () => sendManual('gimbal_pitch_0.4'));
+    document.getElementById('m-tilt-down90').addEventListener('click', () => sendManual('gimbal_pitch_0.8'));
+  </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "manifest_version": "1.0",
+  "created_at": "2026-11-06T14:00:23.576440Z",
+  "git_commit": "c3e5715f510488e04c69f918ed7157547fd56810",
+  "git_dirty": true,
+  "spec_ledger_hash": "bfce0946f11ae7bd747b14a913e1e722c765aff2e5f674001380857406729a9e",
+  "config_hash": "e46f8416dacc5715f205d2e622298bf1c90fce162196266efdebee9b7eaf9a32",
+  "ollama_version": "0.40.12",
+  "model_tag": "qwen3.5:4b",
+  "model_digest": "d8b0f5e94b292e34",
+  "model_capabilities": [
+    "vision",
+    "tools"
+  ],
+  "inference_options": {
+    "num_ctx": 8192,
+    "temperature": 0.0,
+    "seed": 42,
+    "think": false
+  },
+  "habitat_sim_version": "0.3.3",
+  "habitat_lab_version": "0.3.3",
+  "gpu_and_driver": "NVIDIA GeForce RTX 4050 Laptop GPU / Driver 592.82",
+  "scene_id": "gZ6f7yhEvPG",
+  "scene_file_sha256": "e638ab5342c0a968b9f224017f54c1ceca4f9c341c6e06b434325abdd4d0f5ce",
+  "episode_id": "r2r_ce_val_unseen_0001",
+  "episode_file_sha256": "98b980704a701458eef01441771642e724ac3f9d5a12429b1e9d2144a27cc24e",
+  "python_lockfile_hash": "0bc68bbafe645a09568feaf053abcd9db39d59814110f3252bd3c6201077e718"
+}

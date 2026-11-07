@@ -1,0 +1,18 @@
+{
+  "check": "G4.8",
+  "privilege_firewall": "STRICT_SEPARATION",
+  "forbidden_in_agent_observation": [
+    "oracle_goal_position_xyz",
+    "ground_truth_shortest_path",
+    "simulator_scene_graph",
+    "simulator_ground_truth_pose"
+  ],
+  "permitted_in_agent_observation": [
+    "panoramic_rgb_views_0_to_3",
+    "panoramic_depth_views_0_to_3",
+    "relative_odometry_delta_xy_heading",
+    "instruction_text"
+  ],
+  "audit_result": "ZERO_PRIVILEGE_LEAKAGE",
+  "status": "PASS"
+}

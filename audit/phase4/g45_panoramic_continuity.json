@@ -1,0 +1,13 @@
+{
+  "check": "G4.5",
+  "views_configured": 4,
+  "azimuths_deg": [
+    0.0,
+    -90.0,
+    180.0,
+    90.0
+  ],
+  "turn_90_view0_vs_view1_pixel_diff": 0.0,
+  "visual_continuity_verified": true,
+  "status": "PASS"
+}

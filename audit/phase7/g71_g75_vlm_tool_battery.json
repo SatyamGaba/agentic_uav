@@ -1,0 +1,42 @@
+{
+  "check": "G7.1 - G7.5",
+  "model": "qwen3.5:4b",
+  "thinking": false,
+  "temperature": 0.0,
+  "nav_tool_call": {
+    "name": "query_depth",
+    "arguments": {
+      "points": [
+        {
+          "u": 0.5,
+          "v": 0.5,
+          "view": 0
+        },
+        {
+          "u": 0.4,
+          "v": 0.6,
+          "view": 0
+        },
+        {
+          "u": 0.6,
+          "v": 0.6,
+          "view": 0
+        }
+      ]
+    }
+  },
+  "nav_latency_s": 2.304,
+  "arrival_tool_call": {
+    "name": "stop",
+    "arguments": {
+      "reason": "All instruction milestones fulfilled; robot is positioned directly in front of the front desk counter as the final destination."
+    }
+  },
+  "arrival_latency_s": 3.147,
+  "g71_valid_schema": true,
+  "g72_bounded_args": true,
+  "g73_active_nav": true,
+  "g74_clean_stop": true,
+  "g75_latency_under_5s": true,
+  "status": "PASS"
+}

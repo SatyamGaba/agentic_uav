@@ -1,0 +1,10 @@
+{
+  "check": "G3.2",
+  "scene_id": "/home/krutik/data/scene_datasets/mp3d/gZ6f7yhEvPG/gZ6f7yhEvPG.glb",
+  "gpu_device_id": -1,
+  "renderer": "D3D12 (NVIDIA GeForce RTX 4050 Laptop GPU)",
+  "init_time_s": 5.05,
+  "egl_initialized": true,
+  "hardware_accelerated": true,
+  "status": "PASS"
+}

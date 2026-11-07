@@ -1,0 +1,42 @@
+{
+  "check": "G0.4",
+  "benchmark": "R2R-CE val_unseen (100 episodes)",
+  "anchor_paper": "AgenticNav: Zero-Shot Vision-and-Language Navigation as a Tool-Calling Harness (arXiv:2606.10577, 2026)",
+  "paper_table_1_reported_baselines": {
+    "gemini_3_7_flash_anchor": {
+      "type": "Proprietary Commercial Anchor",
+      "sr_pct": 76.0,
+      "spl_pct": 66.5,
+      "osr_pct": 78.0,
+      "ndtw_pct": 69.38,
+      "ne_meters": 3.48,
+      "note": "Headline numbers reported with frontier multimodal API; not target for local 4B/8B open models."
+    },
+    "qwen3_8_27b_open_weight": {
+      "type": "Open-Weight Baseline",
+      "sr_pct": 48.0,
+      "spl_pct": 33.57,
+      "osr_pct": 72.0,
+      "ndtw_pct": 61.58,
+      "ne_meters": 5.65,
+      "note": "Paper's reported performance for open-weight Qwen family backbone."
+    },
+    "deepseek_v4_flash_vision_exp": {
+      "type": "Open-Weight Baseline",
+      "sr_pct": 49.0,
+      "spl_pct": 36.48,
+      "osr_pct": 64.0,
+      "ndtw_pct": 61.18,
+      "ne_meters": 5.67
+    }
+  },
+  "local_development_target": {
+    "model": "qwen3.5:4b",
+    "acceptance_criteria": [
+      "Pipeline correctness strictly proven through G1 to G10 gates",
+      "Zero silent fallbacks, true 5-image multimodal ingestion",
+      "Local replication performance comparable to paper open-weight range (SR ~40-50%, SPL ~30-35%)"
+    ]
+  },
+  "status": "PASS"
+}

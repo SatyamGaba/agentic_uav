@@ -1,0 +1,200 @@
+ [STEP EVALUATION] Step 01 @ Node 01 | Accumulated Odometry: 2.50m
+================================================================================
+ 1. VISUAL & DEPTH PERCEPTION:
+    - Front: 0.00m | Right: 0.00m | Back: 0.00m | Left: 0.00m
+ 2. VLM REASONING ANALYSIS:
+    - Reasoning Quality: [LACKS_MILESTONES] | Format: native_tool_call
+    - Active Milestone   : Not specified
+ 3. ACTION & PARSING:
+    - Action Type  : MOVE_TO
+    - Parsing Valid: True
+    - Payload      : {"status": "executed", "theta_deg": 0.0, "rho_m": 2.5, "moved_m": 2.5, "collided": false, "turn_steps": 0, "forward_steps": 10, "view": 0, "u": 0.5, "v": 0.55, "reason": "Clear passage ahead"}
+ 4. MOVEMENT CONSISTENCY & PROGRESS:
+    - Pose Shift   : (+0.00, +0.00,  +0.0°) -> (+0.00, -2.50,  +0.0°)
+    - Distance Moved: 2.50m | Collided: False | Stalled: False
+    - Goal Distance: 12.03m -> 9.54m (Δ: +2.49m CLOSER (✓))
+ ⚠️  DIAGNOSTIC WARNINGS (1):
+    - [WARNING] Model provided minimal or no milestone decomposition in thought trace.
+--------------------------------------------------------------------------------
+
+================================================================================
+ [STEP EVALUATION] Step 02 @ Node 02 | Accumulated Odometry: 5.00m
+================================================================================
+ 1. VISUAL & DEPTH PERCEPTION:
+    - Front: 0.00m | Right: 0.00m | Back: 0.00m | Left: 0.00m
+ 2. VLM REASONING ANALYSIS:
+    - Reasoning Quality: [LACKS_MILESTONES] | Format: native_tool_call
+    - Active Milestone   : Not specified
+ 3. ACTION & PARSING:
+    - Action Type  : MOVE_TO
+    - Parsing Valid: True
+    - Payload      : {"status": "executed", "theta_deg": 0.0, "rho_m": 2.5, "moved_m": 2.5, "collided": false, "turn_steps": 0, "forward_steps": 10, "view": 0, "u": 0.5, "v": 0.55, "reason": "Clear passage ahead"}
+ 4. MOVEMENT CONSISTENCY & PROGRESS:
+    - Pose Shift   : (+0.00, -2.50,  +0.0°) -> (+0.00, -5.00,  +0.0°)
+    - Distance Moved: 2.50m | Collided: False | Stalled: False
+    - Goal Distance: 9.54m -> 7.06m (Δ: +2.48m CLOSER (✓))
+ ⚠️  DIAGNOSTIC WARNINGS (1):
+    - [WARNING] Model provided minimal or no milestone decomposition in thought trace.
+--------------------------------------------------------------------------------
+
+================================================================================
+ [STEP EVALUATION] Step 03 @ Node 03 | Accumulated Odometry: 7.50m
+================================================================================
+ 1. VISUAL & DEPTH PERCEPTION:
+    - Front: 0.00m | Right: 0.00m | Back: 0.00m | Left: 0.00m
+ 2. VLM REASONING ANALYSIS:
+    - Reasoning Quality: [LACKS_MILESTONES] | Format: native_tool_call
+    - Active Milestone   : Not specified
+ 3. ACTION & PARSING:
+    - Action Type  : MOVE_TO
+    - Parsing Valid: True
+    - Payload      : {"status": "executed", "theta_deg": 0.0, "rho_m": 2.5, "moved_m": 2.5, "collided": false, "turn_steps": 0, "forward_steps": 10, "view": 0, "u": 0.5, "v": 0.55, "reason": "Clear passage ahead"}
+ 4. MOVEMENT CONSISTENCY & PROGRESS:
+    - Pose Shift   : (+0.00, -5.00,  +0.0°) -> (+0.00, -7.50,  +0.0°)
+    - Distance Moved: 2.50m | Collided: False | Stalled: False
+    - Goal Distance: 7.06m -> 4.59m (Δ: +2.47m CLOSER (✓))
+ ⚠️  DIAGNOSTIC WARNINGS (1):
+    - [WARNING] Model provided minimal or no milestone decomposition in thought trace.
+--------------------------------------------------------------------------------
+
+================================================================================
+ [STEP EVALUATION] Step 04 @ Node 04 | Accumulated Odometry: 7.50m
+================================================================================
+ 1. VISUAL & DEPTH PERCEPTION:
+    - Front: 0.00m | Right: 0.00m | Back: 0.00m | Left: 0.00m
+ 2. VLM REASONING ANALYSIS:
+    - Reasoning Quality: [LACKS_MILESTONES] | Format: native_tool_call
+    - Active Milestone   : Not specified
+ 3. ACTION & PARSING:
+    - Action Type  : STOP
+    - Parsing Valid: True
+    - Payload      : {"reason": "Reached goal."}
+ 4. MOVEMENT CONSISTENCY & PROGRESS:
+    - Pose Shift   : (+0.00, -7.50,  +0.0°) -> (+0.00, -7.50,  +0.0°)
+    - Distance Moved: 0.00m | Collided: False | Stalled: False
+    - Goal Distance: 4.59m -> 4.59m (Δ: +0.00m NO CHANGE (=))
+ ⚠️  DIAGNOSTIC WARNINGS (2):
+    - [WARNING] Model provided minimal or no milestone decomposition in thought trace.
+    - [WARNING] PREMATURE STOP DETECTED: Agent invoked stop() 4.59m from goal (> 3.0m threshold).
+--------------------------------------------------------------------------------
+[EVALUATOR] Step audit trace saved to: runs/eval_10ep/r2r_ce_val_unseen_0009/audit_eval_r2r_ce_val_unseen_0009.json
+[EVALUATOR] Final BEV Map saved: runs/eval_10ep/r2r_ce_val_unseen_0009/final_bev_r2r_ce_val_unseen_0009.png
+
+================================================================================
+         EPISODE r2r_ce_val_unseen_0009 DIAGNOSTIC SUMMARY
+================================================================================
+ Outcome Status        : FAILURE (Category: stop_premature)
+ Total Steps Executed  : 4
+ Movement Consistency  : 3/4 steps consistent (75.0%)
+ Reasoning Quality     : 0/4 steps with high-density milestone reasoning
+ Premature Stop Guard  : TRIGGERED ⚠️
+ Physical Collisions   : 0
+ Movement Stalls       : 0
+ Metric SPL            : 0.0000
+ Navigation Error (NE) : 4.59 meters
+ Telemetry Saved To    : runs/eval_10ep/r2r_ce_val_unseen_0009
+================================================================================
+
+################################################################################
+ STARTING INSPECTION: EPISODE 10/10 (r2r_ce_val_unseen_0010)
+ Instruction: "Walk forward past the kitchen island, exit through the door on the right, and wait outside."
+ Start: [0.0, 0.0, 0.0] -> Goal: [-0.1, 0.0, -6.0] (Shortest: 12.30m)
+################################################################################
+
+================================================================================
+ [STEP EVALUATION] Step 01 @ Node 01 | Accumulated Odometry: 2.50m
+================================================================================
+ 1. VISUAL & DEPTH PERCEPTION:
+    - Front: 0.00m | Right: 0.00m | Back: 0.00m | Left: 0.00m
+ 2. VLM REASONING ANALYSIS:
+    - Reasoning Quality: [LACKS_MILESTONES] | Format: native_tool_call
+    - Active Milestone   : Not specified
+ 3. ACTION & PARSING:
+    - Action Type  : MOVE_TO
+    - Parsing Valid: True
+    - Payload      : {"status": "executed", "theta_deg": 0.0, "rho_m": 2.5, "moved_m": 2.5, "collided": false, "turn_steps": 0, "forward_steps": 10, "view": 0, "u": 0.5, "v": 0.55, "reason": "Clear passage ahead"}
+ 4. MOVEMENT CONSISTENCY & PROGRESS:
+    - Pose Shift   : (+0.00, +0.00,  +0.0°) -> (+0.00, -2.50,  +0.0°)
+    - Distance Moved: 2.50m | Collided: False | Stalled: False
+    - Goal Distance: 6.00m -> 3.50m (Δ: +2.50m CLOSER (✓))
+ ⚠️  DIAGNOSTIC WARNINGS (1):
+    - [WARNING] Model provided minimal or no milestone decomposition in thought trace.
+--------------------------------------------------------------------------------
+
+================================================================================
+ [STEP EVALUATION] Step 02 @ Node 02 | Accumulated Odometry: 5.00m
+================================================================================
+ 1. VISUAL & DEPTH PERCEPTION:
+    - Front: 0.00m | Right: 0.00m | Back: 0.00m | Left: 0.00m
+ 2. VLM REASONING ANALYSIS:
+    - Reasoning Quality: [LACKS_MILESTONES] | Format: native_tool_call
+    - Active Milestone   : Not specified
+ 3. ACTION & PARSING:
+    - Action Type  : MOVE_TO
+    - Parsing Valid: True
+    - Payload      : {"status": "executed", "theta_deg": 0.0, "rho_m": 2.5, "moved_m": 2.5, "collided": false, "turn_steps": 0, "forward_steps": 10, "view": 0, "u": 0.5, "v": 0.55, "reason": "Clear passage ahead"}
+ 4. MOVEMENT CONSISTENCY & PROGRESS:
+    - Pose Shift   : (+0.00, -2.50,  +0.0°) -> (+0.00, -5.00,  +0.0°)
+    - Distance Moved: 2.50m | Collided: False | Stalled: False
+    - Goal Distance: 3.50m -> 1.00m (Δ: +2.50m CLOSER (✓))
+ ⚠️  DIAGNOSTIC WARNINGS (1):
+    - [WARNING] Model provided minimal or no milestone decomposition in thought trace.
+--------------------------------------------------------------------------------
+
+================================================================================
+ [STEP EVALUATION] Step 03 @ Node 03 | Accumulated Odometry: 5.25m
+================================================================================
+ 1. VISUAL & DEPTH PERCEPTION:
+    - Front: 0.00m | Right: 0.00m | Back: 0.00m | Left: 0.00m
+ 2. VLM REASONING ANALYSIS:
+    - Reasoning Quality: [LACKS_MILESTONES] | Format: native_tool_call
+    - Active Milestone   : Not specified
+ 3. ACTION & PARSING:
+    - Action Type  : MOVE_TO
+    - Parsing Valid: True
+    - Payload      : {"status": "executed", "theta_deg": 0.0, "rho_m": 0.25, "moved_m": 0.25, "collided": false, "turn_steps": 0, "forward_steps": 1, "view": 0, "u": 0.5, "v": 0.55, "reason": "Clear passage ahead"}
+ 4. MOVEMENT CONSISTENCY & PROGRESS:
+    - Pose Shift   : (+0.00, -5.00,  +0.0°) -> (+0.00, -5.25,  +0.0°)
+    - Distance Moved: 0.25m | Collided: False | Stalled: False
+    - Goal Distance: 1.00m -> 0.76m (Δ: +0.25m CLOSER (✓))
+ ⚠️  DIAGNOSTIC WARNINGS (1):
+    - [WARNING] Model provided minimal or no milestone decomposition in thought trace.
+--------------------------------------------------------------------------------
+
+================================================================================
+ [STEP EVALUATION] Step 04 @ Node 04 | Accumulated Odometry: 5.25m
+================================================================================
+ 1. VISUAL & DEPTH PERCEPTION:
+    - Front: 0.00m | Right: 0.00m | Back: 0.00m | Left: 0.00m
+ 2. VLM REASONING ANALYSIS:
+    - Reasoning Quality: [LACKS_MILESTONES] | Format: native_tool_call
+    - Active Milestone   : Not specified
+ 3. ACTION & PARSING:
+    - Action Type  : STOP
+    - Parsing Valid: True
+    - Payload      : {"reason": "Reached goal."}
+ 4. MOVEMENT CONSISTENCY & PROGRESS:
+    - Pose Shift   : (+0.00, -5.25,  +0.0°) -> (+0.00, -5.25,  +0.0°)
+    - Distance Moved: 0.00m | Collided: False | Stalled: False
+    - Goal Distance: 0.76m -> 0.76m (Δ: +0.00m NO CHANGE (=))
+ ⚠️  DIAGNOSTIC WARNINGS (1):
+    - [WARNING] Model provided minimal or no milestone decomposition in thought trace.
+--------------------------------------------------------------------------------
+[EVALUATOR] Step audit trace saved to: runs/eval_10ep/r2r_ce_val_unseen_0010/audit_eval_r2r_ce_val_unseen_0010.json
+[EVALUATOR] Final BEV Map saved: runs/eval_10ep/r2r_ce_val_unseen_0010/final_bev_r2r_ce_val_unseen_0010.png
+
+================================================================================
+         EPISODE r2r_ce_val_unseen_0010 DIAGNOSTIC SUMMARY
+================================================================================
+ Outcome Status        : SUCCESS (Category: None)
+ Total Steps Executed  : 4
+ Movement Consistency  : 4/4 steps consistent (100.0%)
+ Reasoning Quality     : 0/4 steps with high-density milestone reasoning
+ Premature Stop Guard  : PASSED ✓
+ Physical Collisions   : 0
+ Movement Stalls       : 0
+ Metric SPL            : 1.0000
+ Navigation Error (NE) : 0.76 meters
+ Telemetry Saved To    : runs/eval_10ep/r2r_ce_val_unseen_0010
+================================================================================
+== job 534 exited with code 0 at 2026-11-06T10:17:25+05:30

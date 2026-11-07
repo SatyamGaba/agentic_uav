@@ -1,0 +1,40 @@
+{
+  "gate": "GATE 8",
+  "phase": 8,
+  "title": "Single-Episode Full Provenance Audit",
+  "timestamp": "2026-11-06T14:01:13.803019Z",
+  "episode_id": "r2r_ce_val_unseen_0001",
+  "scene_id": "gZ6f7yhEvPG",
+  "status": "PASS",
+  "checks": {
+    "G8.1_run_manifest": {
+      "status": "PASS",
+      "path": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase8/manifest.json"
+    },
+    "G8.2_sensor_frames": {
+      "status": "PASS",
+      "step_count": 2
+    },
+    "G8.3_step_traces": {
+      "status": "PASS",
+      "jsonl_size_bytes": 9291
+    },
+    "G8.4_final_bev": {
+      "status": "PASS",
+      "path": "/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase8/g8_final_bev.png"
+    },
+    "G8.5_privilege_firewall": {
+      "status": "PASS",
+      "leakage_count": 0
+    },
+    "G8.6_metric_integrity": {
+      "status": "PASS",
+      "success": false,
+      "spl": 0.0,
+      "navigation_error_m": 1.717,
+      "trajectory_length_m": 2.0,
+      "steps": 2,
+      "simulator_actions": 8
+    }
+  }
+}

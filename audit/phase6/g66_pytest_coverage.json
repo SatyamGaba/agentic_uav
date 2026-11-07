@@ -1,0 +1,8 @@
+{
+  "check": "G6.6",
+  "command": "/home/krutik/miniconda3/envs/habitat/bin/pytest agenticnav_paper_replica/ --cov=agenticnav_paper_replica --cov-report=json:/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase6/coverage.json --junitxml=/mnt/c/Users/Kruti/Desktop/PROG/UAV/audit/phase6/junit_results.xml -v",
+  "return_code": 0,
+  "all_passed": true,
+  "coverage_percent": 67.45,
+  "status": "PASS"
+}
