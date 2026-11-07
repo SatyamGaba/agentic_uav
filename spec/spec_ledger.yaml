@@ -90,6 +90,14 @@ parameters:
     owner: "Perception"
     description: "Near-obstacle detection threshold in meters (deviation from 0.5m sensor floor to detect physical obstacles within 0.05m-0.50m; applies to both Arm L and Arm P)"
 
+  blocked_view_zero_depth_threshold:
+    value: 0.35
+    tag: "calibrated_engineering_choice"
+    source: "local_safety_engineering"
+    status: "verified"
+    owner: "Perception"
+    description: "Fraction of zero-depth (unrendered / near-plane clipped) pixels above which a view is marked blocked"
+
   # --- ACTUATION & KINEMATICS ---
   turn_step_deg:
     value: 15.0
