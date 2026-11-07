@@ -37,6 +37,7 @@ class ToolExecutor:
         self.checker = corridor_checker
         self.image_cache = image_cache
         self.standoff_mode = standoff_mode
+        self.blocked_view_count: int = 0
 
     def execute_query_depth(
         self,
@@ -92,6 +93,18 @@ class ToolExecutor:
                 continue
 
             depth_img = depth_views[view]
+
+            # Check for blocked view due to excessive zero-depth pixels
+            zero_fraction = float(np.mean(depth_img == 0.0))
+            threshold = getattr(self.config, "blocked_view_zero_depth_threshold", 0.35)
+            if zero_fraction >= threshold:
+                results.append({
+                    "view": view,
+                    "u": round(u, 2),
+                    "v": round(v, 2),
+                    "error": "blocked_view",
+                })
+                continue
             x0, y0 = normalize_to_pixel(u, v, self.config)
 
             raw_val = float(depth_img[y0, x0])
@@ -189,6 +202,22 @@ class ToolExecutor:
             }
 
         depth_img = depth_views[view]
+
+        # Check for blocked view due to excessive zero-depth pixels (unrendered / near-plane clipping)
+        zero_fraction = float(np.mean(depth_img == 0.0))
+        threshold = getattr(self.config, "blocked_view_zero_depth_threshold", 0.35)
+        if zero_fraction >= threshold:
+            self.blocked_view_count += 1
+            import logging
+            logging.getLogger(__name__).warning(
+                f"View {view} blocked: zero-depth pixel fraction {zero_fraction:.4f} >= {threshold:.4f} "
+                f"(total blocked view events: {self.blocked_view_count})"
+            )
+            return {
+                "status": "reselect",
+                "cause": "blocked_view",
+                "zero_depth_fraction": round(zero_fraction, 4),
+            }
         x0, y0 = normalize_to_pixel(u, v, self.config)
 
         raw_val = float(depth_img[y0, x0])

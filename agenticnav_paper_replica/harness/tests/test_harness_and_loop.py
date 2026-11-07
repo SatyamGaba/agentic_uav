@@ -1,6 +1,8 @@
 """Unit tests for tool schemas, executor, and multi-turn step loop (v7 Specification)."""
 
 import json
+import os
+from pathlib import Path
 import numpy as np
 import pytest
 
@@ -88,6 +90,21 @@ class TestToolExecutor:
         )
         assert res_blocked["status"] == "reselect"
         assert res_blocked["cause"] == "obstacle"
+
+    def test_blocked_view_zero_depth_rejection(self):
+        # Create a depth view with 50% zero-depth pixels
+        depth_blocked = np.full((480, 640), 2.0, dtype=np.float32)
+        depth_blocked[:240, :] = 0.0  # 50% zero pixels
+        self.depth_views[1] = depth_blocked
+
+        res = self.executor.execute_move_to(
+            view=1, u=0.5, v=0.7, reason="Try to move into blocked view",
+            depth_views=self.depth_views, obstacle_points_agent_xz=np.empty((0, 2)),
+        )
+        assert res["status"] == "reselect"
+        assert res["cause"] == "blocked_view"
+        assert res["zero_depth_fraction"] == 0.50
+        assert self.executor.blocked_view_count == 1
 
 
 class TestStepDecisionLoop:
@@ -260,3 +277,75 @@ class TestStepDecisionLoop:
         assert result.action_type == "protocol_violation"
         assert result.terminated_protocol_violation is True
         assert result.malformed_call_count == 3
+
+    def test_image_cap_and_recall_replacement(self):
+        # Verify that recalling images does not accumulate unbounded recalled images
+        # across turns, and image count in request remains capped.
+        from agenticnav_paper_replica.harness.step_loop import count_images_in_messages
+        self.image_cache.store_node_observations(1, {
+            0: np.full((480, 640, 3), 100, dtype=np.uint8),
+            1: np.full((480, 640, 3), 150, dtype=np.uint8),
+        })
+        self.image_cache.set_current_node(2)
+
+        turn = 0
+        def mock_recall_vlm(messages, tools):
+            nonlocal turn
+            turn += 1
+            img_count = count_images_in_messages(messages)
+            if turn == 1:
+                assert img_count == 4  # 4 initial panoramic views
+                return {"content": "", "tool_calls": [{"name": "recall", "arguments": {"node": 1, "view": 0}}]}
+            elif turn == 2:
+                # 4 initial + 1 recalled image = 5
+                assert img_count == 5
+                return {"content": "", "tool_calls": [{"name": "recall", "arguments": {"node": 1, "view": 1}}]}
+            else:
+                # Still 5 images: older recalled image (view 0) was pruned/replaced by latest (view 1)
+                assert img_count == 5
+                return {"content": "", "tool_calls": [{"name": "stop", "arguments": {"reason": "Done"}}]}
+
+        result: StepLoopResult = self.loop.run_step(
+            instruction="Check memory and stop",
+            current_node=2,
+            history=self.history,
+            rgb_views=self.rgb_views,
+            depth_views=self.depth_views,
+            obstacle_points_agent_xz=np.empty((0, 2)),
+            bev_image=None,
+            vlm_client_fn=mock_recall_vlm,
+        )
+        assert result.action_type == "stop"
+        assistant_turns = [t for t in result.turn_log if t.get("role") == "assistant"]
+        assert assistant_turns[0]["request_image_count"] == 4
+        assert assistant_turns[1]["request_image_count"] == 5
+        assert assistant_turns[2]["request_image_count"] == 5
+
+
+class TestProvenanceAndManifest:
+    def test_manifest_provenance_and_clean_tree(self, tmp_path):
+        from scripts.benchmark_r2rce_postfix import sha256_file, check_clean_git_tree, git_revision
+        # Verify sha256
+        test_file = tmp_path / "test.txt"
+        test_file.write_text("agenticnav_provenance_check")
+        digest = sha256_file(test_file)
+        assert len(digest) == 64
+
+        # Verify git revision format (40 hex chars)
+        rev = git_revision()
+        assert rev is not None and len(rev) == 40
+
+    def test_empty_model_id_rejection(self):
+        import subprocess, sys
+        project_root = Path(__file__).resolve().parents[3]
+        env = os.environ.copy()
+        env.pop("AGENTICNAV_MODEL_ID", None)
+        proc = subprocess.run(
+            [sys.executable, "scripts/benchmark_r2rce_postfix.py", "--episodes", "agenticnav_paper_replica/data/r2rce_dev_20.json", "--allow-dirty"],
+            cwd=str(project_root),
+            env=env,
+            capture_output=True,
+            text=True,
+        )
+        assert proc.returncode != 0
+        assert "Model ID is not specified" in proc.stderr

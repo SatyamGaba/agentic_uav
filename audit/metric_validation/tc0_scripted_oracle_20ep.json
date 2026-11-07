@@ -2,8 +2,8 @@
   "num_episodes": 20,
   "success_rate": 100.0,
   "spl": 1.0,
-  "mean_navigation_error_m": 1.7540254026651383,
-  "total_rejections": 19,
+  "mean_navigation_error_m": 1.7710372716188432,
+  "total_rejections": 21,
   "deadlocks": 0,
   "episodes": [
     {
@@ -110,10 +110,10 @@
       "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
       "success": true,
       "spl": 1.0,
-      "navigation_error_m": 1.9588658809661865,
-      "actions": 36,
+      "navigation_error_m": 2.299103260040283,
+      "actions": 34,
       "steps": 5,
-      "rejections": 0,
+      "rejections": 2,
       "failure_category": null
     },
     {

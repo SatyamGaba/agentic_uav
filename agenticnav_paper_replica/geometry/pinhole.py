@@ -70,6 +70,7 @@ class CameraConfig:
     d_min: float = 0.5   # meters: waypoint query floor (paper sensor specification)
     d_max: float = 5.0   # meters: sensor max range
     min_obstacle_depth: float = 0.05  # meters: near obstacle detection threshold (deviation from 0.5m sensor floor)
+    blocked_view_zero_depth_threshold: float = 0.35  # fraction of zero-depth pixels above which a view is marked blocked
     camera_height: float = 1.25  # meters above floor (y=0)
     is_raw_normalized: bool = False  # False for metric buffers in meters; True if [0, 1] raw
 
