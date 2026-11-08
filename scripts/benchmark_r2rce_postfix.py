@@ -476,6 +476,28 @@ def main() -> int:
     cur_emb = None
     for idx, episode in enumerate(episodes, start=1):
         episode_id = episode["episode_id"]
+        ep_file = output_dir / "episodes" / f"{episode_id}.json"
+        if ep_file.exists():
+            try:
+                with open(ep_file, "r", encoding="utf-8") as f:
+                    saved_res = json.load(f)
+                if "failure_category" in saved_res and "metrics" in saved_res:
+                    print(
+                        f"[{idx}/{len(episodes)}] {episode_id} ({episode['scene_id']}) - RESUMED from checkpoint",
+                        flush=True,
+                    )
+                    results.append(saved_res)
+                    print(
+                        f"  success={saved_res['metrics']['success']} "
+                        f"ne={saved_res['metrics']['navigation_error_m']:.2f}m "
+                        f"actions={saved_res['metrics']['simulator_action_count']} "
+                        f"category={saved_res['failure_category']}",
+                        flush=True,
+                    )
+                    continue
+            except Exception as e:
+                print(f"Warning: could not resume {ep_file}: {e}, re-running...", flush=True)
+
         print(f"[{idx}/{len(episodes)}] {episode_id} ({episode['scene_id']})", flush=True)
         res_scene = resolve_scene_path(str(episode.get("scene_id", "")))
         if res_scene != cur_scene:

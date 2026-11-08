@@ -18,9 +18,12 @@ View Azimuths (CCW-positive around +Y_agent):
 """
 
 from dataclasses import dataclass
+import logging
 import math
 from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 VIEW_AZIMUTHS_DEG: Dict[int, float] = {
@@ -43,21 +46,33 @@ def parse_view_index(val: Any) -> int:
     if val is None:
         return 0
     if isinstance(val, (int, np.integer)):
-        return int(val) % 4
+        parsed = int(val) % 4
+        if parsed != val:
+            logger.info("parse_view_index rewritten int: %r -> %d", val, parsed)
+        return parsed
     if isinstance(val, float):
-        return int(round(val)) % 4
+        parsed = int(round(val)) % 4
+        logger.info("parse_view_index rewritten float: %r -> %d", val, parsed)
+        return parsed
     s = str(val).strip().lower()
     if "front" in s or "forward" in s:
+        logger.info("parse_view_index rewritten string keyword: %r -> 0", val)
         return 0
     if "right" in s:
+        logger.info("parse_view_index rewritten string keyword: %r -> 1", val)
         return 1
     if "back" in s or "behind" in s or "rear" in s:
+        logger.info("parse_view_index rewritten string keyword: %r -> 2", val)
         return 2
     if "left" in s:
+        logger.info("parse_view_index rewritten string keyword: %r -> 3", val)
         return 3
     for char in s:
         if char in "0123":
-            return int(char)
+            parsed = int(char)
+            logger.info("parse_view_index rewritten string char: %r -> %d", val, parsed)
+            return parsed
+    logger.info("parse_view_index fallback default: %r -> 0", val)
     return 0
 
 
