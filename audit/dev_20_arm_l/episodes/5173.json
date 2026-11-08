@@ -1,0 +1,63 @@
+{
+  "episode_id": "5173",
+  "scene_id": "mp3d/sT4fr6TAbpF/sT4fr6TAbpF.glb",
+  "instruction": {
+    "instruction_text": "Go down past some room dividers toward a glasstop desk, and turn into the dining area. Wait next to the large glass dining table. ",
+    "instruction_tokens": [
+      1067,
+      780,
+      1728,
+      2187,
+      1994,
+      738,
+      2451,
+      73,
+      1061,
+      692,
+      119,
+      2494,
+      1264,
+      2389,
+      711,
+      150,
+      15,
+      2579,
+      1576,
+      2438,
+      2389,
+      1336,
+      1057,
+      711,
+      2342,
+      15
+    ]
+  },
+  "model": "qwen3.5:4b",
+  "called_stop": false,
+  "terminated_deadlock": true,
+  "terminated_protocol_violation": false,
+  "total_steps": 8,
+  "arrival_verification_steps": 2,
+  "failure_category": "safety_deadlock",
+  "metrics": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": true,
+    "navigation_error_m": 3.8547239303588867,
+    "trajectory_length_m": 9.499999970197678,
+    "simulator_action_count": 68
+  },
+  "metrics_dataclass": {
+    "success": false,
+    "spl": 0.0,
+    "oracle_success": true,
+    "navigation_error_m": 3.8547239303588867,
+    "trajectory_length_m": 9.499999970197678,
+    "shortest_path_distance_m": 6.12554407119751,
+    "total_steps": 69,
+    "simulator_action_count": 68,
+    "ndtw": 0.0
+  },
+  "shortest_path_distance_m": 0.0,
+  "goal_radius_m": 3.0
+}
