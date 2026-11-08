@@ -210,6 +210,7 @@ def run_episode(
             "node_idx": current_node,
             "agent_pose": {"x": obs.allocentric_pose[0], "z": obs.allocentric_pose[1], "yaw_rad": obs.allocentric_pose[2]},
             "geodesic_distance_to_goal_m": embodiment.get_geodesic_distance_to_goal(),
+            "view_zero_depth_fractions": step_result.view_zero_depth_fractions,
             "turns": step_result.turn_log,
             "action_type": step_result.action_type,
             "action_payload": step_result.action_payload,

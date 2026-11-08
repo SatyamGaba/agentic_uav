@@ -86,6 +86,7 @@ class StepLoopResult:
     terminated_protocol_violation: bool = False
     arrival_verification_triggered: bool = False
     turn_log: List[Dict[str, Any]] = field(default_factory=list)
+    view_zero_depth_fractions: Dict[int, float] = field(default_factory=dict)
 
 
 class StepDecisionLoop:
@@ -133,6 +134,12 @@ class StepDecisionLoop:
         duplicate_target_repeats = 0
         verification_triggered = False
 
+        view_zero_depth_fractions: Dict[int, float] = {}
+        if depth_views:
+            for v_idx, d_img in depth_views.items():
+                if isinstance(d_img, np.ndarray) and d_img.size > 0:
+                    view_zero_depth_fractions[int(v_idx)] = round(float(np.mean(d_img == 0.0)), 4)
+
         history_text = history.format_for_prompt()
         initial_user_prompt = build_step_user_prompt(
             instruction=instruction,
@@ -165,6 +172,7 @@ class StepDecisionLoop:
                     terminated_deadlock=True,
                     arrival_verification_triggered=verification_triggered,
                     turn_log=turn_log,
+                    view_zero_depth_fractions=view_zero_depth_fractions,
                 )
 
             # Check malformed call protocol violation budget
@@ -178,6 +186,7 @@ class StepDecisionLoop:
                     terminated_protocol_violation=True,
                     arrival_verification_triggered=verification_triggered,
                     turn_log=turn_log,
+                    view_zero_depth_fractions=view_zero_depth_fractions,
                 )
 
             # Determine available tools (strip evidence tools when E_max reached or verification is active)
@@ -197,6 +206,7 @@ class StepDecisionLoop:
                 "response": vlm_response,
                 "request_image_count": req_img_count,
                 "estimated_tokens": req_est_tokens,
+                "view_zero_depth_fractions": view_zero_depth_fractions,
             })
 
             # Record assistant turn in messages for proper ChatML alternation
@@ -351,6 +361,7 @@ class StepDecisionLoop:
                         malformed_call_count=malformed_count,
                         arrival_verification_triggered=verification_triggered,
                         turn_log=turn_log,
+                        view_zero_depth_fractions=view_zero_depth_fractions,
                     )
 
                 elif t_name == "move_to":
@@ -375,6 +386,7 @@ class StepDecisionLoop:
                             malformed_call_count=malformed_count,
                             arrival_verification_triggered=verification_triggered,
                             turn_log=turn_log,
+                            view_zero_depth_fractions=view_zero_depth_fractions,
                         )
                     else:
                         cause = str(exec_res.get("cause", "reselect"))

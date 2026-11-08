@@ -94,9 +94,9 @@ parameters:
     value: 0.35
     tag: "calibrated_engineering_choice"
     source: "local_safety_engineering"
-    status: "verified"
+    status: "untested on real data"
     owner: "Perception"
-    description: "Fraction of zero-depth (unrendered / near-plane clipped) pixels above which a view is marked blocked"
+    description: "Fraction of zero-depth (unrendered mesh holes / invalid readings) pixels above which a view is marked blocked"
 
   # --- ACTUATION & KINEMATICS ---
   turn_step_deg:

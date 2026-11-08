@@ -266,7 +266,9 @@ def main() -> int:
     parser.add_argument("--model", type=str, default=None,
                         help="VLM Model ID (or set AGENTICNAV_MODEL_ID env var). Required.")
     parser.add_argument("--allow-dirty", action="store_true",
-                        help="Allow running with dirty git tree (development/smoke only).")
+                        help="Allow running with dirty git tree (development/smoke only; strictly forbidden in locked mode).")
+    parser.add_argument("--locked", action="store_true",
+                        help="Locked benchmark mode: strictly enforces clean git tree and locked exposure controls.")
     parser.add_argument("--max-episodes", type=int, default=None)
     parser.add_argument("--max-actions", type=int, default=500)
     parser.add_argument("--max-decision-steps", type=int, default=25)
@@ -288,6 +290,10 @@ def main() -> int:
             )
     else:
         model_name = "stop_immediately_control"
+
+    is_locked = args.locked or "val_unseen_100" in str(args.episodes) or "locked" in str(args.episodes).lower()
+    if is_locked and args.allow_dirty:
+        raise RuntimeError("CRITICAL POLICY VIOLATION: --allow-dirty is strictly forbidden in locked evaluation mode!")
 
     # Enforce clean git working tree unless --allow-dirty is explicitly passed
     if not args.allow_dirty:
@@ -361,9 +367,18 @@ def main() -> int:
 
     trace_logger = TraceLogger(output_dir / "traces")
 
+    dataset_info = {
+        "path": str(args.episodes),
+        "split": dataset.get("split", "val_unseen" if "unseen" in str(args.episodes) else ("dev" if "dev" in str(args.episodes) else "unknown")),
+        "total_episodes_in_file": len(dataset.get("episodes", [])),
+        "selected_episodes": len(episodes),
+    }
+
     manifest = {
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "commit_hash": commit_hash,
+        "dirty": bool(args.allow_dirty),
+        "locked_mode": bool(is_locked),
         "prompt_hash": prompt_hash,
         "dataset_hash": dataset_hash,
         "model_id": model_name,
@@ -372,7 +387,7 @@ def main() -> int:
         "platform": platform.platform(),
         "habitat_sim_available": HABITAT_AVAILABLE,
         "ollama_base_url": ollama_url,
-        "dataset": metadata,
+        "dataset": dataset_info,
         "episode_ids": [e["episode_id"] for e in episodes],
         "config": {
             "arm": args.arm,

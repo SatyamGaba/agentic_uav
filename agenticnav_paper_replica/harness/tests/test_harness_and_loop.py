@@ -280,13 +280,14 @@ class TestStepDecisionLoop:
 
     def test_image_cap_and_recall_replacement(self):
         # Verify that recalling images does not accumulate unbounded recalled images
-        # across turns, and image count in request remains capped.
+        # across turns, and image count in request remains capped at 6 (4 panoramic + 1 BEV + 1 recalled).
         from agenticnav_paper_replica.harness.step_loop import count_images_in_messages
         self.image_cache.store_node_observations(1, {
             0: np.full((480, 640, 3), 100, dtype=np.uint8),
             1: np.full((480, 640, 3), 150, dtype=np.uint8),
         })
         self.image_cache.set_current_node(2)
+        mock_bev = np.full((256, 256, 3), 50, dtype=np.uint8)
 
         turn = 0
         def mock_recall_vlm(messages, tools):
@@ -294,15 +295,15 @@ class TestStepDecisionLoop:
             turn += 1
             img_count = count_images_in_messages(messages)
             if turn == 1:
-                assert img_count == 4  # 4 initial panoramic views
+                assert img_count == 5  # 4 initial panoramic views + 1 BEV
                 return {"content": "", "tool_calls": [{"name": "recall", "arguments": {"node": 1, "view": 0}}]}
             elif turn == 2:
-                # 4 initial + 1 recalled image = 5
-                assert img_count == 5
+                # 4 initial + 1 BEV + 1 recalled image = 6
+                assert img_count == 6
                 return {"content": "", "tool_calls": [{"name": "recall", "arguments": {"node": 1, "view": 1}}]}
             else:
-                # Still 5 images: older recalled image (view 0) was pruned/replaced by latest (view 1)
-                assert img_count == 5
+                # Still 6 images: older recalled image (view 0) was pruned/replaced by latest (view 1)
+                assert img_count == 6
                 return {"content": "", "tool_calls": [{"name": "stop", "arguments": {"reason": "Done"}}]}
 
         result: StepLoopResult = self.loop.run_step(
@@ -312,14 +313,14 @@ class TestStepDecisionLoop:
             rgb_views=self.rgb_views,
             depth_views=self.depth_views,
             obstacle_points_agent_xz=np.empty((0, 2)),
-            bev_image=None,
+            bev_image=mock_bev,
             vlm_client_fn=mock_recall_vlm,
         )
         assert result.action_type == "stop"
         assistant_turns = [t for t in result.turn_log if t.get("role") == "assistant"]
-        assert assistant_turns[0]["request_image_count"] == 4
-        assert assistant_turns[1]["request_image_count"] == 5
-        assert assistant_turns[2]["request_image_count"] == 5
+        assert assistant_turns[0]["request_image_count"] == 5
+        assert assistant_turns[1]["request_image_count"] == 6
+        assert assistant_turns[2]["request_image_count"] == 6
 
 
 class TestProvenanceAndManifest:
@@ -349,3 +350,18 @@ class TestProvenanceAndManifest:
         )
         assert proc.returncode != 0
         assert "Model ID is not specified" in proc.stderr
+
+    def test_locked_mode_forbids_allow_dirty(self):
+        import subprocess, sys
+        project_root = Path(__file__).resolve().parents[3]
+        env = os.environ.copy()
+        env["AGENTICNAV_MODEL_ID"] = "mock_test_model"
+        proc = subprocess.run(
+            [sys.executable, "scripts/benchmark_r2rce_postfix.py", "--episodes", "agenticnav_paper_replica/data/r2rce_dev_20.json", "--locked", "--allow-dirty"],
+            cwd=str(project_root),
+            env=env,
+            capture_output=True,
+            text=True,
+        )
+        assert proc.returncode != 0
+        assert "strictly forbidden in locked evaluation mode" in proc.stderr
