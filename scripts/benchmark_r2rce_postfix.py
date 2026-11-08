@@ -198,7 +198,7 @@ def run_one(
             "simulator_action_count": int(metrics.simulator_action_count),
         },
         "metrics_dataclass": asdict(metrics),
-        "shortest_path_distance_m": float(episode.get("shortest_path_distance", 0.0)),
+        "shortest_path_distance_m": float(metrics.shortest_path_distance_m),
         "goal_radius_m": float(episode.get("goal_radius", 3.0)),
     }
 

@@ -158,10 +158,18 @@ parameters:
   chassis_y_max:
     value: 1.25
     tag: "paper-unspecified"
-    source: "paper_text (Sec 4.5: agent height band up to camera mount height 1.25m)"
+    source: "local_safety_engineering / paper_text (Sec 4.5: agent height band up to camera mount height 1.25m)"
     status: "verified"
     owner: "Safety"
-    description: "Maximum height above floor datum for obstacle pointcloud slice in meters"
+    description: "Maximum height above floor datum for obstacle pointcloud slice in meters. Note: Habitat-Sim agent cylinder height is 1.50m (camera at 1.25m); obstacles between 1.25m and 1.50m (e.g. low-hanging fixtures) are not detected by level horizontal cameras without upward tilt."
+
+  pure_rotation_obstacle_check:
+    value: "skip_footprint"
+    tag: "calibrated_engineering_choice"
+    source: "local_safety_engineering"
+    status: "verified"
+    owner: "Safety"
+    description: "When forward_steps == 0 (pure in-place rotation), footprint obstacle check is skipped since rotating in place sweeps the pre-existing circular cylinder without expanding footprint, preventing false reselect deadlocks in cluttered starts (e.g. spawning touching beds/walls)."
 
   zero_rho_policy:
     value: "rotate"

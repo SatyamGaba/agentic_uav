@@ -15,6 +15,8 @@ from agenticnav_paper_replica.geometry.pinhole import (
     normalize_to_pixel,
     convert_raw_depth,
     parse_view_index,
+    parse_view_index_ex,
+    InvalidViewError,
 )
 from agenticnav_paper_replica.geometry.safety_region import (
     GroundCorridorChecker,
@@ -79,7 +81,19 @@ class ToolExecutor:
             if not isinstance(pt, dict):
                 continue
 
-            view = parse_view_index(pt.get("view", 0))
+            raw_v = pt.get("view", 0)
+            try:
+                view, rewritten = parse_view_index_ex(raw_v)
+            except InvalidViewError as e:
+                logger.warning("Invalid view index in query_depth: %s", e)
+                results.append({
+                    "view": raw_v,
+                    "u": round(float(pt.get("u", 0.5)), 2),
+                    "v": round(float(pt.get("v", 0.5)), 2),
+                    "error": "invalid_view",
+                })
+                continue
+
             u = float(pt.get("u", 0.5))
             v = float(pt.get("v", 0.5))
 

@@ -334,6 +334,32 @@ class TestZeroRhoPolicyAndAblationSwitches:
         assert res.forward_steps == 0
         assert res.turn_steps == -6  # 6 steps right
 
+    def test_pure_rotation_ignores_geometry_already_touching_body(self):
+        """Confirm forward_steps == 0 ignores pre-existing footprint collisions (e.g. wall at 0.10m)."""
+        checker = GroundCorridorChecker(
+            base_margin=0.30, forward_step_m=0.25, zero_rho_policy="rotate"
+        )
+        # 10 obstacle points right at the agent's skin (dist = 0.10m < r_a=0.18m)
+        touching_obs = np.array([[0.10, 0.0] for _ in range(10)], dtype=np.float64)
+        # Target at 45 deg left, distance 0.20m (rho_q = 0, turn_steps = +3)
+        res = checker.evaluate(p_x=-0.14, p_z=-0.14, obstacles_2d=touching_obs)
+        assert res.status == "executed"
+        assert res.forward_steps == 0
+        assert res.turn_steps == 3
+        assert res.quantized_rho_m == 0.0
+
+    def test_forward_move_still_rejected_by_obstacle_ahead(self):
+        """Confirm forward move with forward_steps > 0 is still rejected by obstacle in corridor."""
+        checker = GroundCorridorChecker(
+            base_margin=0.30, forward_step_m=0.25, zero_rho_policy="rotate"
+        )
+        # Obstacle straight ahead at 0.40m
+        ahead_obs = np.array([[0.0, -0.40] for _ in range(5)], dtype=np.float64)
+        # Target at 1.0m ahead (rho_q = 0.75m)
+        res = checker.evaluate(p_x=0.0, p_z=-1.0, obstacles_2d=ahead_obs)
+        assert res.status == "reselect"
+        assert res.cause == "obstacle"
+
     def test_no_motion_reselect_when_both_zero(self):
         checker = GroundCorridorChecker(
             base_margin=0.30, forward_step_m=0.25, zero_rho_policy="rotate"

@@ -6,7 +6,7 @@ import math
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 import numpy as np
 
-from agenticnav_paper_replica.geometry.pinhole import parse_view_index
+from agenticnav_paper_replica.geometry.pinhole import parse_view_index, parse_view_index_ex, InvalidViewError
 from agenticnav_paper_replica.harness.tools import get_available_tools
 from agenticnav_paper_replica.harness.executor import ToolExecutor
 from agenticnav_paper_replica.harness.prompts import (
@@ -281,10 +281,16 @@ class StepDecisionLoop:
                             depth_views=depth_views,
                         )
                     else:  # recall
-                        exec_res = self.executor.execute_recall(
-                            node=int(t_args.get("node", 1)),
-                            view=parse_view_index(t_args.get("view", 0)),
-                        )
+                        raw_v = t_args.get("view", 0)
+                        try:
+                            v_idx, _ = parse_view_index_ex(raw_v)
+                            exec_res = self.executor.execute_recall(
+                                node=int(t_args.get("node", 1)),
+                                view=v_idx,
+                            )
+                        except InvalidViewError as e:
+                            malformed_count += 1
+                            exec_res = {"status": "error", "message": f"Invalid view: {e}"}
 
                     tool_msg = {
                         "role": "tool",
@@ -365,7 +371,20 @@ class StepDecisionLoop:
                     )
 
                 elif t_name == "move_to":
-                    t_view = parse_view_index(t_args.get("view", 0))
+                    raw_v = t_args.get("view", 0)
+                    try:
+                        t_view, _ = parse_view_index_ex(raw_v)
+                    except InvalidViewError as e:
+                        malformed_count += 1
+                        tool_msg = {
+                            "role": "tool",
+                            "name": t_name,
+                            "content": json.dumps({"status": "error", "message": f"Invalid view: {e}"}),
+                        }
+                        messages.append(tool_msg)
+                        turn_log.append(tool_msg)
+                        continue
+
                     t_u = float(t_args.get("u", 0.5))
                     t_v = float(t_args.get("v", 0.5))
                     exec_res = self.executor.execute_move_to(

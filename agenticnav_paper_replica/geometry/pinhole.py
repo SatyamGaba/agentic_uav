@@ -41,39 +41,84 @@ VIEW_LABELS: Dict[int, str] = {
 }
 
 
+class InvalidViewError(ValueError):
+    """Raised when a view cannot be parsed into a valid view index [0, 1, 2, 3]."""
+    pass
+
+
+def parse_view_index_ex(val: Any) -> Tuple[int, bool]:
+    """Parse a view index returning (view_idx, rewritten).
+
+    Raises:
+        InvalidViewError: if val cannot be mapped to a valid view [0, 1, 2, 3] without ambiguity.
+    """
+    if val is None:
+        raise InvalidViewError(f"View is None: {val!r}")
+
+    if isinstance(val, bool):
+        raise InvalidViewError(f"Boolean cannot be a view index: {val!r}")
+
+    if isinstance(val, (int, np.integer)):
+        ival = int(val)
+        if ival in (0, 1, 2, 3):
+            return ival, False
+        raise InvalidViewError(f"Integer view {ival} out of range [0, 3]")
+
+    if isinstance(val, (float, np.floating)):
+        fval = float(val)
+        if np.isnan(fval) or np.isinf(fval):
+            raise InvalidViewError(f"Invalid floating point view: {val!r}")
+        # Allow exact floats like 0.0, 1.0, 2.0, 3.0
+        if fval in (0.0, 1.0, 2.0, 3.0):
+            return int(fval), True
+        raise InvalidViewError(f"Float view {fval} is not in [0.0, 3.0]")
+
+    s = str(val).strip().lower()
+    if not s:
+        raise InvalidViewError(f"Empty view string: {val!r}")
+
+    # Check exact digits "0", "1", "2", "3"
+    if s in ("0", "1", "2", "3"):
+        return int(s), (not isinstance(val, int))
+
+    # Check clear unambiguous keywords
+    # Match front/forward
+    is_front = "front" in s or "forward" in s
+    is_right = "right" in s
+    is_back = "back" in s or "behind" in s or "rear" in s
+    is_left = "left" in s
+
+    matches = [
+        (0, is_front),
+        (1, is_right),
+        (2, is_back),
+        (3, is_left),
+    ]
+    matched_views = [view for view, matched in matches if matched]
+    if len(matched_views) == 1:
+        return matched_views[0], True
+    elif len(matched_views) > 1:
+        raise InvalidViewError(f"Ambiguous view keyword string {val!r} matches multiple views: {matched_views}")
+
+    # Check for phrases like "view 0", "cam 1", "view_2"
+    import re
+    vm = re.search(r'\b(?:view|cam|camera)\s*[:=_#]?\s*([0-3])\b', s)
+    if vm:
+        return int(vm.group(1)), True
+
+    raise InvalidViewError(f"Cannot parse valid view index from {val!r}")
+
+
 def parse_view_index(val: Any) -> int:
     """Robustly parse a view index from an int, float, or string (e.g. 0, 'Front', 'View 0', 'Right')."""
-    if val is None:
+    try:
+        view, rewritten = parse_view_index_ex(val)
+        if rewritten:
+            logger.info("parse_view_index rewritten: %r -> %d", val, view)
+        return view
+    except InvalidViewError as e:
+        logger.warning("parse_view_index fallback to 0 due to error: %s", e)
         return 0
-    if isinstance(val, (int, np.integer)):
-        parsed = int(val) % 4
-        if parsed != val:
-            logger.info("parse_view_index rewritten int: %r -> %d", val, parsed)
-        return parsed
-    if isinstance(val, float):
-        parsed = int(round(val)) % 4
-        logger.info("parse_view_index rewritten float: %r -> %d", val, parsed)
-        return parsed
-    s = str(val).strip().lower()
-    if "front" in s or "forward" in s:
-        logger.info("parse_view_index rewritten string keyword: %r -> 0", val)
-        return 0
-    if "right" in s:
-        logger.info("parse_view_index rewritten string keyword: %r -> 1", val)
-        return 1
-    if "back" in s or "behind" in s or "rear" in s:
-        logger.info("parse_view_index rewritten string keyword: %r -> 2", val)
-        return 2
-    if "left" in s:
-        logger.info("parse_view_index rewritten string keyword: %r -> 3", val)
-        return 3
-    for char in s:
-        if char in "0123":
-            parsed = int(char)
-            logger.info("parse_view_index rewritten string char: %r -> %d", val, parsed)
-            return parsed
-    logger.info("parse_view_index fallback default: %r -> 0", val)
-    return 0
 
 
 @dataclass
