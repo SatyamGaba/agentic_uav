@@ -59,13 +59,27 @@ Or for final destination arrival:
 }}
 ```
 
-### MANDATORY NAVIGATION & STOPPING RULES:
-- **Instruction Milestones**: Break the instruction down into sequential milestones (e.g., 1. Exit room -> 2. Turn right into hallway -> 3. Walk towards landmark -> 4. Stop near landmark). Always track which milestone you are currently executing.
-- **Maintain Forward Momentum**: As long as intermediate milestones remain, continue executing `move_to` along the open corridor, doorway, or floor towards the next waypoint.
-- **Never Repeat a Blocked Target**: If `move_to` returns `reselect` or `no_motion`, do NOT reissue the exact same `(view, u, v)` target. Choose a different view or a different floor point.
-- **Depth Is Not Arrival**: A depth reading only measures clearance to a surface. It does not prove that you have reached the instructed destination.
-- **Goal Landmark Arrival**: When you have fulfilled all milestones and reached the target location (or are positioned directly facing/next to the destination landmark specified in the instruction), invoke `stop`.
-- **Blocked by Landmark**: If forward motion is blocked because you have arrived directly in front of the goal object (e.g., table, counter, bed, or door specified in the instruction), call `stop`. If it is an unrelated obstacle on the way, turn to navigate around it."""
+### MANDATORY TERMINAL & STEP CONTROL RULES:
+1. **Instruction Milestones**: Break the instruction down into sequential milestones (e.g., 1. Exit room -> 2. Turn right into hallway -> 3. Walk towards landmark -> 4. Stop near landmark). Always track which milestone you are currently executing.
+
+2. **APPROACH STRIDE SCALING**:
+   - The horizon / eye-level is at v = 0.50.
+   - For open distant corridors, selecting v in [0.55, 0.70] executes standard long strides (1.5m - 2.5m).
+   - When approaching a target landmark visible in your front camera (e.g., archway, window, rug, table, bed):
+     DO NOT select distant floor points (v = 0.55 - 0.70), which execute large 2.5m strides and will overshoot past the goal.
+     Select near-field floor points (v = 0.80 - 0.90) to execute precise micro-steps (0.5m - 1.0m) to position accurately at the landmark.
+
+3. **TERMINAL STOP VERIFICATION**:
+   - If your previous step brought you adjacent to or inside the named landmark (e.g., clearance to landmark is small, or you are standing directly inside an archway/doorway/target room):
+   - You MUST issue `stop(reason)`. DO NOT command another `move_to` action.
+
+4. **ORIENTATION & BEV DIRECTION CHECK**:
+   - Before taking a 180° turn (selecting View 2), inspect the cyan path on your BEV map.
+   - If turning around causes you to retrace steps backward along your cyan line into an already-visited room, DO NOT move forward. Rotate to View 1 or View 3 to find an orthogonal unexplored corridor.
+
+5. **Depth Is Not Arrival**: A depth reading only measures local clearance to a surface. It does not prove that you have reached the instructed destination.
+
+6. **Never Repeat a Blocked Target**: If `move_to` returns `reselect` or `no_motion`, do NOT reissue the exact same `(view, u, v)` target. Choose a different view or a different floor point."""
 
 SYSTEM_PROMPT = build_system_prompt(floor_grounding=True)
 
@@ -91,10 +105,10 @@ def build_step_user_prompt(
     else:
         msg += (
             "### Instructions for this Step:\n"
-            "1. Deconstruct the goal instruction into sequential milestones.\n"
-            "2. Identify which milestone was just completed and which milestone is next.\n"
-            "3. If intermediate milestones remain, execute `move_to` along the corridor/doorway to progress.\n"
-            "4. If all instruction milestones are fulfilled and you are at the target destination, call `stop`.\n"
+            "1. Milestone Progress: Check which instructed milestone was just completed.\n"
+            "2. Landmark & Stop Check: If your current position is already adjacent to or inside the target destination landmark (e.g., inside the archway/doorway, or within 1.5m of the named table/couch/window), invoke `stop` immediately. DO NOT take another move_to stride!\n"
+            "3. Approach Stride Scaling: If advancing towards a visible destination landmark, select near-field coordinates (v = 0.80 - 0.90) to execute a precise micro-step (0.5m - 1.0m) rather than overshooting.\n"
+            "4. BEV Direction Check: Before moving into View 2 (turning back), check your BEV map to ensure you are not walking backward along your past trajectory line into an already-visited room.\n"
             "Decide on your next action now."
         )
 

@@ -342,10 +342,12 @@ def main() -> int:
         config.obstacle_point_threshold = 1
         config.floor_grounding_prompt = False
         config.arrival_verification = False
+        config.adjacent_bin_snap = False
     else:  # Arm L
         config.obstacle_point_threshold = 5
         config.floor_grounding_prompt = True
         config.arrival_verification = True
+        config.adjacent_bin_snap = True
 
     # Sort episodes by scene to eliminate repetitive simulator reload overhead
     episodes = sorted(episodes, key=lambda e: resolve_scene_path(str(e.get("scene_id", ""))))

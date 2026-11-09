@@ -26,7 +26,7 @@ class ReplicaConfig:
 
     # Standoff and snapping ablation switches (Section 11, default off)
     standoff_mode: str = "fixed"      # "fixed" (default), "slope" (ablation only)
-    adjacent_bin_snap: bool = False   # False (default, not in paper), True (ablation only)
+    adjacent_bin_snap: bool = True    # Enabled in Arm L for tight doorway passage
     max_snap_deg: float = 9.0
     max_snap_drift_m: float = 0.35
 

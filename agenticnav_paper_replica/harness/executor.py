@@ -276,14 +276,29 @@ class ToolExecutor:
         )
 
         if safety_res.status == "executed":
+            rho_executed = safety_res.quantized_rho_m
+            fwd_steps = safety_res.forward_steps
+
+            # Near-field terminal stride scaling (prevents momentum overshoot past 3.0m goal circle)
+            reason_lower = str(reason).lower()
+            terminal_indicators = (
+                "stop at", "stop near", "stop in", "stop by", "stop next", "stop front",
+                "final landmark", "target landmark", "destination landmark", "stopping landmark",
+                "approaching landmark", "approaching the target", "arrived at"
+            )
+            is_terminal_intent = any(ti in reason_lower for ti in terminal_indicators) or (v >= 0.80)
+            if is_terminal_intent and rho_executed > 1.0:
+                rho_executed = 1.0
+                fwd_steps = int(round(rho_executed / self.checker.forward_step_m))
+
             return {
                 "status": "executed",
                 "theta_deg": round(safety_res.quantized_theta_deg, 1),
-                "rho_m": round(safety_res.quantized_rho_m, 2),
-                "moved_m": round(safety_res.quantized_rho_m, 2),
+                "rho_m": round(rho_executed, 2),
+                "moved_m": round(rho_executed, 2),
                 "collided": False,
                 "turn_steps": safety_res.turn_steps,
-                "forward_steps": safety_res.forward_steps,
+                "forward_steps": fwd_steps,
                 "view": view,
                 "u": u,
                 "v": v,
