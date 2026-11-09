@@ -64,6 +64,36 @@ class TestActionHistory:
         assert "Moved 1.0m down the hallway." in text_prog
         assert "Internal rationale that should be hidden" not in text_prog
 
+    def test_prompt_formatting_collision_shortfall_and_pure_rotation(self):
+        hist = ActionHistory(max_history=6, mode="full")
+        # 1. Pure in-place rotation
+        hist.append(
+            step_idx=1,
+            from_node=1,
+            to_node=2,
+            action_type="move_to",
+            action_params={"view": 3, "u": 0.5, "v": 0.85, "theta_deg": 90.0, "rho_m": 0.0, "forward_steps": 0},
+            reason="Turn left toward archway",
+            outcome={"status": "executed", "moved_m": 0.0, "collided": False},
+        )
+        prompt_rot = hist.format_for_prompt()
+        assert "ROTATED +90° in place" in prompt_rot
+        assert "View 0 now faces your new heading" in prompt_rot
+
+        # 2. Collision shortfall
+        hist.append(
+            step_idx=2,
+            from_node=2,
+            to_node=3,
+            action_type="move_to",
+            action_params={"view": 0, "u": 0.5, "v": 0.7, "theta_deg": 0.0, "rho_m": 1.0, "forward_steps": 4},
+            reason="Move along billiard table",
+            outcome={"status": "executed", "moved_m": 0.14, "collided": True},
+        )
+        prompt_coll = hist.format_for_prompt()
+        assert "PHYSICAL COLLISION" in prompt_coll
+        assert "shortened displacement from 1.00m to 0.14m" in prompt_coll
+
 
 class TestEpisodicImageCache:
     def test_store_and_recall_valid_node(self):

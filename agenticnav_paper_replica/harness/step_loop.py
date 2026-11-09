@@ -280,6 +280,8 @@ class StepDecisionLoop:
                         exec_res = self.executor.execute_query_depth(
                             points=t_args.get("points", []),
                             depth_views=depth_views,
+                            obstacle_points_agent_xz=obstacle_points_agent_xz,
+                            obstacle_points_agent_xyz=obstacle_points_agent_xyz,
                         )
                     else:  # recall
                         raw_v = t_args.get("view", 0)
@@ -325,7 +327,10 @@ class StepDecisionLoop:
                 if evidence_count >= self.max_evidence_queries:
                     limit_msg = {
                         "role": "user",
-                        "content": "Evidence query budget reached for this step. A move_to or stop action is now required."
+                        "content": (
+                            "Evidence query budget reached for this step. A move_to or stop action is now required. "
+                            "Output at most 2 sentences of reasoning and immediately emit your move_to or stop JSON tool call."
+                        )
                     }
                     messages.append(limit_msg)
                     turn_log.append(limit_msg)

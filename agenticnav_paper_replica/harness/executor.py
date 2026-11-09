@@ -45,6 +45,8 @@ class ToolExecutor:
         self,
         points: Union[List[Any], Dict[str, Any], str],
         depth_views: Dict[int, np.ndarray],
+        obstacle_points_agent_xz: Optional[np.ndarray] = None,
+        obstacle_points_agent_xyz: Optional[np.ndarray] = None,
     ) -> Dict[str, Any]:
         """Execute batched query_depth (Section 5.1).
 
@@ -141,10 +143,41 @@ class ToolExecutor:
                     if ok:
                         valid_patch_depths.append(d_met)
 
-            # Compute action preview (theta, rho) that move_to would execute
+            # Compute action preview (theta, rho, clearance) that move_to would execute
             p_c_prev = deproject_pixel(x0, y0, z_center, self.config, is_normalized=False)
             p_ag_prev = camera_to_agent_frame(p_c_prev, view, self.config)
-            _, _, rho_q_prev, th_q_prev = self.checker.compute_kinematics(float(p_ag_prev[0]), float(p_ag_prev[2]))
+            px = float(p_ag_prev[0])
+            py = float(p_ag_prev[1])
+            pz = float(p_ag_prev[2])
+
+            if obstacle_points_agent_xz is not None:
+                safety_res = self.checker.evaluate(
+                    p_x=px,
+                    p_z=pz,
+                    obstacles_2d=obstacle_points_agent_xz,
+                    m_eff=self.checker.base_margin,
+                    p_y=py,
+                    obstacles_3d=obstacle_points_agent_xyz,
+                )
+                is_clear = (safety_res.status == "executed")
+                obstacle_cause = safety_res.cause if not is_clear else None
+                raw_rho = safety_res.quantized_rho_m
+                th_q_prev = safety_res.quantized_theta_deg
+            else:
+                _, _, raw_rho, th_q_prev = self.checker.compute_kinematics(px, pz, self.checker.base_margin)
+                is_clear = True
+                obstacle_cause = None
+
+            # Unified terminal stride scaling with move_to:
+            # Damp v >= 0.80 to 1.0m only during near-field approach (depth < 2.5m)
+            is_terminal_near_field = (v >= 0.80 and z_center < 2.5)
+            if is_clear:
+                if is_terminal_near_field and raw_rho > 1.0:
+                    exec_rho = 1.0
+                else:
+                    exec_rho = raw_rho
+            else:
+                exec_rho = 0.0
 
             if len(valid_patch_depths) >= 3:
                 min_m = float(np.min(valid_patch_depths))
@@ -159,7 +192,9 @@ class ToolExecutor:
                     "mean_m": round(mean_m, 2),
                     "median_m": round(median_m, 2),
                     "preview_theta_deg": round(th_q_prev, 1),
-                    "preview_rho_m": round(rho_q_prev, 2),
+                    "preview_rho_m": round(exec_rho, 2),
+                    "clear": is_clear,
+                    "obstacle_cause": obstacle_cause,
                 })
             else:
                 results.append({
@@ -172,7 +207,9 @@ class ToolExecutor:
                     "median_m": None,
                     "sparse_patch": True,
                     "preview_theta_deg": round(th_q_prev, 1),
-                    "preview_rho_m": round(rho_q_prev, 2),
+                    "preview_rho_m": round(exec_rho, 2),
+                    "clear": is_clear,
+                    "obstacle_cause": obstacle_cause,
                 })
 
         return {"query_results": results}
@@ -286,7 +323,10 @@ class ToolExecutor:
                 "final landmark", "target landmark", "destination landmark", "stopping landmark",
                 "approaching landmark", "approaching the target", "arrived at"
             )
-            is_terminal_intent = any(ti in reason_lower for ti in terminal_indicators) or (v >= 0.80)
+            is_terminal_intent = (
+                any(ti in reason_lower for ti in terminal_indicators)
+                or (v >= 0.80 and z_c < 2.5)
+            )
             if is_terminal_intent and rho_executed > 1.0:
                 rho_executed = 1.0
                 fwd_steps = int(round(rho_executed / self.checker.forward_step_m))

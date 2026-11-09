@@ -98,9 +98,18 @@ class ActionHistory:
             if rec.outcome:
                 status = rec.outcome.get("status", "")
                 if status == "executed":
-                    rho = rec.outcome.get("quantized_rho_m", 0.0)
-                    th = rec.outcome.get("quantized_theta_deg", 0.0)
-                    out_str = f" -> Executed (displaced {rho:.2f}m, turn {th:+.0f}°)"
+                    cmd_rho = rec.action_params.get("rho_m", rec.outcome.get("quantized_rho_m", 0.0))
+                    actual_moved = rec.outcome.get("moved_m", cmd_rho)
+                    collided = rec.outcome.get("collided", False)
+                    th = rec.action_params.get("theta_deg", rec.outcome.get("quantized_theta_deg", 0.0))
+                    fwd_steps = rec.action_params.get("forward_steps", 0)
+
+                    if cmd_rho <= 0.0 or fwd_steps == 0:
+                        out_str = f" -> Executed (ROTATED {th:+.0f}° in place, 0.00m forward; Note: View 0 now faces your new heading)"
+                    elif collided or (actual_moved < 0.5 * cmd_rho):
+                        out_str = f" -> Executed (displaced {actual_moved:.2f}m, turn {th:+.0f}° | PHYSICAL COLLISION: Contact with obstacle shortened displacement from {cmd_rho:.2f}m to {actual_moved:.2f}m; you are still near your previous position)"
+                    else:
+                        out_str = f" -> Executed (displaced {actual_moved:.2f}m, turn {th:+.0f}°)"
                 elif status == "reselect":
                     cause = rec.outcome.get("cause", "unknown")
                     out_str = f" -> Reselect ({cause})"

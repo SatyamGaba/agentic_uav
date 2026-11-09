@@ -72,6 +72,31 @@ class TestToolExecutor:
         res = self.executor.execute_query_depth(points, self.depth_views)
         assert res["query_results"][0]["depth_m"] == pytest.approx(2.0, abs=1e-2)
 
+    def test_query_depth_clearance_and_synchronization(self):
+        # Open corridor
+        empty_obs = np.empty((0, 2))
+        res_open = self.executor.execute_query_depth(
+            [{"view": 0, "u": 0.5, "v": 0.7}],
+            self.depth_views,
+            obstacle_points_agent_xz=empty_obs,
+        )
+        q_open = res_open["query_results"][0]
+        assert q_open["clear"] is True
+        assert q_open["obstacle_cause"] is None
+        assert q_open["preview_rho_m"] > 0.0
+
+        # Obstructed corridor
+        blocked_obs = np.array([[0.0, -1.0]])
+        res_blocked = self.executor.execute_query_depth(
+            [{"view": 0, "u": 0.5, "v": 0.7}],
+            self.depth_views,
+            obstacle_points_agent_xz=blocked_obs,
+        )
+        q_blocked = res_blocked["query_results"][0]
+        assert q_blocked["clear"] is False
+        assert q_blocked["obstacle_cause"] == "obstacle"
+        assert q_blocked["preview_rho_m"] == 0.0
+
     def test_move_to_executed_and_reselect(self):
         obstacles = np.empty((0, 2))
         res = self.executor.execute_move_to(
