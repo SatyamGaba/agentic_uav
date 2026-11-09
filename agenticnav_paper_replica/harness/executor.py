@@ -207,6 +207,7 @@ class ToolExecutor:
         reason: str,
         depth_views: Dict[int, np.ndarray],
         obstacle_points_agent_xz: np.ndarray,
+        obstacle_points_agent_xyz: Optional[np.ndarray] = None,
     ) -> Dict[str, Any]:
         """Execute move_to tool (Section 5.3)."""
         if view not in depth_views:
@@ -264,12 +265,14 @@ class ToolExecutor:
         else:
             m_eff = self.checker.base_margin
 
-        # Step 4, 5, 6: Corridor check and quantization
+        # Step 4, 5, 6: Corridor check and quantization (with 3D swept cylinder evaluation)
         safety_res: SafetyCheckResult = self.checker.evaluate(
             p_x=p_x,
             p_z=p_z,
             obstacles_2d=obstacle_points_agent_xz,
             m_eff=m_eff,
+            p_y=p_y,
+            obstacles_3d=obstacle_points_agent_xyz,
         )
 
         if safety_res.status == "executed":

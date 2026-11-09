@@ -368,3 +368,84 @@ class TestZeroRhoPolicyAndAblationSwitches:
         res = checker.evaluate(p_x=0.0, p_z=-0.15, obstacles_2d=np.empty((0, 2)))
         assert res.status == "reselect"
         assert res.cause == "no_motion"
+
+
+class Test3DSweptCylinderSafety:
+    """Verifies that 3D swept cylinder clearance operates naturally across flat terrain,
+
+    staircases, and inclines without hardcoded stair detection or simulator cheating.
+    """
+
+    def test_flat_ground_3d_identical_to_2d(self):
+        checker = GroundCorridorChecker(
+            base_margin=0.30, forward_step_m=0.25, obstacle_point_threshold=1
+        )
+        # Target straight ahead at 1.5m (flat floor, p_y = 0.0)
+        # Place an obstacle block at 0.8m ahead, y = 0.5m (chest level)
+        obs_3d = np.array([[0.0, 0.50, -0.80]], dtype=np.float64)
+        obs_2d = np.array([[0.0, -0.80]], dtype=np.float64)
+
+        res = checker.evaluate(
+            p_x=0.0, p_z=-1.5, obstacles_2d=obs_2d, p_y=0.0, obstacles_3d=obs_3d
+        )
+        assert res.status == "reselect"
+        assert res.cause == "obstacle"
+        assert res.collision_point_count == 1
+
+    def test_staircase_climb_permits_clean_stairs_without_reselect(self):
+        """Incline path up stairs: stair treads under feet are supporting terrain, not obstacles."""
+        checker = GroundCorridorChecker(
+            base_margin=0.30, forward_step_m=0.25, obstacle_point_threshold=1
+        )
+        # Target at top of stairs: 2.0m forward, 0.8m up (slope = 0.40, e.g. 5 steps of 16cm riser)
+        p_x, p_y, p_z = 0.0, 0.80, -2.0
+
+        # Create stair tread points at s = 0.4, 0.8, 1.2, 1.6m along corridor
+        # Each tread sits at height y = 0.16, 0.32, 0.48, 0.64m
+        # To a 2D flat floor checker, all of these points are > 0.15m and cause immediate false deadlock!
+        stair_pts_3d = np.array([
+            [0.0, 0.16, -0.40],
+            [0.0, 0.32, -0.80],
+            [0.0, 0.48, -1.20],
+            [0.0, 0.64, -1.60],
+        ], dtype=np.float64)
+
+        # 2D representation (which flattened stairs to a wall)
+        stair_pts_2d = np.column_stack([stair_pts_3d[:, 0], stair_pts_3d[:, 2]])
+
+        # In 3D swept cylinder mode:
+        res = checker.evaluate(
+            p_x=p_x, p_z=p_z, obstacles_2d=stair_pts_2d, p_y=p_y, obstacles_3d=stair_pts_3d
+        )
+        # MUST BE EXECUTED (no false obstacle rejection!)
+        assert res.status == "executed", f"Clean stairs rejected with cause: {res.cause}"
+        assert res.forward_steps > 0
+        assert res.collision_point_count == 0
+
+    def test_staircase_obstacle_correctly_detected(self):
+        """If a true physical obstacle (e.g. box or wall) sits ON the stairs, it must be detected."""
+        checker = GroundCorridorChecker(
+            base_margin=0.30, forward_step_m=0.25, obstacle_point_threshold=1
+        )
+        # Target at top of stairs: 2.0m forward, 0.8m up (slope = 0.40)
+        p_x, p_y, p_z = 0.0, 0.80, -2.0
+
+        # Clean stairs + 1 large box sitting on step 2 (s = 0.8m, where y_base = 0.32m)
+        # Box surface is at y = 0.75m (which is 0.43m above the step tread, penetrating the body cylinder)
+        stair_with_box_3d = np.array([
+            [0.0, 0.16, -0.40],      # step 1 tread (safe)
+            [0.0, 0.32, -0.80],      # step 2 tread (safe)
+            [0.0, 0.75, -0.80],      # OBSTACLE BOX on step 2!
+            [0.0, 0.48, -1.20],      # step 3 tread (safe)
+            [0.0, 0.64, -1.60],      # step 4 tread (safe)
+        ], dtype=np.float64)
+
+        stair_with_box_2d = np.column_stack([stair_with_box_3d[:, 0], stair_with_box_3d[:, 2]])
+
+        res = checker.evaluate(
+            p_x=p_x, p_z=p_z, obstacles_2d=stair_with_box_2d, p_y=p_y, obstacles_3d=stair_with_box_3d
+        )
+        assert res.status == "reselect"
+        assert res.cause == "obstacle"
+        assert res.collision_point_count == 1
+

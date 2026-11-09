@@ -187,7 +187,7 @@ class OllamaNavClient:
         temperature: float = 0.0,
         seed: int = 42,
         thinking: bool = False,
-        timeout_s: float = 60.0,
+        timeout_s: float = 180.0,
         num_ctx: int = 8192,
         supports_vision: Optional[bool] = None,
     ):

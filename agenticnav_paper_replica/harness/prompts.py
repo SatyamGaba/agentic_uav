@@ -87,7 +87,7 @@ def build_step_user_prompt(
 
     if reselect_feedback:
         msg += f"### Warning / Reselect Feedback:\n{reselect_feedback}\n\n"
-        msg += "Please review the obstacle feedback. If you have arrived at your target landmark, call `stop`. Otherwise, select an alternative open direction.\n"
+        msg += "Please review the obstacle feedback and select an alternative unobstructed target or view.\n"
     else:
         msg += (
             "### Instructions for this Step:\n"
@@ -112,29 +112,28 @@ def build_arrival_verification_prompt(
     accumulated_distance_m: float = 0.0,
     attempts: Optional[int] = None,
 ) -> str:
-    """Builds the one-shot terminal verification turn before a safety deadlock."""
+    """Builds the final warning turn before a safety deadlock (neutral, no arrival hints)."""
     target_text = f"(view={target_view}, u={target_u:.2f}, v={target_v:.2f})"
     if repeats >= 2:
         failure_text = (
             f"Your target {target_text} has failed {repeats} time(s) with cause "
-            f"`{last_cause}`. Repeating it will terminate the episode."
+            f"`{last_cause}`. Repeating it will trigger a safety deadlock."
         )
     else:
         attempt_count = attempts if attempts is not None else repeats
         failure_text = (
             f"You have made {attempt_count} consecutive failed move attempts. The most recent "
             f"target {target_text} failed with cause `{last_cause}`. Another failed target will "
-            "terminate the episode."
+            "trigger a safety deadlock."
         )
 
     return (
-        "### ARRIVAL VERIFICATION REQUIRED\n"
+        "### OBSTACLE SAFETY WARNING\n"
         f"You are at decision node {current_node} after {accumulated_distance_m:.2f} m of travel.\n"
         f"{failure_text}\n\n"
-        f"Original instruction: \"{instruction}\"\n\n"
-        "Inspect the current camera views one final time and choose exactly one action:\n"
-        "1. `stop(reason)` if the instructed destination landmark is visible and you are directly next to it.\n"
-        "2. `move_to(view, u, v, reason)` only if you select a DIFFERENT view or a DIFFERENT floor point.\n\n"
-        "Do not repeat the failed target. Do not call stop merely because the path is blocked; "
-        "stop only when the destination landmark itself matches the instruction."
+        f"Goal instruction: \"{instruction}\"\n\n"
+        "Inspect the current camera views and BEV map to choose your next action:\n"
+        "- `move_to(view, u, v, reason)`: Choose an alternative open floor point or view to advance along an unobstructed passage.\n"
+        "- `stop(reason)`: Invoke only if you have independently verified that you have reached the instructed destination landmark.\n"
+        "Do not repeat the failed obstructed target."
     )

@@ -124,6 +124,7 @@ class StepDecisionLoop:
         vlm_client_fn: Callable[[List[Dict[str, Any]], List[Dict[str, Any]]], Dict[str, Any]],
         initial_reselect_count: int = 0,
         accumulated_distance_m: float = 0.0,
+        obstacle_points_agent_xyz: Optional[np.ndarray] = None,
     ) -> StepLoopResult:
         """Runs the multi-turn loop for decision step t (Blueprint v7 Section 6)."""
         evidence_count = 0
@@ -394,6 +395,7 @@ class StepDecisionLoop:
                         reason=str(t_args.get("reason", "")),
                         depth_views=depth_views,
                         obstacle_points_agent_xz=obstacle_points_agent_xz,
+                        obstacle_points_agent_xyz=obstacle_points_agent_xyz,
                     )
 
                     if exec_res.get("status") == "executed":
@@ -458,14 +460,12 @@ class StepDecisionLoop:
                         if cause == "no_motion":
                             feedback_payload["guidance"] = (
                                 "Forward distance to target is less than 0.25m after standoff subtraction (too close or facing an obstacle). "
-                                "Do NOT repeat this exact target. If the destination landmark is directly in front of you, invoke stop(). "
-                                "Otherwise, select a different view (1: Right, 3: Left) or a different floor point to find an open path."
+                                "Do NOT repeat this exact target. Please select a different floor point or turn to an adjacent view (1: Right, 3: Left) to find an open path."
                             )
-                        elif cause == "corridor_blocked":
+                        elif cause in ("corridor_blocked", "obstacle"):
                             feedback_payload["guidance"] = (
                                 "Corridor to selected point is obstructed by an obstacle. "
-                                "Choose a DIFFERENT unobstructed floor point or turn to an adjacent view. "
-                                "Call stop() only if the instructed destination landmark is directly in front of you."
+                                "Choose a DIFFERENT unobstructed floor point or turn to an adjacent view to find an open path."
                             )
                         else:
                             feedback_payload["guidance"] = (

@@ -109,13 +109,60 @@ class GroundCorridorChecker:
         theta_deg: float,
         rho_q: float,
         obstacles_2d: np.ndarray,
+        p_y: float = 0.0,
+        obstacles_3d: Optional[np.ndarray] = None,
+        D_raw: Optional[float] = None,
+        step_clearance_m: float = 0.15,
+        head_clearance_m: float = 1.25,
     ) -> Tuple[bool, int]:
-        """Test whether any obstacle point falls inside the rectangular safety corridor R.
+        """Test whether any obstacle point falls inside the swept safety volume.
 
-        Corridor:
-            s in (0, rho_q + r_a)
-            |h| < r_a
+        If obstacles_3d (shape (N, 3)) is provided, performs a true 3D swept cylinder
+        check along the continuous trajectory vector (s, h, y):
+            - s in (0, rho_q + r_a)
+            - |h| < r_a
+            - y in [y_base(s) + step_clearance_m, y_base(s) + head_clearance_m]
+          where y_base(s) = s * (p_y / D_raw) is the continuous elevation of the path
+          (handling flat floors, inclines, stairs, and terrain ramps naturally).
+
+        If obstacles_3d is None, falls back to the planar 2D rectangular corridor.
         """
+        # 3D Swept Cylinder Mode
+        if obstacles_3d is not None and obstacles_3d.shape[0] > 0 and obstacles_3d.shape[1] >= 3:
+            ox = obstacles_3d[:, 0]
+            oy = obstacles_3d[:, 1]
+            oz = obstacles_3d[:, 2]
+
+            # If pure rotation (rho_q == 0), check in-place chassis cylinder
+            if rho_q <= 0.0:
+                dists_sq = ox ** 2 + oz ** 2
+                in_circle = dists_sq < (self.r_a ** 2)
+                in_height = (oy >= step_clearance_m) & (oy <= head_clearance_m)
+                colliding_mask = in_circle & in_height
+                coll_count = int(np.sum(colliding_mask))
+                return (coll_count >= self.obstacle_point_threshold), coll_count
+
+            theta_rad = math.radians(theta_deg)
+            sin_th = math.sin(theta_rad)
+            cos_th = math.cos(theta_rad)
+
+            s = -ox * sin_th - oz * cos_th
+            h = ox * cos_th - oz * sin_th
+
+            in_s = (s > 0.0) & (s < (rho_q + self.r_a))
+            in_h = np.abs(h) < self.r_a
+
+            d_horiz = D_raw if (D_raw is not None and D_raw > 1e-4) else max(rho_q, 1e-4)
+            slope = p_y / d_horiz
+            y_base_s = s * slope
+
+            in_y = (oy >= (y_base_s + step_clearance_m)) & (oy <= (y_base_s + head_clearance_m))
+
+            colliding_mask = in_s & in_h & in_y
+            collision_count = int(np.sum(colliding_mask))
+            return (collision_count >= self.obstacle_point_threshold), collision_count
+
+        # 2D fallback mode
         if obstacles_2d.shape[0] == 0:
             return False, 0
 
@@ -149,6 +196,8 @@ class GroundCorridorChecker:
         p_z: float,
         obstacles_2d: np.ndarray,
         m_eff: Optional[float] = None,
+        p_y: float = 0.0,
+        obstacles_3d: Optional[np.ndarray] = None,
     ) -> SafetyCheckResult:
         """Full safety check and motion planning pipeline for a candidate target (v7)."""
         if m_eff is None:
@@ -161,7 +210,9 @@ class GroundCorridorChecker:
             if theta_q_deg != 0.0 and self.zero_rho_policy == "rotate":
                 # Execute turn-only move
                 turn_steps = int(round(theta_q_deg / self.turn_step_deg))
-                colliding, coll_count = self.test_corridor_collision(theta_q_deg, 0.0, obstacles_2d)
+                colliding, coll_count = self.test_corridor_collision(
+                    theta_q_deg, 0.0, obstacles_2d, p_y=p_y, obstacles_3d=obstacles_3d, D_raw=D_raw
+                )
                 if colliding:
                     return SafetyCheckResult(
                         status="reselect",
@@ -197,7 +248,9 @@ class GroundCorridorChecker:
                 )
 
         # Test primary quantized corridor
-        colliding, coll_count = self.test_corridor_collision(theta_q_deg, rho_q, obstacles_2d)
+        colliding, coll_count = self.test_corridor_collision(
+            theta_q_deg, rho_q, obstacles_2d, p_y=p_y, obstacles_3d=obstacles_3d, D_raw=D_raw
+        )
 
         snapped = False
         if colliding and self.allow_adjacent_bin_snap:
@@ -211,7 +264,7 @@ class GroundCorridorChecker:
 
                 if (diff_alt <= self.max_snap_deg) and (lateral_drift <= self.max_snap_drift_m):
                     alt_colliding, alt_coll_count = self.test_corridor_collision(
-                        theta_alt_deg, rho_q, obstacles_2d
+                        theta_alt_deg, rho_q, obstacles_2d, p_y=p_y, obstacles_3d=obstacles_3d, D_raw=D_raw
                     )
                     if not alt_colliding:
                         theta_q_deg = theta_alt_deg

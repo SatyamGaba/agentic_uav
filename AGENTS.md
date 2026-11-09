@@ -102,4 +102,75 @@ We are replicating **AgenticNav (arXiv:2606.10577, 2026)** for ground Vision-and
   - `--limit-mm-per-prompt image=8` (or 10) configured on server.
   - Context length $\ge 32\text{k}$.
   - Wiring `VLLMNavClient` directly to `benchmark_r2rce_postfix.py` via `--backend vllm`.
-- [ ] **H1–H3 (Cluster Dry Run)**: 3-episode non-locked dry run on remote GPU cluster, verifying manifest hashes, GPU EGL rendering, and checkpoint resume.
+- [x] **H1–H3 (Cluster Dry Run & Smoke Test)**: 3-episode smoke test on remote GPU cluster passed with 100% SR on Habitat R2R-CE (`r2rce_val_unseen_100_rand.json`), verifying manifest hashes, GPU EGL rendering, tool-dispatch, and zero failures across all 3 episodes.
+
+---
+
+## 7. Remote Cluster State & Execution Log (November 8, 2026)
+
+- **Dedicated Hardware**: NVIDIA L40S (46,068 MiB VRAM), Node `172.24.16.175`.
+- **Environment**:
+  - Python 3.9 in `/home/jovyan/.conda/envs/habitat`.
+  - Headless `habitat-sim` 0.3.3 installed with PyTorch cu121 and GPU EGL acceleration (`libegl`, `libopengl`).
+  - PyTest suite: **82 passed / 0 failed / 1 skipped** on cluster node (Job #607 and #609).
+- **Codebase & Datasets**:
+  - Codebase bundle synced, reassembled, and git initialized clean at `/home/jovyan/scratch/UAV/` (commit `3d82eff`).
+  - All 10 canonical MP3D scenes downloaded directly into `/home/jovyan/scratch/data/scene_datasets/mp3d` (Job #608).
+- **Model Deployment (Ollama)**:
+  - `qwen3.8:27b` (27.3B parameters, native vision and tools verified, family `qwen35`) pulled and active in Ollama on port 11434 (Job #612).
+  - Also pulled and available: `qwen2.5:32b` (19 GB) and `qwen2.5:72b` (47 GB).
+- **Verified Smoke Test Results (Job #617 - Habitat R2R-CE)**:
+  - Dataset: Official Habitat R2R-CE split `agenticnav_paper_replica/data/r2rce_val_unseen_100_rand.json`.
+  - Model: `qwen3.8:27b` (Arm L).
+  - Episodes evaluated: 3 (`r2r_ce_val_unseen_0001`, `0002`, `0003` in scene `zsNo4HB9uLZ`).
+  - **Success Rate**: **100.0% (3/3)**.
+  - **Oracle Success Rate**: **100.0%**.
+  - **Mean SPL**: **55.63** (79.81%, 40.83%, 46.24%).
+  - **Mean Navigation Error (NE)**: **1.35 m** (0.35 m, 1.23 m, 2.46 m).
+  - **Failure Taxonomy**: 3 Successes, 0 Deadlocks, 0 Budget Exceeded, 0 Protocol Violations, 0 Infrastructure Errors.
+  - Verification Gate: **PASS**.
+- **Full Benchmark Execution - Arm P (Job #634 - Executed November 8, 2026)**:
+  - Job ID: **#634** (`benchmark-qwen3.8-27b-habitat-r2rce-100ep`).
+  - Duration: 2 hours 10 minutes on NVIDIA L40S GPU.
+  - Evaluation: **Arm P (Paper-Faithful, $N=1$, no arrival verification)** across Habitat R2R-CE split.
+  - **Episodes Completed**: **99/100 episodes**.
+  - **Success Rate (SR)**: **13.13%** (95% CI: $[7.07\%, 20.20\%]$).
+  - **Success weighted by Path Length (SPL)**: **7.83**.
+  - **Oracle Success Rate (OSR)**: **36.36%** (95% CI: $[27.27\%, 46.46\%]$).
+  - **Navigation Error (NE)**: **7.24 m**.
+  - **Failure Taxonomy**: 13 Successes, 37 Safety Deadlocks ($N=1$ obstacle rejection), 18 Budget Exceeded, 12 Stop Premature, 12 Missed Stop, 7 Stop After Reach, 0 Protocol Violations, 0 Infrastructure Crashes.
+  - Checkpoints: Fully persisted on cluster at `results/arm_p_habitat_r2rce_100/`.
+- **Completed Benchmark Execution - Arm L & Automated HF Upload (Job #639)**:
+  - Job ID: **#639** (`benchmark-arm-l-and-hf-upload`).
+  - Evaluation: **Arm L (Local Aids: $N=5$, Arrival Verification, Floor Guidance, 100 episodes)**.
+  - **Episodes Completed**: **99/100 episodes**.
+  - **Success Rate (SR)**: **19.19%** (+46.2% relative gain over Arm P).
+  - **Success weighted by Path Length (SPL)**: **13.64** (+74.2% relative gain over Arm P).
+  - **Oracle Success Rate (OSR)**: **40.40%** (40 episodes physically reached $\le 3.0$ m).
+  - **Navigation Error (NE)**: **7.38 m**.
+  - **Deadlocks**: Cut down from 37% to 20%.
+  - Checkpoints & Traces: Persisted on cluster and fully uploaded to Hugging Face dataset [`Krut27/agenticnav-benchmark-results`](https://huggingface.co/datasets/Krut27/agenticnav-benchmark-results).
+
+---
+
+## 8. Principled Architecture Fixes (November 9, 2026)
+
+- **Philosophical Invariant**: VLM is the sole cognitive decision-maker; framework provides purely passive 3D physical safety checks without leading hints, heuristics, or oracle NavMesh cheating.
+- **3D Swept Cylinder Safety Checker (`safety_region.py`)**:
+  - Replaced flat 2D bounding box with true 3D swept cylinder along continuous trajectory vector $\mathbf{p}(s) = (x(s), y(s), z(s))$.
+  - At distance $s$, terrain supporting the agent ($y < y_{\text{base}}(s) + 0.15$ m) is treated as floor/stair treads.
+  - Only points penetrating the agent's body cylinder $[y_{\text{base}}(s) + 0.15\text{ m}, y_{\text{base}}(s) + 1.25\text{ m}]$ are counted as obstacles.
+  - General: naturally handles flat floors, stairs, ramps, and inclines without "stair detectors" or NavMesh oracle queries.
+- **Prompt & Reselect Neutralization (`step_loop.py`, `prompts.py`)**:
+  - Stripped all arrival hints and "if destination landmark visible, call stop" from reselection feedback.
+  - Replaced leading arrival prompts with neutral obstacle safety warnings.
+  - VLM evaluates instruction milestones and destination arrival 100% autonomously based on visual camera evidence.
+- **VLM Client Timeout Hardening (`ollama_client.py`)**:
+  - Increased `timeout_s` from 60.0s to 180.0s with exponential retry backoff to eliminate dropped socket timeouts on late decision turns.
+- **Test Suite Status**:
+  - 19/19 geometry tests passing (`Test3DSweptCylinderSafety` verified with flat floor, clean stairs, and obstacle box on stairs).
+  - 15/15 harness decision loop tests passing.
+
+
+
+

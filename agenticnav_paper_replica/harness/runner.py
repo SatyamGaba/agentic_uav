@@ -134,7 +134,7 @@ def run_episode(
                 config=camera_cfg,
                 stride=4,
                 y_min=config.chassis_y_min,
-                y_max=config.chassis_y_max,
+                y_max=getattr(config, "chassis_y_max_3d", 2.50),
             )
             if len(pts_obs) > 0:
                 obstacle_pts_list.append(pts_obs)
@@ -148,14 +148,28 @@ def run_episode(
         if obstacle_pts_list:
             cur_obs_agent_xyz = np.vstack(obstacle_pts_list)
             ox_agent = cur_obs_agent_xyz[:, 0]
+            oy_agent = cur_obs_agent_xyz[:, 1]
             oz_agent = cur_obs_agent_xyz[:, 2]
-            ox_world = ax + cos_a * ox_agent + sin_a * oz_agent
-            oz_world = az - sin_a * ox_agent + cos_a * oz_agent
-            obs_world_xz = np.column_stack([ox_world, oz_world])
-            obs_agent_xz = np.column_stack([ox_agent, oz_agent])
+
+            # 2D BEV map: filter strictly to current floor horizontal slice [chassis_y_min, chassis_y_max]
+            bev_mask = (oy_agent >= config.chassis_y_min) & (oy_agent <= config.chassis_y_max)
+            if np.any(bev_mask):
+                ox_bev = ox_agent[bev_mask]
+                oz_bev = oz_agent[bev_mask]
+                ox_world = ax + cos_a * ox_bev + sin_a * oz_bev
+                oz_world = az - sin_a * ox_bev + cos_a * oz_bev
+                obs_world_xz = np.column_stack([ox_world, oz_world])
+                obs_agent_xz = np.column_stack([ox_bev, oz_bev])
+            else:
+                obs_world_xz = np.empty((0, 2), dtype=np.float64)
+                obs_agent_xz = np.empty((0, 2), dtype=np.float64)
+
+            # Full 3D point cloud for 3D swept cylinder collision checking
+            obs_agent_xyz = cur_obs_agent_xyz
         else:
             obs_world_xz = np.empty((0, 2), dtype=np.float64)
             obs_agent_xz = np.empty((0, 2), dtype=np.float64)
+            obs_agent_xyz = np.empty((0, 3), dtype=np.float64)
 
         if free_pts_list:
             cur_free_agent_xz = np.vstack(free_pts_list)
@@ -203,6 +217,7 @@ def run_episode(
             vlm_client_fn=vlm_client_fn,
             initial_reselect_count=consecutive_reselects,
             accumulated_distance_m=total_dist_m,
+            obstacle_points_agent_xyz=obs_agent_xyz,
         )
 
         step_traces.append({
