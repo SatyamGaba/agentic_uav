@@ -150,10 +150,22 @@ We are replicating **AgenticNav (arXiv:2606.10577, 2026)** for ground Vision-and
   - **Navigation Error (NE)**: **7.38 m**.
   - **Deadlocks**: Cut down from 37% to 20%.
   - Checkpoints & Traces: Persisted on cluster and fully uploaded to Hugging Face dataset [`Krut27/agenticnav-benchmark-results`](https://huggingface.co/datasets/Krut27/agenticnav-benchmark-results).
+- **Completed Benchmark Execution - Arm L-v3 & Stride Scaling (Job #641 - Executed November 9, 2026)**:
+  - Job ID: **#641** (`benchmark-arm-l-v3-stride-scaling-and-hf-upload`).
+  - Evaluation: **Arm L-v3 (Approach Stride Scaling, Terminal Stop Verification, BEV Retrace Checking, 3D Bin Snapping)** across full 100-episode Habitat R2R-CE benchmark.
+  - **Episodes Completed**: **100/100 episodes** (100% completion rate).
+  - **Success Rate (SR)**: **24.00%** (95% CI: $[16.69\%, 33.23\%]$) — **all-time high**, +41.2% relative jump over v2, and nearly 2x Arm P.
+  - **Success weighted by Path Length (SPL)**: **16.04** (>2x Arm P at 7.83).
+  - **Oracle Success Rate (OSR)**: **45.00%** (45 episodes physically reached $\le 3.0$ m).
+  - **Mean Navigation Error (NE)**: **6.76 m** (best precision recorded).
+  - **Mean Trajectory Length**: **20.16 m** (cut down from 36.08 m in v2, 44.1% reduction in wandering).
+  - **Failure Taxonomy**: 24 Successes, 20 Safety Deadlocks, 12 Budget Exceeded (cut in half from 24), 25 Stop Premature, 8 Missed Stop (cut in half from 16), 11 Stop After Reach, 0 Protocol Violations, 0 Infrastructure Errors.
+  - **Top Scene SR**: `TbHJrupSAjP` 40.0% (6/15), `x8F5xyUWy9e` 42.9% (3/7), `zsNo4HB9uLZ` 25.9% (7/27).
+  - Checkpoints & Traces: Persisted on cluster and fully uploaded to HF at `benchmark_results/arm_l_v3_habitat_r2rce_100/`.
 
 ---
 
-## 8. Principled Architecture Fixes (November 9, 2026)
+## 8. Principled Architecture Fixes (Arm L-v3 & Arm L-v4)
 
 - **Philosophical Invariant**: VLM is the sole cognitive decision-maker; framework provides purely passive 3D physical safety checks without leading hints, heuristics, or oracle NavMesh cheating.
 - **3D Swept Cylinder Safety Checker (`safety_region.py`)**:
@@ -161,15 +173,16 @@ We are replicating **AgenticNav (arXiv:2606.10577, 2026)** for ground Vision-and
   - At distance $s$, terrain supporting the agent ($y < y_{\text{base}}(s) + 0.15$ m) is treated as floor/stair treads.
   - Only points penetrating the agent's body cylinder $[y_{\text{base}}(s) + 0.15\text{ m}, y_{\text{base}}(s) + 1.25\text{ m}]$ are counted as obstacles.
   - General: naturally handles flat floors, stairs, ramps, and inclines without "stair detectors" or NavMesh oracle queries.
-- **Prompt & Reselect Neutralization (`step_loop.py`, `prompts.py`)**:
-  - Stripped all arrival hints and "if destination landmark visible, call stop" from reselection feedback.
-  - Replaced leading arrival prompts with neutral obstacle safety warnings.
-  - VLM evaluates instruction milestones and destination arrival 100% autonomously based on visual camera evidence.
-- **VLM Client Timeout Hardening (`ollama_client.py`)**:
-  - Increased `timeout_s` from 60.0s to 180.0s with exponential retry backoff to eliminate dropped socket timeouts on late decision turns.
+- **Arm L-v4 Physical Grounding & Clearance Synchronization**:
+  1. **`query_depth` 3D Corridor Clearance**: Returns `clear: bool`, `obstacle_cause: str | null`, and the exact post-clamp `preview_rho_m` matching `execute_move_to`.
+  2. **Physical Odometry Feedback & Collision Warnings (`history.py`)**: If the agent's actual motion is shortened by an obstacle collision (`actual_moved < 0.5 * rho_m`), action history explicitly logs the shortfall and warns the agent it remains near its previous position, eliminating internal odometry inflation that previously caused premature stops.
+  3. **Pure-Rotation Disorientation Elimination**: When `rho_m == 0`, action history logs `ROTATED +theta° in place, 0.00m forward; Note: View 0 now faces your new heading`, preventing 180° double-rotation loops.
+  4. **Peripheral Portal Checks (`prompts.py`)**: Instructs the agent to check Views 1 & 3 when stopping at archways/doorways, recognizing when it is already positioned between portal jambs and preventing pass-through overshoots.
+  5. **Terminal Stride Restriction**: Only clamps strides to 1.0 m when `depth_m < 2.5 m` or on explicit terminal intent; preserves full $1.5\text{--}2.25$ m strides during open transit ($\ge 3.0$ m).
+  6. **CoT Budget Cap**: Enforces a 2-sentence maximum thought on evidence-exhausted turns, preventing degenerate repetition loops.
 - **Test Suite Status**:
-  - 19/19 geometry tests passing (`Test3DSweptCylinderSafety` verified with flat floor, clean stairs, and obstacle box on stairs).
-  - 15/15 harness decision loop tests passing.
+  - 84 passed / 1 skipped / 0 failed in full PyTest suite.
+  - Tracked git working tree is clean and locked on commit `bb191c8` (`Arch/VLM`).
 
 
 
