@@ -180,9 +180,14 @@ We are replicating **AgenticNav (arXiv:2606.10577, 2026)** for ground Vision-and
   4. **Peripheral Portal Checks (`prompts.py`)**: Instructs the agent to check Views 1 & 3 when stopping at archways/doorways, recognizing when it is already positioned between portal jambs and preventing pass-through overshoots.
   5. **Terminal Stride Restriction**: Only clamps strides to 1.0 m when `depth_m < 2.5 m` or on explicit terminal intent; preserves full $1.5\text{--}2.25$ m strides during open transit ($\ge 3.0$ m).
   6. **CoT Budget Cap**: Enforces a 2-sentence maximum thought on evidence-exhausted turns, preventing degenerate repetition loops.
+- **Arm O (Habitat Oracle Local Actuation)**:
+  - **Motivation**: Ablation to decouple high-level VLM multimodal reasoning from low-level hand-crafted harness actuation (collision boxes, straight-line swept cylinders, discrete velocity bursts).
+  - **Zero Global Oracle Cheating**: The VLM remains the sole cognitive agent, receiving panoramic RGB-D and BEV views and deciding waypoints via `move_to(view, u, v, reason)` and `stop(reason)`. It NEVER receives the episode's final goal or shortest-path distances.
+  - **NavMesh ShortestPath Follower**: Actuates the local waypoint selected by the VLM using Habitat-Sim's native `pathfinder.find_path()` and discrete simulator actions (`turn_left`, `turn_right`, `move_forward`), sliding along walls naturally and avoiding doorframe collisions.
+  - **Stride & Waypoint Clamping**: Local travel along the NavMesh path is clamped to commanded stride ($1.0\text{--}1.75$ m), preventing unnatural multi-room teleports.
 - **Test Suite Status**:
-  - 84 passed / 1 skipped / 0 failed in full PyTest suite.
-  - Tracked git working tree is clean and locked on commit `bb191c8` (`Arch/VLM`).
+  - 85 passed / 1 skipped / 0 failed in full PyTest suite.
+  - Tracked git working tree is clean and locked on commit `efd5b33` (`Arch/VLM`).
 
 
 
