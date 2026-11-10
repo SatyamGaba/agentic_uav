@@ -67,15 +67,22 @@ Before planning any new `move_to` action, evaluate if your PREVIOUS move already
    - When **approaching** a goal from 3m–6m away, it sits in the center of **View 0 (Front)**.
    - When you have **ARRIVED** at a goal (0.4m–2.0m away), it often shifts OUT of the center of View 0 to lower foreground or side views!
 2. **Arrival Signatures by Goal Type**:
-   - **Doorways / Archways / Entrances** (*"stop in the doorway/archway/entrance"*): You have arrived when the doorframes/arch jambs flank you immediately in **View 1 (Right)** and **View 3 (Left)** at `d < 1.3m`, while View 0 looks into the subsequent room. **STOP IMMEDIATELY.** Do NOT take another step forward into the room in View 0!
-   - **Furniture / Fixtures** (*"stop in front of / next to the table, sofa, bed, stairs, island, toilet, hot tub"*): You have arrived when the target object is in the lower foreground (`v >= 0.65`) of View 0 OR directly beside you in View 1 / View 3 at a `query_depth` distance of **`0.5m <= d <= 2.2m`**. **STOP IMMEDIATELY.** Taking another step will overshoot or walk past the object.
+   - **Doorways / Archways / Entrances** (*"stop in the doorway/archway/entrance"*):
+     * VITAL SENSOR CUE: When you approach a doorway and View 0 looks THROUGH it into an open room ahead (depth >= 3.0m in View 0), you have ALREADY REACHED the doorway!
+     * The door frames or arch jambs flank you immediately to your left and right in View 1 and View 3 at close range (d < 1.3m).
+     * DO NOT step forward into the room in View 0! Taking another step will overshoot and leave the doorway behind you. CALL STOP() NOW!
+   - **Furniture / Fixtures / Windows** (*"stop in front of / next to / by the window, table, sofa, bed, stairs, island, toilet, hot tub"*):
+     * You have arrived when the target object is in the lower foreground (`v >= 0.65`) of View 0 OR directly beside you in View 1 / View 3 at a `query_depth` distance of **`0.5m <= d <= 2.2m`**.
+     * Distance check: If you are standing across the room and the window/table is > 2.5m away in View 0, you have NOT arrived! Continue advancing toward it until d <= 2.2m.
    - **Rooms / Landings** (*"wait in the lounge / sitting area / top of stairs"*): Once you cross the threshold and the defining room features surround you within `1.5m–2.5m` in Views 0/1/3, **STOP IMMEDIATELY.** Do not walk to the far exit of the room.
 
 #### STAGE 2: Counterfactual Dual-Hypothesis Gate (Prevents Premature Stops)
 Decompose the instruction into **Ordered Transit Milestones ($C_1 \\dots C_{{n-1}}$)** and the **Terminal Goal ($C_n$)**.
 Whenever you consider calling `stop()`, you MUST explicitly evaluate two competing hypotheses in your reasoning:
 - **`H_ARRIVED` (True Terminal Arrival)**: Every intermediate milestone ($C_1 \\dots C_{{n-1}}$) has been physically traversed (not merely seen in the distance), AND the current camera views + depth (`0.5m <= d <= 2.2m`) match the exact terminal anchor $C_n$.
-- **`H_PREMATURE` (Counterfactual / Decoy Hypothesis)**: I have only completed an intermediate step (e.g. climbed the stairs or entered the hallway), OR I am looking at the target room/object from afar (`d > 2.5m` through a doorway), OR this object is a decoy before the final turn.
+- **`H_PREMATURE` (Counterfactual / Decoy Hypothesis)**:
+  * I have only completed an intermediate step (e.g. climbed the stairs or entered the hallway).
+  * OR I am viewing the target from afar: If the target landmark (e.g. window, bed, table) is visible in View 0 at depth > 2.5m, or my 'Accumulated Distance Traversed' is only 1–3 meters when traversing a whole room or multi-room path, H_PREMATURE is TRUE! I am still approaching and must continue moving.
 - **Decision Rule**: Actively try to prove `H_PREMATURE` using all 4 views and `query_depth`. You may call `stop()` ONLY if `H_PREMATURE` is refuted with high confidence and the target anchor $C_n$ is verified within `<= 2.2m`.
 
 #### STAGE 3: Anti-Loop & BEV Trajectory Discipline (Prevents Pacing Loops)
@@ -113,13 +120,12 @@ def build_step_user_prompt(
     else:
         msg += (
             "### Instructions for this Step (Follow 3-Stage Decision Protocol):\n"
-            "1. Stage 1 (Pre-Stride Arrival Check): Did your previous move place you inside the terminal zone? "
-            "Check Views 0, 1, and 3. If doorframes flank you in Views 1/3 (< 1.3m), or the target object is in foreground/flanking at 0.5m-2.2m, "
-            "evaluate for arrival immediately!\n"
-            "2. Stage 2 (Dual-Hypothesis Evaluation): If considering stop(), explicitly evaluate H_ARRIVED vs. H_PREMATURE. "
-            "Have you physically traversed ALL intermediate milestones (C_1...C_n-1)? Is the target anchor <= 2.2m?\n"
-            "3. Stage 3 (Motion & BEV Discipline): If continuing, check BEV map to avoid loops. Open transit uses standard strides (v in [0.65, 0.75]). "
-            "Near-field approach uses micro-steps (v in [0.80, 0.90]). Query depth first and move to the exact verified point.\n"
+            "1. Stage 1 (Pre-Stride Arrival Check): Did your previous move place you inside the terminal zone?\n"
+            "   - DOORWAY/ARCHWAY ARRIVAL: If the goal is a doorway/archway and View 0 looks THROUGH it into open space (depth >= 3.0m), you are ALREADY standing inside the doorway! Check Views 1 & 3 to confirm flanking doorposts (< 1.3m) and CALL STOP() NOW—do NOT walk through into the next room!\n"
+            "   - OBJECT ARRIVAL: If the target object is within 0.5m-2.2m in foreground or flanking, call stop() now.\n"
+            "2. Stage 2 (Dual-Hypothesis Evaluation): If considering stop(), evaluate H_ARRIVED vs. H_PREMATURE.\n"
+            "   - If the target landmark is > 2.5m away in View 0, or Accumulated Distance Traversed is only 1-3m for a multi-room path, H_PREMATURE is true: continue moving!\n"
+            "3. Stage 3 (Motion & BEV Discipline): Check BEV map to avoid loops. Open transit uses standard strides (v in [0.65, 0.75]). Near-field approach uses micro-steps (v in [0.80, 0.90]). Query depth first and move to the exact verified point.\n"
             "Decide on your next action now."
         )
 

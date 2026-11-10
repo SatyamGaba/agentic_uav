@@ -77,3 +77,4 @@ Eliminate tool-call formatting failures to guarantee `PROTOCOL_VIOLATION == 0`:
      - 4 `SAFETY_DEADLOCK`: `ep_0013, ep_0058, ep_0031, ep_0038`
      - 1 `PROTOCOL_VIOLATION`: `ep_0018`
 - **Success Gate for Smoke Test:** 0 safety deadlocks, 0 protocol violations, and >= 65% SR on the `STOP_AFTER_REACH` + `MISSED_STOP` subset before launching the full 100-episode benchmark.
+
