@@ -34,11 +34,13 @@ class ToolExecutor:
         corridor_checker: GroundCorridorChecker,
         image_cache: EpisodicImageCache,
         standoff_mode: str = "fixed",  # "fixed" (default), "slope" (ablation)
+        oracle_local_actuation: bool = False,
     ):
         self.config = camera_config
         self.checker = corridor_checker
         self.image_cache = image_cache
         self.standoff_mode = standoff_mode
+        self.oracle_local_actuation = oracle_local_actuation
         self.blocked_view_count: int = 0
 
     def execute_query_depth(
@@ -150,7 +152,7 @@ class ToolExecutor:
             py = float(p_ag_prev[1])
             pz = float(p_ag_prev[2])
 
-            if obstacle_points_agent_xz is not None:
+            if obstacle_points_agent_xz is not None and not self.oracle_local_actuation:
                 safety_res = self.checker.evaluate(
                     p_x=px,
                     p_z=pz,
@@ -312,9 +314,20 @@ class ToolExecutor:
             obstacles_3d=obstacle_points_agent_xyz,
         )
 
-        if safety_res.status == "executed":
-            rho_executed = safety_res.quantized_rho_m
-            fwd_steps = safety_res.forward_steps
+        if safety_res.status == "executed" or self.oracle_local_actuation:
+            if safety_res.status == "executed":
+                rho_executed = safety_res.quantized_rho_m
+                fwd_steps = safety_res.forward_steps
+                th_deg = safety_res.quantized_theta_deg
+                turn_steps = safety_res.turn_steps
+            else:
+                # Oracle actuation: NavMesh path follower handles obstacles
+                rho_raw = math.sqrt(p_x * p_x + p_z * p_z)
+                rho_executed = min(rho_raw, self.checker.rho_max)
+                fwd_steps = int(round(rho_executed / self.checker.forward_step_m))
+                th_raw = math.degrees(math.atan2(-p_x, -p_z))
+                th_deg = self.checker.turn_step_deg * round(th_raw / self.checker.turn_step_deg)
+                turn_steps = int(round(th_deg / self.checker.turn_step_deg))
 
             # Near-field terminal stride scaling (prevents momentum overshoot past 3.0m goal circle)
             reason_lower = str(reason).lower()
@@ -333,12 +346,13 @@ class ToolExecutor:
 
             return {
                 "status": "executed",
-                "theta_deg": round(safety_res.quantized_theta_deg, 1),
+                "theta_deg": round(th_deg, 1),
                 "rho_m": round(rho_executed, 2),
                 "moved_m": round(rho_executed, 2),
                 "collided": False,
-                "turn_steps": safety_res.turn_steps,
+                "turn_steps": turn_steps,
                 "forward_steps": fwd_steps,
+                "p_agent": [round(p_x, 3), round(p_y, 3), round(p_z, 3)],
                 "view": view,
                 "u": u,
                 "v": v,

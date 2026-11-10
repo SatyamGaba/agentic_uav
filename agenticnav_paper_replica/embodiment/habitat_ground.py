@@ -265,6 +265,27 @@ class MockGroundEmbodiment(EmbodimentBase):
     def get_geodesic_distance_to_goal(self) -> float:
         return float(math.sqrt((self.goal_x - self.x) ** 2 + (self.goal_z - self.z) ** 2))
 
+    def step_waypoint_navmesh(
+        self,
+        target_world_pos: np.ndarray,
+        max_step_distance_m: float = 1.75,
+    ) -> StepObservation:
+        """Mock waypoint follower: aligns to target_world_pos and steps forward up to max_step_distance_m."""
+        tx = float(target_world_pos[0])
+        tz = float(target_world_pos[2])
+        dx = tx - self.x
+        dz = tz - self.z
+        dist = math.sqrt(dx * dx + dz * dz)
+        if dist < 1e-4:
+            return self.step_discrete(turn_steps_15deg=0, forward_steps_025m=0)
+
+        target_yaw = math.atan2(-dx, -dz)
+        diff = (target_yaw - self.yaw_rad + math.pi) % (2.0 * math.pi) - math.pi
+        turn_steps = int(round(math.degrees(diff) / 15.0))
+        fwd_dist = min(dist, max_step_distance_m)
+        fwd_steps = int(round(fwd_dist / 0.25))
+        return self.step_discrete(turn_steps_15deg=turn_steps, forward_steps_025m=fwd_steps)
+
     def get_shortest_path_distance(self) -> float:
         return float(self.shortest_path_len)
 
@@ -422,6 +443,123 @@ class HabitatGroundEmbodiment(EmbodimentBase):
             if np.linalg.norm(pos_post - pos_pre) < 0.05:
                 collided = True
             record_substep()
+
+        pos_after = self.sim.get_agent(0).get_state().position
+        actual_dist = float(np.linalg.norm(pos_after - pos_before))
+
+        obs = self._extract_obs()
+        obs.primitive_trajectory = prim_traj
+        obs.primitive_geodesic_distances = prim_geod
+        obs.actual_distance_moved = actual_dist
+        obs.collided = collided
+        return obs
+
+    def step_waypoint_navmesh(
+        self,
+        target_world_pos: np.ndarray,
+        max_step_distance_m: float = 1.75,
+    ) -> StepObservation:
+        """Actuates the agent towards the target world coordinate along the navigable mesh.
+
+        Used for Arm O (Habitat Oracle Local Actuation).
+        Queries Habitat's pathfinder to find the shortest navigable route to the snapped target,
+        and follows it using discrete simulator actions while sliding along walls.
+        """
+        agent = self.sim.get_agent(0)
+        cur_state = agent.get_state()
+        cur_pos = np.array(cur_state.position, dtype=np.float32)
+        pf = self.sim.pathfinder
+
+        p_target = np.array(target_world_pos, dtype=np.float32)
+        if pf.is_loaded:
+            p_snap = pf.snap_point(p_target)
+            if np.isnan(p_snap[0]):
+                p_cand = np.array([p_target[0], cur_pos[1], p_target[2]], dtype=np.float32)
+                p_snap = pf.snap_point(p_cand)
+            if np.isnan(p_snap[0]):
+                p_snap = cur_pos
+        else:
+            p_snap = p_target
+
+        path = habitat_sim.ShortestPath()
+        path.requested_start = cur_pos
+        path.requested_end = p_snap
+        found = pf.find_path(path) if pf.is_loaded else False
+
+        pos_before = np.array(cur_pos, copy=True)
+        prim_traj: List[Tuple[float, float, float]] = []
+        prim_geod: List[float] = []
+        collided = False
+
+        def record_substep():
+            st = self.sim.get_agent(0).get_state()
+            pos = st.position
+            prim_traj.append((float(pos[0]), float(pos[1]), float(pos[2])))
+            prim_geod.append(self.get_geodesic_distance_to_goal())
+
+        if not found or len(path.points) < 2:
+            # Fallback to direct discrete step towards snapped target
+            dx = float(p_snap[0] - cur_pos[0])
+            dz = float(p_snap[2] - cur_pos[2])
+            dist = math.sqrt(dx * dx + dz * dz)
+            target_yaw = math.atan2(-dx, -dz)
+            rot = cur_state.rotation
+            cur_yaw = 2.0 * math.atan2(rot.y, rot.w)
+            diff = (target_yaw - cur_yaw + math.pi) % (2.0 * math.pi) - math.pi
+            turn_steps = int(round(math.degrees(diff) / 15.0))
+            fwd_dist = min(dist, max_step_distance_m)
+            fwd_steps = int(round(fwd_dist / 0.25))
+            return self.step_discrete(turn_steps_15deg=turn_steps, forward_steps_025m=fwd_steps)
+
+        # Follow path waypoints using discrete simulator actions
+        waypoints = list(path.points[1:])
+        wp_idx = 0
+        total_dist_moved = 0.0
+        consecutive_collisions = 0
+        max_substeps = 35  # Cap primitive actions per decision step
+
+        for _ in range(max_substeps):
+            if wp_idx >= len(waypoints):
+                break
+            if total_dist_moved >= max_step_distance_m:
+                break
+            if consecutive_collisions >= 3:
+                break
+
+            target_wp = waypoints[wp_idx]
+            agent_st = self.sim.get_agent(0).get_state()
+            agent_pos = agent_st.position
+            dx = float(target_wp[0] - agent_pos[0])
+            dz = float(target_wp[2] - agent_pos[2])
+            dist_to_wp = math.sqrt(dx * dx + dz * dz)
+
+            if dist_to_wp < 0.20:
+                wp_idx += 1
+                continue
+
+            target_yaw = math.atan2(-dx, -dz)
+            rot = agent_st.rotation
+            cur_yaw = 2.0 * math.atan2(rot.y, rot.w)
+            diff = (target_yaw - cur_yaw + math.pi) % (2.0 * math.pi) - math.pi
+
+            if abs(diff) > math.radians(12.0):
+                turn_act = "turn_left" if diff > 0 else "turn_right"
+                self.sim.step(turn_act)
+                self.action_count += 1
+                record_substep()
+            else:
+                pos_pre = np.array(self.sim.get_agent(0).get_state().position, copy=True)
+                self.sim.step("move_forward")
+                self.action_count += 1
+                pos_post = self.sim.get_agent(0).get_state().position
+                delta = float(np.linalg.norm(pos_post - pos_pre))
+                total_dist_moved += delta
+                if delta < 0.03:
+                    collided = True
+                    consecutive_collisions += 1
+                else:
+                    consecutive_collisions = 0
+                record_substep()
 
         pos_after = self.sim.get_agent(0).get_state().position
         actual_dist = float(np.linalg.norm(pos_after - pos_before))

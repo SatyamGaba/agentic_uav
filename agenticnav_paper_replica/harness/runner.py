@@ -86,7 +86,11 @@ def run_episode(
     occupancy_grid = OccupancyGrid2D(grid_size=config.bev_grid_size, resolution_m=config.bev_resolution_m)
     bev_renderer = BEVRenderer(mode="without_bev" if not config.bev_image else "full")
     tool_executor = ToolExecutor(
-        camera_cfg, corridor_checker, image_cache, standoff_mode=config.standoff_mode
+        camera_cfg,
+        corridor_checker,
+        image_cache,
+        standoff_mode=config.standoff_mode,
+        oracle_local_actuation=getattr(config, "oracle_local_actuation", False),
     )
     step_loop = StepDecisionLoop(
         executor=tool_executor,
@@ -310,9 +314,36 @@ def run_episode(
             break
 
         elif step_result.action_type == "move_to":
-            turn_steps = step_result.action_payload.get("turn_steps", 0)
-            forward_steps = step_result.action_payload.get("forward_steps", 0)
-            obs = embodiment.step_discrete(turn_steps_15deg=turn_steps, forward_steps_025m=forward_steps)
+            if getattr(config, "oracle_local_actuation", False):
+                # Habitat Oracle Local Actuation (Arm O)
+                p_agent = step_result.action_payload.get("p_agent")
+                if p_agent is not None:
+                    px, py, pz = p_agent
+                    ax, az, ayaw = obs.allocentric_pose
+                    cur_pos = obs.position
+                    x_world = cur_pos[0] + math.cos(ayaw) * px + math.sin(ayaw) * pz
+                    y_world = cur_pos[1] + py
+                    z_world = cur_pos[2] - math.sin(ayaw) * px + math.cos(ayaw) * pz
+                    target_world = np.array([x_world, y_world, z_world], dtype=np.float32)
+                else:
+                    theta_deg = step_result.action_payload.get("theta_deg", 0.0)
+                    rho_m = step_result.action_payload.get("rho_m", 1.0)
+                    th_rad = math.radians(theta_deg)
+                    px = -rho_m * math.sin(th_rad)
+                    pz = -rho_m * math.cos(th_rad)
+                    ax, az, ayaw = obs.allocentric_pose
+                    cur_pos = obs.position
+                    x_world = cur_pos[0] + math.cos(ayaw) * px + math.sin(ayaw) * pz
+                    y_world = cur_pos[1]
+                    z_world = cur_pos[2] - math.sin(ayaw) * px + math.cos(ayaw) * pz
+                    target_world = np.array([x_world, y_world, z_world], dtype=np.float32)
+
+                max_step = step_result.action_payload.get("rho_m", 1.75)
+                obs = embodiment.step_waypoint_navmesh(target_world_pos=target_world, max_step_distance_m=max_step)
+            else:
+                turn_steps = step_result.action_payload.get("turn_steps", 0)
+                forward_steps = step_result.action_payload.get("forward_steps", 0)
+                obs = embodiment.step_discrete(turn_steps_15deg=turn_steps, forward_steps_025m=forward_steps)
 
             # Record per-primitive steps for standard Habitat metric evaluation (OSR, TL, SPL)
             if obs.primitive_trajectory:

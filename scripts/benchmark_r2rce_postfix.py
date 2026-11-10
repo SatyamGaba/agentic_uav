@@ -261,8 +261,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Post-fix R2R-CE benchmark")
     parser.add_argument("--episodes", type=Path, default=DEFAULT_EPISODES)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT)
-    parser.add_argument("--arm", type=str, choices=["P", "L"], default="L",
-                        help="Experimental arm: 'P' (Paper-faithful: N_th=1, no arrival verify, no floor guidance) or 'L' (Local aids: N_th=5, arrival verify, floor guidance).")
+    parser.add_argument("--arm", type=str, choices=["P", "L", "O"], default="L",
+                        help="Experimental arm: 'P' (Paper-faithful: N_th=1, no arrival verify, no floor guidance), 'L' (Local aids: N_th=5, arrival verify, floor guidance), or 'O' (Habitat Oracle Local Actuation: NavMesh path follower for VLM waypoints).")
     parser.add_argument("--model", type=str, default=None,
                         help="VLM Model ID (or set AGENTICNAV_MODEL_ID env var). Required.")
     parser.add_argument("--allow-dirty", action="store_true",
@@ -343,11 +343,19 @@ def main() -> int:
         config.floor_grounding_prompt = False
         config.arrival_verification = False
         config.adjacent_bin_snap = False
+        config.oracle_local_actuation = False
+    elif args.arm == "O":
+        config.obstacle_point_threshold = 5
+        config.floor_grounding_prompt = True
+        config.arrival_verification = True
+        config.adjacent_bin_snap = True
+        config.oracle_local_actuation = True
     else:  # Arm L
         config.obstacle_point_threshold = 5
         config.floor_grounding_prompt = True
         config.arrival_verification = True
         config.adjacent_bin_snap = True
+        config.oracle_local_actuation = False
 
     # Sort episodes by scene to eliminate repetitive simulator reload overhead
     episodes = sorted(episodes, key=lambda e: resolve_scene_path(str(e.get("scene_id", ""))))

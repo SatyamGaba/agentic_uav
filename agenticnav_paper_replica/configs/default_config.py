@@ -66,6 +66,8 @@ class ReplicaConfig:
     obstacle_point_threshold: int = 5
     floor_grounding_prompt: bool = True
     arrival_verification: bool = True
+    chassis_y_max_3d: float = 2.50
+    oracle_local_actuation: bool = False  # Arm O: Habitat NavMesh path follower for VLM waypoints
 
     # Ablation toggles (Section 11)
     depth_tool: str = "on"                 # "on", "off", "depth_image"

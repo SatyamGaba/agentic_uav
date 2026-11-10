@@ -187,3 +187,53 @@ class TestEndToEndRunner:
         assert res.metrics.success is False
         assert res.terminated_deadlock is True
 
+    def test_oracle_local_actuation_episode(self, tmp_path):
+        """Verify that Arm O (oracle_local_actuation=True) dispatches waypoints cleanly without deadlocking."""
+        config = ReplicaConfig(oracle_local_actuation=True)
+        embodiment = MockGroundEmbodiment()
+        logger = TraceLogger(tmp_path / "traces")
+
+        episode_data = {
+            "episode_id": "test_ep_oracle_001",
+            "scene_id": "test_scene",
+            "instruction": "Navigate down hallway to the landmark.",
+            "goal_x": 0.0,
+            "goal_z": -3.0,
+        }
+
+        turn_counter = 0
+
+        def mock_oracle_vlm(messages, tools):
+            nonlocal turn_counter
+            turn_counter += 1
+            if turn_counter == 1:
+                return {
+                    "content": "",
+                    "tool_calls": [{"name": "query_depth", "arguments": {"points": [{"view": 0, "u": 0.5, "v": 0.7}]}}],
+                }
+            elif turn_counter == 2:
+                return {
+                    "content": "",
+                    "tool_calls": [{"name": "move_to", "arguments": {"view": 0, "u": 0.5, "v": 0.7, "reason": "Moving along corridor"}}],
+                }
+            else:
+                return {
+                    "content": "",
+                    "tool_calls": [{"name": "stop", "arguments": {"reason": "Arrived at target"}}],
+                }
+
+        res: EpisodeRunResult = run_episode(
+            episode_data=episode_data,
+            embodiment=embodiment,
+            config=config,
+            vlm_client_fn=mock_oracle_vlm,
+            trace_logger=logger,
+        )
+
+        assert res.metrics.success is True
+        assert res.metrics.spl > 0.0
+        assert res.failure_category is None
+        assert res.terminated_deadlock is False
+        assert res.metrics.trajectory_length_m > 0.0
+
+

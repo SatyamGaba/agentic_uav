@@ -50,6 +50,24 @@ class EmbodimentBase(ABC):
         pass
 
     @abstractmethod
+    def step_waypoint_navmesh(
+        self,
+        target_world_pos: np.ndarray,
+        max_step_distance_m: float = 1.75,
+    ) -> StepObservation:
+        """Actuates the agent towards the target world coordinate along the navigable mesh.
+
+        Used for Arm O (Habitat Oracle Local Actuation).
+        Args:
+            target_world_pos: 3D world coordinate [x, y, z] of the selected waypoint.
+            max_step_distance_m: Maximum Euclidean distance along the path to advance.
+
+        Returns:
+            StepObservation after following the navigable path towards the waypoint.
+        """
+        pass
+
+    @abstractmethod
     def get_geodesic_distance_to_goal(self) -> float:
         """Privileged oracle query for evaluation harness only. Never exposed to agent prompt."""
         pass
