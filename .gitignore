@@ -10,6 +10,8 @@ venv/
 
 # Runtime / generated evidence
 runs/
+results/
+audit/
 audit/phase9_postfix_pilot*/
 audit/phase9_postfix/run*.log
 *.log
