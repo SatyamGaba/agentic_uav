@@ -1,0 +1,1244 @@
+{
+  "name": "r2rce_val_unseen_20_remediation",
+  "description": "20 high-signal failure episodes from Arm O benchmark for pre-flight validation",
+  "num_episodes": 20,
+  "target_categories": {
+    "STOP_AFTER_REACH": [
+      "0010",
+      "0012",
+      "0023",
+      "0036",
+      "0007",
+      "0026"
+    ],
+    "MISSED_STOP": [
+      "0039",
+      "0049",
+      "0054",
+      "0071"
+    ],
+    "STOP_PREMATURE": [
+      "0017",
+      "0005",
+      "0016",
+      "0040",
+      "0042"
+    ],
+    "SAFETY_DEADLOCK": [
+      "0013",
+      "0058",
+      "0031",
+      "0038"
+    ],
+    "PROTOCOL_VIOLATION": [
+      "0018"
+    ]
+  },
+  "episodes": [
+    {
+      "index": 9,
+      "episode_id": "r2r_ce_val_unseen_0010",
+      "original_episode_id": 10,
+      "trajectory_id": 57,
+      "scene_id": "2azQ1b91cZZ",
+      "source_scene_id": "mp3d/2azQ1b91cZZ/2azQ1b91cZZ.glb",
+      "instruction": "Walk into the living room and keep walking straight past the living room. Then walk into the entrance under the balcony. Wait in the entrance to the other room.",
+      "start_position": [
+        16.489099502563477,
+        0.12711000442504883,
+        8.970789909362793
+      ],
+      "start_rotation": [
+        -0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        16.465200424194336,
+        0.12711000442504883,
+        1.8578599691390991
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 7.112969875335693,
+      "reference_path": [
+        [
+          16.489099502563477,
+          0.12711000442504883,
+          8.970789909362793
+        ],
+        [
+          16.625499725341797,
+          0.12711000442504883,
+          7.304369926452637
+        ],
+        [
+          16.550800323486328,
+          0.12711000442504883,
+          4.390049934387207
+        ],
+        [
+          16.67340087890625,
+          0.12711000442504883,
+          3.144469976425171
+        ],
+        [
+          16.465200424194336,
+          0.12711000442504883,
+          1.8578599691390991
+        ]
+      ]
+    },
+    {
+      "index": 11,
+      "episode_id": "r2r_ce_val_unseen_0012",
+      "original_episode_id": 12,
+      "trajectory_id": 57,
+      "scene_id": "2azQ1b91cZZ",
+      "source_scene_id": "mp3d/2azQ1b91cZZ/2azQ1b91cZZ.glb",
+      "instruction": "Move forward to the doorway on the opposite side of the hall.  Stop in the archway.",
+      "start_position": [
+        16.489099502563477,
+        0.12711000442504883,
+        8.970789909362793
+      ],
+      "start_rotation": [
+        -0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        16.465200424194336,
+        0.12711000442504883,
+        1.8578599691390991
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 7.112969875335693,
+      "reference_path": [
+        [
+          16.489099502563477,
+          0.12711000442504883,
+          8.970789909362793
+        ],
+        [
+          16.625499725341797,
+          0.12711000442504883,
+          7.304369926452637
+        ],
+        [
+          16.550800323486328,
+          0.12711000442504883,
+          4.390049934387207
+        ],
+        [
+          16.67340087890625,
+          0.12711000442504883,
+          3.144469976425171
+        ],
+        [
+          16.465200424194336,
+          0.12711000442504883,
+          1.8578599691390991
+        ]
+      ]
+    },
+    {
+      "index": 22,
+      "episode_id": "r2r_ce_val_unseen_0023",
+      "original_episode_id": 23,
+      "trajectory_id": 104,
+      "scene_id": "TbHJrupSAjP",
+      "source_scene_id": "mp3d/TbHJrupSAjP/TbHJrupSAjP.glb",
+      "instruction": "Leave the bathroom, and bedroom and go into the hall. Walk straight down the hall and enter the bedroom across from the starting room. Stop in the doorway to this bedroom.",
+      "start_position": [
+        1.0499900579452515,
+        3.6244001388549805,
+        -10.431300163269043
+      ],
+      "start_rotation": [
+        -0.0,
+        1.0,
+        0.0,
+        6.123233995736766e-17
+      ],
+      "goal_position": [
+        2.638849973678589,
+        3.4244003295898438,
+        -2.374039888381958
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 8.376006126403809,
+      "reference_path": [
+        [
+          1.0499900579452515,
+          3.6244001388549805,
+          -10.431300163269043
+        ],
+        [
+          2.124690055847168,
+          3.493797779083252,
+          -9.706689834594727
+        ],
+        [
+          1.8453099727630615,
+          3.600543260574341,
+          -7.446040153503418
+        ],
+        [
+          2.1461100578308105,
+          3.5395541191101074,
+          -6.301770210266113
+        ],
+        [
+          2.1451499462127686,
+          3.560312509536743,
+          -5.003729820251465
+        ],
+        [
+          2.3382298946380615,
+          3.487471103668213,
+          -3.7762300968170166
+        ],
+        [
+          2.638849973678589,
+          3.4244003295898438,
+          -2.374039888381958
+        ]
+      ]
+    },
+    {
+      "index": 35,
+      "episode_id": "r2r_ce_val_unseen_0036",
+      "original_episode_id": 36,
+      "trajectory_id": 132,
+      "scene_id": "TbHJrupSAjP",
+      "source_scene_id": "mp3d/TbHJrupSAjP/TbHJrupSAjP.glb",
+      "instruction": "Walk through the bedroom and out of the door into the hallway. Walk down the hall along the banister rail through the open door. Continue into the bedroom with a round mirror on the wall and butterfly sculpture.",
+      "start_position": [
+        1.1446900367736816,
+        3.4365439414978027,
+        -9.352140426635742
+      ],
+      "start_rotation": [
+        -0.0,
+        0.8660254037844385,
+        -0.0,
+        -0.5000000000000002
+      ],
+      "goal_position": [
+        2.638849973678589,
+        3.4244003295898438,
+        -2.374039888381958
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 7.18794059753418,
+      "reference_path": [
+        [
+          1.1446900367736816,
+          3.4365439414978027,
+          -9.352140426635742
+        ],
+        [
+          2.124690055847168,
+          3.493797779083252,
+          -9.706689834594727
+        ],
+        [
+          1.8453099727630615,
+          3.600543260574341,
+          -7.446040153503418
+        ],
+        [
+          2.1461100578308105,
+          3.5395541191101074,
+          -6.301770210266113
+        ],
+        [
+          2.1451499462127686,
+          3.560312509536743,
+          -5.003729820251465
+        ],
+        [
+          2.3382298946380615,
+          3.487471103668213,
+          -3.7762300968170166
+        ],
+        [
+          2.638849973678589,
+          3.4244003295898438,
+          -2.374039888381958
+        ]
+      ]
+    },
+    {
+      "index": 6,
+      "episode_id": "r2r_ce_val_unseen_0007",
+      "original_episode_id": 7,
+      "trajectory_id": 42,
+      "scene_id": "x8F5xyUWy9e",
+      "source_scene_id": "mp3d/x8F5xyUWy9e/x8F5xyUWy9e.glb",
+      "instruction": "Go straight past the pool. Walk between the bar and chairs.  Stop when you get to the corner of the bar.  That's where you will wait.",
+      "start_position": [
+        -0.944907009601593,
+        0.04610800743103027,
+        5.948919773101807
+      ],
+      "start_rotation": [
+        -0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.8591700196266174,
+        0.04610800743103027,
+        -4.339749813079834
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 10.452263832092285,
+      "reference_path": [
+        [
+          -0.944907009601593,
+          0.04610800743103027,
+          5.948919773101807
+        ],
+        [
+          -0.9132469892501831,
+          0.04610800743103027,
+          5.334700107574463
+        ],
+        [
+          -0.06894180178642273,
+          0.04610800743103027,
+          2.4979100227355957
+        ],
+        [
+          0.02519790083169937,
+          0.10301037132740021,
+          -0.15336599946022034
+        ],
+        [
+          0.8089100122451782,
+          0.04610800743103027,
+          -2.4403700828552246
+        ],
+        [
+          0.8591700196266174,
+          0.04610800743103027,
+          -4.339749813079834
+        ]
+      ]
+    },
+    {
+      "index": 25,
+      "episode_id": "r2r_ce_val_unseen_0026",
+      "original_episode_id": 26,
+      "trajectory_id": 122,
+      "scene_id": "zsNo4HB9uLZ",
+      "source_scene_id": "mp3d/zsNo4HB9uLZ/zsNo4HB9uLZ.glb",
+      "instruction": "Turn around 180 degrees.  Go down the hallway to the right.  Walk through the kitchen, past the island and stop as soon as you reach the table.",
+      "start_position": [
+        1.6058199405670166,
+        0.17162801325321198,
+        -3.821429967880249
+      ],
+      "start_rotation": [
+        -0.0,
+        0.49999999999999983,
+        0.0,
+        0.8660254037844387
+      ],
+      "goal_position": [
+        14.051600456237793,
+        0.17162801325321198,
+        -1.9895999431610107
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 12.70976448059082,
+      "reference_path": [
+        [
+          1.6058199405670166,
+          0.17162801325321198,
+          -3.821429967880249
+        ],
+        [
+          5.932779788970947,
+          0.17162801325321198,
+          -2.3794898986816406
+        ],
+        [
+          7.576839923858643,
+          0.17162801325321198,
+          -2.444770097732544
+        ],
+        [
+          9.91016960144043,
+          0.17162801325321198,
+          -2.424109935760498
+        ],
+        [
+          12.461600303649902,
+          0.17162801325321198,
+          -2.3902199268341064
+        ],
+        [
+          14.051600456237793,
+          0.17162801325321198,
+          -1.9895999431610107
+        ]
+      ]
+    },
+    {
+      "index": 38,
+      "episode_id": "r2r_ce_val_unseen_0039",
+      "original_episode_id": 39,
+      "trajectory_id": 138,
+      "scene_id": "zsNo4HB9uLZ",
+      "source_scene_id": "mp3d/zsNo4HB9uLZ/zsNo4HB9uLZ.glb",
+      "instruction": "Walk past the bed and move straight until you have pasts through 3 doorways.",
+      "start_position": [
+        -2.035788059234619,
+        0.17162801325321198,
+        -3.9434499740600586
+      ],
+      "start_rotation": [
+        -0.0,
+        0.2588190451025209,
+        0.0,
+        0.9659258262890682
+      ],
+      "goal_position": [
+        6.815470218658447,
+        0.17162801325321198,
+        -4.185239791870117
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 8.85549545288086,
+      "reference_path": [
+        [
+          -2.035788059234619,
+          0.17162801325321198,
+          -3.9434499740600586
+        ],
+        [
+          0.2081959992647171,
+          0.17162801325321198,
+          -3.8352599143981934
+        ],
+        [
+          1.6058199405670166,
+          0.17162801325321198,
+          -3.821429967880249
+        ],
+        [
+          3.887209892272949,
+          0.17162801325321198,
+          -4.108749866485596
+        ],
+        [
+          5.669280052185059,
+          0.17162801325321198,
+          -4.211060047149658
+        ],
+        [
+          6.815470218658447,
+          0.17162801325321198,
+          -4.185239791870117
+        ]
+      ]
+    },
+    {
+      "index": 48,
+      "episode_id": "r2r_ce_val_unseen_0049",
+      "original_episode_id": 49,
+      "trajectory_id": 173,
+      "scene_id": "QUCTc6BB5sX",
+      "source_scene_id": "mp3d/QUCTc6BB5sX/QUCTc6BB5sX.glb",
+      "instruction": "Walk through the kitchen passed the sink and around the corner out into the hallway. Walk into the arched entry well to the left of the stairwell. Continue into the room with the armchair and bed.",
+      "start_position": [
+        -4.338840007781982,
+        0.15480518341064453,
+        -14.498000144958496
+      ],
+      "start_rotation": [
+        -0.0,
+        0.9659258262890682,
+        0.0,
+        0.25881904510252096
+      ],
+      "goal_position": [
+        8.568960189819336,
+        0.15480518341064453,
+        -11.03909969329834
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 14.054312705993652,
+      "reference_path": [
+        [
+          -4.338840007781982,
+          0.15480518341064453,
+          -14.498000144958496
+        ],
+        [
+          -2.159590005874634,
+          0.15480518341064453,
+          -14.57509994506836
+        ],
+        [
+          -2.1420300006866455,
+          0.15480518341064453,
+          -12.03030014038086
+        ],
+        [
+          0.14195099472999573,
+          0.15480518341064453,
+          -12.11970043182373
+        ],
+        [
+          2.703939914703369,
+          0.15480518341064453,
+          -12.175999641418457
+        ],
+        [
+          4.944920063018799,
+          0.15480518341064453,
+          -12.134599685668945
+        ],
+        [
+          8.568960189819336,
+          0.15480518341064453,
+          -11.03909969329834
+        ]
+      ]
+    },
+    {
+      "index": 53,
+      "episode_id": "r2r_ce_val_unseen_0054",
+      "original_episode_id": 54,
+      "trajectory_id": 175,
+      "scene_id": "zsNo4HB9uLZ",
+      "source_scene_id": "mp3d/zsNo4HB9uLZ/zsNo4HB9uLZ.glb",
+      "instruction": "Turn around and go out of the room towards the clock.  Turn right and go down the hall past the kitchen counter.  At the end of the kitchen counter turn left and go past the kitchen to the hall and go slight left and straight through the door.",
+      "start_position": [
+        5.029807090759277,
+        0.17162801325321198,
+        4.014754295349121
+      ],
+      "start_rotation": [
+        -0.0,
+        0.9659258262890683,
+        -0.0,
+        -0.25881904510252063
+      ],
+      "goal_position": [
+        11.279899597167969,
+        0.17162801325321198,
+        -5.680339813232422
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 14.436294555664062,
+      "reference_path": [
+        [
+          5.029807090759277,
+          0.17162801325321198,
+          4.014754295349121
+        ],
+        [
+          6.924980163574219,
+          0.17162801325321198,
+          1.1728399991989136
+        ],
+        [
+          7.860569953918457,
+          0.17162801325321198,
+          -0.23864400386810303
+        ],
+        [
+          10.112000465393066,
+          0.17162801325321198,
+          -0.19209399819374084
+        ],
+        [
+          12.857000350952148,
+          0.17162801325321198,
+          -0.06946899741888046
+        ],
+        [
+          12.461600303649902,
+          0.17162801325321198,
+          -2.3902199268341064
+        ],
+        [
+          11.279899597167969,
+          0.17162801325321198,
+          -5.680339813232422
+        ]
+      ]
+    },
+    {
+      "index": 70,
+      "episode_id": "r2r_ce_val_unseen_0071",
+      "original_episode_id": 71,
+      "trajectory_id": 254,
+      "scene_id": "2azQ1b91cZZ",
+      "source_scene_id": "mp3d/2azQ1b91cZZ/2azQ1b91cZZ.glb",
+      "instruction": "Walk to the right of the coutch and through the doors to the tan couch  Pass through the dining room and wait outside.",
+      "start_position": [
+        -7.24875020980835,
+        0.12711000442504883,
+        4.79511022567749
+      ],
+      "start_rotation": [
+        -0.0,
+        0.7071067811865476,
+        -0.0,
+        -0.7071067811865475
+      ],
+      "goal_position": [
+        4.643919944763184,
+        0.12711000442504883,
+        6.875820159912109
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 15.644170761108398,
+      "reference_path": [
+        [
+          -7.24875020980835,
+          0.12711000442504883,
+          4.79511022567749
+        ],
+        [
+          -6.13431978225708,
+          0.1649501770734787,
+          3.4969398975372314
+        ],
+        [
+          -5.339210033416748,
+          0.12711000442504883,
+          2.2049601078033447
+        ],
+        [
+          -3.0203499794006348,
+          0.12711000442504883,
+          0.9954800009727478
+        ],
+        [
+          -1.437940001487732,
+          0.12711000442504883,
+          2.839169979095459
+        ],
+        [
+          0.7217940092086792,
+          0.12711000442504883,
+          5.7094597816467285
+        ],
+        [
+          4.643919944763184,
+          0.12711000442504883,
+          6.875820159912109
+        ]
+      ]
+    },
+    {
+      "index": 16,
+      "episode_id": "r2r_ce_val_unseen_0017",
+      "original_episode_id": 17,
+      "trajectory_id": 64,
+      "scene_id": "2azQ1b91cZZ",
+      "source_scene_id": "mp3d/2azQ1b91cZZ/2azQ1b91cZZ.glb",
+      "instruction": "Travel to the window overlooking the garden on the opposite end of the billiard room.",
+      "start_position": [
+        20.814699172973633,
+        0.12711000442504883,
+        10.473899841308594
+      ],
+      "start_rotation": [
+        -0.0,
+        0.49999999999999994,
+        -0.0,
+        -0.8660254037844387
+      ],
+      "goal_position": [
+        12.230600357055664,
+        0.12711000442504883,
+        10.421899795532227
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 8.607149124145508,
+      "reference_path": [
+        [
+          20.814699172973633,
+          0.12711000442504883,
+          10.473899841308594
+        ],
+        [
+          19.12980079650879,
+          0.12711000442504883,
+          10.344799995422363
+        ],
+        [
+          17.696199417114258,
+          0.12711000442504883,
+          9.855759620666504
+        ],
+        [
+          15.252599716186523,
+          0.12711000442504883,
+          9.807979583740234
+        ],
+        [
+          13.946100234985352,
+          0.12711000442504883,
+          10.328200340270996
+        ],
+        [
+          12.230600357055664,
+          0.12711000442504883,
+          10.421899795532227
+        ]
+      ]
+    },
+    {
+      "index": 4,
+      "episode_id": "r2r_ce_val_unseen_0005",
+      "original_episode_id": 5,
+      "trajectory_id": 21,
+      "scene_id": "TbHJrupSAjP",
+      "source_scene_id": "mp3d/TbHJrupSAjP/TbHJrupSAjP.glb",
+      "instruction": "Go up the stairs, and then turn around and go through the door past the stairs. Walk up to the bed, then turn to the right and walk into the doorway. Stop there.",
+      "start_position": [
+        -0.8490139842033386,
+        1.379429578781128,
+        -3.431030035018921
+      ],
+      "start_rotation": [
+        -0.0,
+        0.2588190451025209,
+        0.0,
+        0.9659258262890682
+      ],
+      "goal_position": [
+        -2.9906399250030518,
+        3.5454914569854736,
+        -7.188910007476807
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 9.660629272460938,
+      "reference_path": [
+        [
+          -0.8490139842033386,
+          1.379429578781128,
+          -3.431030035018921
+        ],
+        [
+          -0.20984399318695068,
+          2.297478675842285,
+          -4.568480014801025
+        ],
+        [
+          0.9583550095558167,
+          3.11130428314209,
+          -4.9011101722717285
+        ],
+        [
+          2.1451499462127686,
+          3.560312509536743,
+          -5.003729820251465
+        ],
+        [
+          -0.711899995803833,
+          3.5800554752349854,
+          -6.376410007476807
+        ],
+        [
+          -3.1145999431610107,
+          3.5302207469940186,
+          -5.832210063934326
+        ],
+        [
+          -2.9906399250030518,
+          3.5454914569854736,
+          -7.188910007476807
+        ]
+      ]
+    },
+    {
+      "index": 15,
+      "episode_id": "r2r_ce_val_unseen_0016",
+      "original_episode_id": 16,
+      "trajectory_id": 64,
+      "scene_id": "2azQ1b91cZZ",
+      "source_scene_id": "mp3d/2azQ1b91cZZ/2azQ1b91cZZ.glb",
+      "instruction": "turn round and walk past the billiard table, walk straight on, stop by the window.",
+      "start_position": [
+        20.814699172973633,
+        0.12711000442504883,
+        10.473899841308594
+      ],
+      "start_rotation": [
+        -0.0,
+        0.49999999999999994,
+        -0.0,
+        -0.8660254037844387
+      ],
+      "goal_position": [
+        12.230600357055664,
+        0.12711000442504883,
+        10.421899795532227
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 8.607149124145508,
+      "reference_path": [
+        [
+          20.814699172973633,
+          0.12711000442504883,
+          10.473899841308594
+        ],
+        [
+          19.12980079650879,
+          0.12711000442504883,
+          10.344799995422363
+        ],
+        [
+          17.696199417114258,
+          0.12711000442504883,
+          9.855759620666504
+        ],
+        [
+          15.252599716186523,
+          0.12711000442504883,
+          9.807979583740234
+        ],
+        [
+          13.946100234985352,
+          0.12711000442504883,
+          10.328200340270996
+        ],
+        [
+          12.230600357055664,
+          0.12711000442504883,
+          10.421899795532227
+        ]
+      ]
+    },
+    {
+      "index": 39,
+      "episode_id": "r2r_ce_val_unseen_0040",
+      "original_episode_id": 40,
+      "trajectory_id": 155,
+      "scene_id": "zsNo4HB9uLZ",
+      "source_scene_id": "mp3d/zsNo4HB9uLZ/zsNo4HB9uLZ.glb",
+      "instruction": "Walk into the kitchen area. Walk by the sink and oven. Walk straight into the hallway. turn right into the little room. Turn left and walk into the bedroom. Stop by the corner of the bed.",
+      "start_position": [
+        14.38700008392334,
+        0.17162801325321198,
+        -0.21611900627613068
+      ],
+      "start_rotation": [
+        -0.0,
+        0.8660254037844387,
+        0.0,
+        0.4999999999999999
+      ],
+      "goal_position": [
+        0.2081959992647171,
+        0.17162801325321198,
+        -3.8352599143981934
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 14.96241569519043,
+      "reference_path": [
+        [
+          14.38700008392334,
+          0.17162801325321198,
+          -0.21611900627613068
+        ],
+        [
+          12.461600303649902,
+          0.17162801325321198,
+          -2.3902199268341064
+        ],
+        [
+          9.91016960144043,
+          0.17162801325321198,
+          -2.424109935760498
+        ],
+        [
+          7.576839923858643,
+          0.17162801325321198,
+          -2.444770097732544
+        ],
+        [
+          5.932779788970947,
+          0.17162801325321198,
+          -2.3794898986816406
+        ],
+        [
+          1.6058199405670166,
+          0.17162801325321198,
+          -3.821429967880249
+        ],
+        [
+          0.2081959992647171,
+          0.17162801325321198,
+          -3.8352599143981934
+        ]
+      ]
+    },
+    {
+      "index": 41,
+      "episode_id": "r2r_ce_val_unseen_0042",
+      "original_episode_id": 42,
+      "trajectory_id": 155,
+      "scene_id": "zsNo4HB9uLZ",
+      "source_scene_id": "mp3d/zsNo4HB9uLZ/zsNo4HB9uLZ.glb",
+      "instruction": "Walk towards the kitchen area. Keep walking along the kitchen area towards the doorway. Turn right and exit the kitchen area walking across the small living room area and into the bedroom to you left.",
+      "start_position": [
+        14.38700008392334,
+        0.17162801325321198,
+        -0.21611900627613068
+      ],
+      "start_rotation": [
+        -0.0,
+        0.8660254037844387,
+        0.0,
+        0.4999999999999999
+      ],
+      "goal_position": [
+        0.2081959992647171,
+        0.17162801325321198,
+        -3.8352599143981934
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 14.96241569519043,
+      "reference_path": [
+        [
+          14.38700008392334,
+          0.17162801325321198,
+          -0.21611900627613068
+        ],
+        [
+          12.461600303649902,
+          0.17162801325321198,
+          -2.3902199268341064
+        ],
+        [
+          9.91016960144043,
+          0.17162801325321198,
+          -2.424109935760498
+        ],
+        [
+          7.576839923858643,
+          0.17162801325321198,
+          -2.444770097732544
+        ],
+        [
+          5.932779788970947,
+          0.17162801325321198,
+          -2.3794898986816406
+        ],
+        [
+          1.6058199405670166,
+          0.17162801325321198,
+          -3.821429967880249
+        ],
+        [
+          0.2081959992647171,
+          0.17162801325321198,
+          -3.8352599143981934
+        ]
+      ]
+    },
+    {
+      "index": 12,
+      "episode_id": "r2r_ce_val_unseen_0013",
+      "original_episode_id": 13,
+      "trajectory_id": 62,
+      "scene_id": "zsNo4HB9uLZ",
+      "source_scene_id": "mp3d/zsNo4HB9uLZ/zsNo4HB9uLZ.glb",
+      "instruction": "Walk passed the dining table and continue towards the kitchen. Walk through the kitchen passed the counters and stove and stop near the sink.",
+      "start_position": [
+        17.45949935913086,
+        0.17162801325321198,
+        0.21568399667739868
+      ],
+      "start_rotation": [
+        -0.0,
+        1.0,
+        0.0,
+        6.123233995736766e-17
+      ],
+      "goal_position": [
+        5.932779788970947,
+        0.17162801325321198,
+        -2.3794898986816406
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 12.037668228149414,
+      "reference_path": [
+        [
+          17.45949935913086,
+          0.17162801325321198,
+          0.21568399667739868
+        ],
+        [
+          14.38700008392334,
+          0.17162801325321198,
+          -0.21611900627613068
+        ],
+        [
+          12.461600303649902,
+          0.17162801325321198,
+          -2.3902199268341064
+        ],
+        [
+          9.91016960144043,
+          0.17162801325321198,
+          -2.424109935760498
+        ],
+        [
+          7.576839923858643,
+          0.17162801325321198,
+          -2.444770097732544
+        ],
+        [
+          5.932779788970947,
+          0.17162801325321198,
+          -2.3794898986816406
+        ]
+      ]
+    },
+    {
+      "index": 57,
+      "episode_id": "r2r_ce_val_unseen_0058",
+      "original_episode_id": 58,
+      "trajectory_id": 208,
+      "scene_id": "TbHJrupSAjP",
+      "source_scene_id": "mp3d/TbHJrupSAjP/TbHJrupSAjP.glb",
+      "instruction": "In the entry way go up the stairs and in the hallway at the top take a left and go past the dining room into the entry way with the stairs on the right side and stop right between the bottom of the first stair and the console table on the left.",
+      "start_position": [
+        6.758969783782959,
+        -2.427623987197876,
+        -4.948939800262451
+      ],
+      "start_rotation": [
+        -0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "goal_position": [
+        0.5773000121116638,
+        0.024399995803833008,
+        -1.52606999874115
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 8.337790489196777,
+      "reference_path": [
+        [
+          6.758969783782959,
+          -2.427623987197876,
+          -4.948939800262451
+        ],
+        [
+          6.006979942321777,
+          -1.8857978582382202,
+          -4.925670146942139
+        ],
+        [
+          5.039279937744141,
+          -1.1575438976287842,
+          -4.9232001304626465
+        ],
+        [
+          3.9755098819732666,
+          -0.409275621175766,
+          -4.967030048370361
+        ],
+        [
+          2.3268001079559326,
+          0.024399995803833008,
+          -3.7597999572753906
+        ],
+        [
+          0.5773000121116638,
+          0.024399995803833008,
+          -1.52606999874115
+        ]
+      ]
+    },
+    {
+      "index": 30,
+      "episode_id": "r2r_ce_val_unseen_0031",
+      "original_episode_id": 31,
+      "trajectory_id": 129,
+      "scene_id": "x8F5xyUWy9e",
+      "source_scene_id": "mp3d/x8F5xyUWy9e/x8F5xyUWy9e.glb",
+      "instruction": "Go to the plant\r\nGo to the rope\r\nGo to the steamroom door\r\nGo to the table.",
+      "start_position": [
+        -7.149509906768799,
+        1.1533952951431274,
+        -4.945370197296143
+      ],
+      "start_rotation": [
+        -0.0,
+        0.7071067811865475,
+        0.0,
+        0.7071067811865476
+      ],
+      "goal_position": [
+        -3.514270067214966,
+        1.0461080074310303,
+        -1.9369399547576904
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 6.361871719360352,
+      "reference_path": [
+        [
+          -7.149509906768799,
+          1.1533952951431274,
+          -4.945370197296143
+        ],
+        [
+          -6.597370147705078,
+          1.0461080074310303,
+          -2.976069927215576
+        ],
+        [
+          -6.052060127258301,
+          1.0461080074310303,
+          -0.692093014717102
+        ],
+        [
+          -4.619659900665283,
+          1.0461080074310303,
+          -1.40802001953125
+        ],
+        [
+          -3.514270067214966,
+          1.0461080074310303,
+          -1.9369399547576904
+        ]
+      ]
+    },
+    {
+      "index": 37,
+      "episode_id": "r2r_ce_val_unseen_0038",
+      "original_episode_id": 38,
+      "trajectory_id": 138,
+      "scene_id": "zsNo4HB9uLZ",
+      "source_scene_id": "mp3d/zsNo4HB9uLZ/zsNo4HB9uLZ.glb",
+      "instruction": "Go straight past the bed and into the hallway. Enter the bedroom straight ahead and wait there.",
+      "start_position": [
+        -2.035788059234619,
+        0.17162801325321198,
+        -3.9434499740600586
+      ],
+      "start_rotation": [
+        -0.0,
+        0.2588190451025209,
+        0.0,
+        0.9659258262890682
+      ],
+      "goal_position": [
+        6.815470218658447,
+        0.17162801325321198,
+        -4.185239791870117
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 8.85549545288086,
+      "reference_path": [
+        [
+          -2.035788059234619,
+          0.17162801325321198,
+          -3.9434499740600586
+        ],
+        [
+          0.2081959992647171,
+          0.17162801325321198,
+          -3.8352599143981934
+        ],
+        [
+          1.6058199405670166,
+          0.17162801325321198,
+          -3.821429967880249
+        ],
+        [
+          3.887209892272949,
+          0.17162801325321198,
+          -4.108749866485596
+        ],
+        [
+          5.669280052185059,
+          0.17162801325321198,
+          -4.211060047149658
+        ],
+        [
+          6.815470218658447,
+          0.17162801325321198,
+          -4.185239791870117
+        ]
+      ]
+    },
+    {
+      "index": 17,
+      "episode_id": "r2r_ce_val_unseen_0018",
+      "original_episode_id": 18,
+      "trajectory_id": 64,
+      "scene_id": "2azQ1b91cZZ",
+      "source_scene_id": "mp3d/2azQ1b91cZZ/2azQ1b91cZZ.glb",
+      "instruction": "Walk across the room, past the pool table on your left side as you walk.  Stop in front of the television mounted on the wall across from the couch.",
+      "start_position": [
+        20.814699172973633,
+        0.12711000442504883,
+        10.473899841308594
+      ],
+      "start_rotation": [
+        -0.0,
+        0.49999999999999994,
+        -0.0,
+        -0.8660254037844387
+      ],
+      "goal_position": [
+        12.230600357055664,
+        0.12711000442504883,
+        10.421899795532227
+      ],
+      "goal_radius": 3.0,
+      "shortest_path_distance": 8.607149124145508,
+      "reference_path": [
+        [
+          20.814699172973633,
+          0.12711000442504883,
+          10.473899841308594
+        ],
+        [
+          19.12980079650879,
+          0.12711000442504883,
+          10.344799995422363
+        ],
+        [
+          17.696199417114258,
+          0.12711000442504883,
+          9.855759620666504
+        ],
+        [
+          15.252599716186523,
+          0.12711000442504883,
+          9.807979583740234
+        ],
+        [
+          13.946100234985352,
+          0.12711000442504883,
+          10.328200340270996
+        ],
+        [
+          12.230600357055664,
+          0.12711000442504883,
+          10.421899795532227
+        ]
+      ]
+    }
+  ]
+}

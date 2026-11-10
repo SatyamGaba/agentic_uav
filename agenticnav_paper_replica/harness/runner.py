@@ -203,6 +203,27 @@ def run_episode(
                 tdz = trajectory[ti + 1][1] - trajectory[ti][1]
                 total_dist_m += math.sqrt(tdx * tdx + tdz * tdz)
 
+        # Check for trajectory loop / spatial revisitation (Task 4)
+        loop_warning: Optional[str] = None
+        if len(node_poses) >= 3:
+            cur_x, cur_z = obs.allocentric_pose[0], obs.allocentric_pose[1]
+            min_prev_dist = float("inf")
+            revisited_step = -1
+            for prev_idx in range(len(node_poses) - 2):
+                px, pz, _ = node_poses[prev_idx]
+                dist_prev = math.sqrt((cur_x - px) ** 2 + (cur_z - pz) ** 2)
+                if dist_prev < min_prev_dist:
+                    min_prev_dist = dist_prev
+                    revisited_step = prev_idx
+
+            if min_prev_dist < 1.20:
+                loop_warning = (
+                    f"[LOOP WARNING: You are currently within {min_prev_dist:.2f}m of where you were at Step {revisited_step}. "
+                    "You are pacing or oscillating in an area you have already visited. "
+                    "(1) If you are at/near the destination landmark described in the instruction, CALL STOP() NOW instead of pacing. "
+                    "(2) If not at the destination, DO NOT retrace your prior path: pick a completely different, unexplored direction/doorway from the BEV map!]"
+                )
+
         pre_pose = obs.allocentric_pose
         pre_goal_dist = embodiment.get_geodesic_distance_to_goal()
 
@@ -222,6 +243,7 @@ def run_episode(
             initial_reselect_count=consecutive_reselects,
             accumulated_distance_m=total_dist_m,
             obstacle_points_agent_xyz=obs_agent_xyz,
+            loop_warning=loop_warning,
         )
 
         step_traces.append({

@@ -59,36 +59,31 @@ Or for final destination arrival:
 }}
 ```
 
-### MANDATORY TERMINAL & STEP CONTROL RULES:
-1. **Milestone Progression: Destination vs. Transit Landmarks**:
-   - Navigation instructions specify a sequence of milestones ending at a destination landmark.
-   - Transit landmarks (e.g., "walk past the dining table and kitchen counter", "walk through the living room") are route waypoints along the journey. NEVER stop at intermediate transit landmarks or starting objects!
-   - You MUST only call `stop` when you reach the FINAL destination landmark described in the concluding clause of the instruction.
+### 3-STAGE DECISION PROTOCOL (MANDATORY AT EVERY STEP):
 
-2. **Peripheral Portal Check (Archway / Doorway / Room Entrance)**:
-   - When the instruction says "stop in/at the archway/doorway/entrance", inspect View 1 (Right) and View 3 (Left) in addition to View 0.
-   - If door frames, arch jambs, or walls flank you immediately on the left and right (< 0.8m depth), or if View 0 looks through the arch into the room ahead, you are ALREADY standing inside the portal! Call `stop` now! DO NOT take another forward step through into the next room!
+#### STAGE 1: Mandatory Pre-Stride Arrival Check (Prevents Overshooting / Missed Stops)
+Before planning any new `move_to` action, evaluate if your PREVIOUS move already placed you inside the final destination zone:
+1. **Egocentric Frustum Shift on Arrival**:
+   - When **approaching** a goal from 3m–6m away, it sits in the center of **View 0 (Front)**.
+   - When you have **ARRIVED** at a goal (0.4m–2.0m away), it often shifts OUT of the center of View 0 to lower foreground or side views!
+2. **Arrival Signatures by Goal Type**:
+   - **Doorways / Archways / Entrances** (*"stop in the doorway/archway/entrance"*): You have arrived when the doorframes/arch jambs flank you immediately in **View 1 (Right)** and **View 3 (Left)** at `d < 1.3m`, while View 0 looks into the subsequent room. **STOP IMMEDIATELY.** Do NOT take another step forward into the room in View 0!
+   - **Furniture / Fixtures** (*"stop in front of / next to the table, sofa, bed, stairs, island, toilet, hot tub"*): You have arrived when the target object is in the lower foreground (`v >= 0.65`) of View 0 OR directly beside you in View 1 / View 3 at a `query_depth` distance of **`0.5m <= d <= 2.2m`**. **STOP IMMEDIATELY.** Taking another step will overshoot or walk past the object.
+   - **Rooms / Landings** (*"wait in the lounge / sitting area / top of stairs"*): Once you cross the threshold and the defining room features surround you within `1.5m–2.5m` in Views 0/1/3, **STOP IMMEDIATELY.** Do not walk to the far exit of the room.
 
-3. **Sub-Goal Visibility Gating (Corners & Blocked Turns)**:
-   - If a required turn is blocked at u=0.5 (e.g. facing a corner or wall edge), check wider angles u in {0.3, 0.7} or take a small forward step (0.5m - 1.0m) to clear the wall corner and align with the opening before abandoning the turn!
+#### STAGE 2: Counterfactual Dual-Hypothesis Gate (Prevents Premature Stops)
+Decompose the instruction into **Ordered Transit Milestones ($C_1 \\dots C_{{n-1}}$)** and the **Terminal Goal ($C_n$)**.
+Whenever you consider calling `stop()`, you MUST explicitly evaluate two competing hypotheses in your reasoning:
+- **`H_ARRIVED` (True Terminal Arrival)**: Every intermediate milestone ($C_1 \\dots C_{{n-1}}$) has been physically traversed (not merely seen in the distance), AND the current camera views + depth (`0.5m <= d <= 2.2m`) match the exact terminal anchor $C_n$.
+- **`H_PREMATURE` (Counterfactual / Decoy Hypothesis)**: I have only completed an intermediate step (e.g. climbed the stairs or entered the hallway), OR I am looking at the target room/object from afar (`d > 2.5m` through a doorway), OR this object is a decoy before the final turn.
+- **Decision Rule**: Actively try to prove `H_PREMATURE` using all 4 views and `query_depth`. You may call `stop()` ONLY if `H_PREMATURE` is refuted with high confidence and the target anchor $C_n$ is verified within `<= 2.2m`.
 
-4. **Exact Query-to-Move Mapping (No Blind Shifting)**:
-   - When commanding `move_to`, select the EXACT `(view, u, v)` coordinates that `query_depth` verified as `"clear": true`. Do NOT shift to an unverified coordinate (e.g. querying v=0.75 and commanding v=0.85), which risks hitting unverified obstacles.
-
-5. **Transit Stride vs. Near-Field Terminal Approaching**:
-   - Open room/corridor transit: For clear distances >= 3.0m, select v in [0.65, 0.75] to cover ground with standard 1.5m - 2.5m strides.
-   - Near-field terminal approach: When approaching within 2.5m of the final destination landmark, select near-field points (v in [0.80, 0.90]) to execute precise micro-steps (0.5m - 1.0m) and position accurately without overshooting.
-
-6. **Physical Collision Feedback**:
-   - Pay close attention to action history. If your previous move reported a physical collision or shortened displacement (e.g. moved 0.14m of commanded 1.0m), you are still near your previous position! Adjust your heading or select an unobstructed angle.
-
-7. **BEV Direction Check & Pure Rotations**:
-   - If action history reports you rotated in place, remember that View 0 now faces your new heading.
-   - Before taking a 180° turn (selecting View 2), inspect the cyan path on your BEV map. If turning around causes you to retrace steps backward along your cyan line into an already-visited room, DO NOT move forward. Rotate to View 1 or View 3 to find an orthogonal unexplored corridor.
-
-8. **Depth Is Not Arrival**: A depth reading only measures local clearance to a surface. It does not prove that you have reached the instructed destination.
-
-9. **Never Repeat a Blocked Target**: If `move_to` returns `reselect` or `no_motion`, do NOT reissue the exact same `(view, u, v)` target. Choose a different view or a different floor point."""
+#### STAGE 3: Anti-Loop & BEV Trajectory Discipline (Prevents Pacing Loops)
+1. **BEV Trajectory Inspection**: Inspect the cyan path on your BEV map before selecting a `move_to` target. Do NOT place a `move_to` target on a location already traversed by your trajectory line unless dead-end backtracking is required.
+2. **Local Pacing Prevention**: If you have remained within the same ~2m area for >= 2 steps because you are close to the target landmark, **call `stop()` instead of pacing around the landmark.**
+3. **Pure-Rotation Orientation**: If action history reports you rotated in place, remember View 0 now faces your new heading.
+4. **Verified Move Execution**: Select the EXACT `(view, u, v)` coordinates verified by `query_depth` that returned `"clear": true`. Never blindly shift coordinates.
+5. **Never Repeat a Blocked Target**: If `move_to` returns `reselect` or `no_motion`, do NOT reissue the exact same `(view, u, v)` target. Choose a different view or floor point."""
 
 SYSTEM_PROMPT = build_system_prompt(floor_grounding=True)
 
@@ -99,6 +94,7 @@ def build_step_user_prompt(
     history_text: str,
     accumulated_distance_m: float = 0.0,
     reselect_feedback: Optional[str] = None,
+    loop_warning: Optional[str] = None,
 ) -> str:
     """Builds the structured user message for the current decision step."""
     msg = f"### Goal Navigation Instruction:\n\"{instruction}\"\n\n"
@@ -108,17 +104,22 @@ def build_step_user_prompt(
 
     msg += f"### Action History (Recent Steps):\n{history_text}\n\n"
 
+    if loop_warning:
+        msg += f"### Loop / Oscillation Warning:\n{loop_warning}\n\n"
+
     if reselect_feedback:
         msg += f"### Warning / Reselect Feedback:\n{reselect_feedback}\n\n"
         msg += "Please review the obstacle feedback and select an alternative unobstructed target or view.\n"
     else:
         msg += (
-            "### Instructions for this Step:\n"
-            "1. Milestone Progress: Check which instructed milestone was just completed. DO NOT stop at intermediate transit landmarks or starting objects; only stop at the final destination landmark.\n"
-            "2. Peripheral Portal Check: If stopping at an archway/doorway/entrance, check View 1 (Right) and View 3 (Left). If door frames flank you on left and right, or View 0 looks through into the subsequent room, you are already inside the portal—call `stop` now!\n"
-            "3. Landmark Approach & Stride: During open transit (depth >= 3.0m), use standard strides (v in [0.65, 0.75]). Only use micro-steps (v in [0.80, 0.90]) when approaching within 2.5m of the final destination.\n"
-            "4. Verified Move Execution: Select the EXACT (view, u, v) target verified by `query_depth` that returned `clear: true`.\n"
-            "5. BEV & Heading Check: If your previous move was a pure in-place turn, View 0 now faces your new heading. Avoid retracing backward along your past cyan path on the BEV map.\n"
+            "### Instructions for this Step (Follow 3-Stage Decision Protocol):\n"
+            "1. Stage 1 (Pre-Stride Arrival Check): Did your previous move place you inside the terminal zone? "
+            "Check Views 0, 1, and 3. If doorframes flank you in Views 1/3 (< 1.3m), or the target object is in foreground/flanking at 0.5m-2.2m, "
+            "evaluate for arrival immediately!\n"
+            "2. Stage 2 (Dual-Hypothesis Evaluation): If considering stop(), explicitly evaluate H_ARRIVED vs. H_PREMATURE. "
+            "Have you physically traversed ALL intermediate milestones (C_1...C_n-1)? Is the target anchor <= 2.2m?\n"
+            "3. Stage 3 (Motion & BEV Discipline): If continuing, check BEV map to avoid loops. Open transit uses standard strides (v in [0.65, 0.75]). "
+            "Near-field approach uses micro-steps (v in [0.80, 0.90]). Query depth first and move to the exact verified point.\n"
             "Decide on your next action now."
         )
 

@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 import json
 import math
+import re
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 import numpy as np
 
@@ -41,6 +42,92 @@ def canonicalize_tool_name(name: str) -> str:
         return ""
     clean = str(name).strip().lower()
     return TOOL_NAME_ALIASES.get(clean, clean)
+
+
+def sanitize_tool_call(tc: Dict[str, Any]) -> Dict[str, Any]:
+    """Sanitize and normalize tool calls, extracting JSON if wrapped in strings or markdown,
+    normalizing pixel coords to [0.0, 1.0], and parsing view indices.
+    """
+    raw_name = tc.get("name", "")
+    name = canonicalize_tool_name(raw_name)
+    args = tc.get("arguments", {})
+
+    if isinstance(args, str):
+        clean_str = args.strip()
+        if clean_str.startswith("```"):
+            clean_str = re.sub(r"^```(?:json)?\s*", "", clean_str)
+            clean_str = re.sub(r"\s*```$", "", clean_str)
+        try:
+            args = json.loads(clean_str)
+        except Exception:
+            args = {}
+
+    if not isinstance(args, dict):
+        args = {}
+
+    if name == "move_to":
+        # Normalize view
+        if "view" in args:
+            try:
+                v_idx, _ = parse_view_index_ex(args["view"])
+                args["view"] = v_idx
+            except Exception:
+                pass
+        # Normalize and clamp coordinates
+        for k, max_dim in [("u", 640.0), ("v", 480.0)]:
+            if k in args:
+                try:
+                    val = float(args[k])
+                    if val > 1.0:
+                        val = val / max_dim
+                    args[k] = min(1.0, max(0.0, val))
+                except Exception:
+                    args[k] = 0.5
+    elif name == "query_depth":
+        pts = args.get("points", [])
+        if isinstance(pts, str):
+            clean_pts = pts.strip()
+            if clean_pts.startswith("```"):
+                clean_pts = re.sub(r"^```(?:json)?\s*", "", clean_pts)
+                clean_pts = re.sub(r"\s*```$", "", clean_pts)
+            try:
+                pts = json.loads(clean_pts)
+            except Exception:
+                pts = []
+        if isinstance(pts, dict):
+            pts = [pts]
+        if isinstance(pts, list):
+            sanitized_pts = []
+            for p in pts:
+                if not isinstance(p, dict):
+                    continue
+                sp = dict(p)
+                if "view" in sp:
+                    try:
+                        v_idx, _ = parse_view_index_ex(sp["view"])
+                        sp["view"] = v_idx
+                    except Exception:
+                        pass
+                for k, max_dim in [("u", 640.0), ("v", 480.0)]:
+                    if k in sp:
+                        try:
+                            val = float(sp[k])
+                            if val > 1.0:
+                                val = val / max_dim
+                            sp[k] = min(1.0, max(0.0, val))
+                        except Exception:
+                            sp[k] = 0.5
+                sanitized_pts.append(sp)
+            args["points"] = sanitized_pts
+    elif name == "recall":
+        if "view" in args:
+            try:
+                v_idx, _ = parse_view_index_ex(args["view"])
+                args["view"] = v_idx
+            except Exception:
+                pass
+
+    return {"name": name, "arguments": args}
 
 
 def count_images_in_messages(messages: List[Dict[str, Any]]) -> int:
@@ -125,6 +212,7 @@ class StepDecisionLoop:
         initial_reselect_count: int = 0,
         accumulated_distance_m: float = 0.0,
         obstacle_points_agent_xyz: Optional[np.ndarray] = None,
+        loop_warning: Optional[str] = None,
     ) -> StepLoopResult:
         """Runs the multi-turn loop for decision step t (Blueprint v7 Section 6)."""
         evidence_count = 0
@@ -148,6 +236,7 @@ class StepDecisionLoop:
             history_text=history_text,
             accumulated_distance_m=accumulated_distance_m,
             reselect_feedback=None,
+            loop_warning=loop_warning,
         )
 
         system_prompt = build_system_prompt(floor_grounding=self.floor_grounding_prompt)
@@ -221,9 +310,7 @@ class StepDecisionLoop:
                 assistant_entry["tool_calls"] = assistant_tool_calls
             messages.append(assistant_entry)
 
-            tool_calls = assistant_tool_calls
-            for tc in tool_calls:
-                tc["name"] = canonicalize_tool_name(tc.get("name", ""))
+            tool_calls = [sanitize_tool_call(tc) for tc in assistant_tool_calls]
 
             # Handle no tool calls (counts against M_max)
             if not tool_calls:
@@ -231,8 +318,8 @@ class StepDecisionLoop:
                 reprompt_msg = {
                     "role": "user",
                     "content": (
-                        "No valid navigation tool was invoked. You MUST choose and call one tool "
-                        "(move_to, stop, query_depth, recall) by formatting your tool call as a JSON block, e.g.:\n"
+                        "SCHEMA ERROR: No valid navigation tool call detected.\n"
+                        "You MUST invoke exactly one tool (move_to, stop, query_depth, recall) by formatting your tool call as a JSON block, e.g.:\n"
                         "```json\n"
                         '{"name": "move_to", "arguments": {"view": 0, "u": 0.5, "v": 0.55, "reason": "Advance along corridor"}}\n'
                         "```\n"
@@ -260,6 +347,25 @@ class StepDecisionLoop:
                 }
                 messages.append(verify_tool_msg)
                 turn_log.append(verify_tool_msg)
+                continue
+
+            # If evidence calls are present but evidence budget is exhausted and no terminal calls issued:
+            if evidence_calls and not terminal_calls and (evidence_count >= self.max_evidence_queries):
+                malformed_count += 1
+                budget_msg = {
+                    "role": "tool",
+                    "name": evidence_calls[0]["name"],
+                    "content": json.dumps({
+                        "status": "budget_exhausted",
+                        "message": (
+                            "SCHEMA NOTICE: Evidence query budget is exhausted for this step (max 4 queries reached). "
+                            "You must now choose and execute move_to(...) or stop(...). "
+                            "Do not call query_depth or recall again on this step."
+                        ),
+                    }),
+                }
+                messages.append(budget_msg)
+                turn_log.append(budget_msg)
                 continue
 
             # Case 1: Evidence calls present (and under evidence budget)
@@ -488,9 +594,14 @@ class StepDecisionLoop:
 
             # Fallback for unrecognized tools
             malformed_count += 1
+            unrecognized_names = [tc.get('name') for tc in tool_calls]
             err_msg = {
                 "role": "user",
-                "content": f"Unrecognized tool calls: {[tc.get('name') for tc in tool_calls]}.",
+                "content": (
+                    f"SCHEMA ERROR: Unrecognized tool calls: {unrecognized_names}.\n"
+                    "Valid tools are ONLY: 'move_to', 'stop', 'query_depth', and 'recall'.\n"
+                    "Please reissue your action using one of these valid tools in standard JSON format."
+                ),
             }
             messages.append(err_msg)
             turn_log.append(err_msg)

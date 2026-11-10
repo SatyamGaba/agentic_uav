@@ -533,3 +533,52 @@ def extract_view_obstacle_and_free_points(
 
     return obs_pts, free_endpoints
 
+
+def scan_upward_for_valid_depth(
+    depth_img: np.ndarray,
+    u: float,
+    v: float,
+    config: CameraConfig,
+    min_v: float = 0.35,
+    step_v: float = 0.04,
+) -> Optional[Tuple[float, int, int, float]]:
+    """Scans upward along the same column u when near-plane clip (d <= d_min) occurs.
+
+    Looking higher over foreground furniture or stair treads often reveals the open room.
+    Returns:
+        (v_candidate, x0, y0, valid_z_c) if a valid depth pixel is found, else None.
+    """
+    v_cand = v - step_v
+    while v_cand >= min_v:
+        x0, y0 = normalize_to_pixel(u, v_cand, config)
+        if 0 <= y0 < depth_img.shape[0] and 0 <= x0 < depth_img.shape[1]:
+            val = float(depth_img[y0, x0])
+            is_valid, z_c, _ = convert_raw_depth(val, config)
+            if is_valid:
+                return v_cand, x0, y0, z_c
+        v_cand -= step_v
+    return None
+
+
+def compute_azimuth_ground_projection(
+    view_idx: int,
+    u: float,
+    config: CameraConfig,
+    distance_m: float = 1.25,
+) -> np.ndarray:
+    """Computes a 3D point in the canonical agent frame at floor elevation (p_y = 0.0)
+    projected distance_m forward along the horizontal ray bearing of (view_idx, u).
+
+    Used as an actuation fallback when near-plane clipping (e.g. facing a table or stairs)
+    occurs, allowing the NavMesh follower to route around the obstacle.
+    """
+    x0, _ = normalize_to_pixel(u, 0.5, config)
+    x_c = (x0 + 0.5 - config.cx) * distance_m / config.fx
+    y_c = 0.0
+    z_c = float(distance_m)
+    p_c = np.array([x_c, y_c, z_c], dtype=np.float64)
+    p_agent = camera_to_agent_frame(p_c, view_idx, config)
+    p_agent[1] = 0.0  # Floor elevation
+    return p_agent
+
+

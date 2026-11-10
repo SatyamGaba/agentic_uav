@@ -17,6 +17,8 @@ from agenticnav_paper_replica.geometry.pinhole import (
     parse_view_index,
     parse_view_index_ex,
     InvalidViewError,
+    scan_upward_for_valid_depth,
+    compute_azimuth_ground_projection,
 )
 from agenticnav_paper_replica.geometry.safety_region import (
     GroundCorridorChecker,
@@ -128,12 +130,32 @@ class ToolExecutor:
             raw_val = float(depth_img[y0, x0])
             is_valid, z_center, error_cause = convert_raw_depth(raw_val, self.config)
             if not is_valid:
-                results.append({
-                    "view": view,
-                    "u": round(u, 2),
-                    "v": round(v, 2),
-                    "error": error_cause or "invalid_depth",
-                })
+                if 0.0 < raw_val <= (self.config.d_min + 1e-3):
+                    results.append({
+                        "view": view,
+                        "u": round(u, 2),
+                        "v": round(v, 2),
+                        "error": "near_plane_clip",
+                        "message": (
+                            "Target distance is < 0.50m (surface/wall/table in immediate foreground). "
+                            "Look higher (v <= 0.50) or pick another direction."
+                        ),
+                    })
+                elif raw_val >= (self.config.d_max - 1e-3):
+                    results.append({
+                        "view": view,
+                        "u": round(u, 2),
+                        "v": round(v, 2),
+                        "error": "far_saturation",
+                        "message": "Target distance is >= 5.0m (beyond sensor range).",
+                    })
+                else:
+                    results.append({
+                        "view": view,
+                        "u": round(u, 2),
+                        "v": round(v, 2),
+                        "error": error_cause or "invalid_depth",
+                    })
                 continue
 
             patch = extract_depth_patch(depth_img, x0, y0, patch_size=5)
@@ -276,13 +298,89 @@ class ToolExecutor:
 
         raw_val = float(depth_img[y0, x0])
         is_valid, z_c, error_cause = convert_raw_depth(raw_val, self.config)
+        used_fallback = False
+
         if not is_valid:
-            return {
-                "status": "reselect",
-                "cause": error_cause or "invalid_depth",
-            }
+            if 0.0 < raw_val <= (self.config.d_min + 1e-3):
+                # 1. Try upward vertical ray search along column u
+                scan_res = scan_upward_for_valid_depth(
+                    depth_img=depth_img,
+                    u=u,
+                    v=v,
+                    config=self.config,
+                    min_v=0.35,
+                    step_v=0.04,
+                )
+                if scan_res is not None:
+                    v_cand, x0_cand, y0_cand, z_c_cand = scan_res
+                    x0, y0 = x0_cand, y0_cand
+                    v = v_cand
+                    z_c = z_c_cand
+                    is_valid = True
+                elif self.oracle_local_actuation:
+                    # 2. Azimuth ground-projection fallback for oracle actuation
+                    used_fallback = True
+                    z_c = 1.25
+                    is_valid = True
+
+            if not is_valid:
+                if 0.0 < raw_val <= (self.config.d_min + 1e-3):
+                    return {
+                        "status": "reselect",
+                        "cause": "invalid_depth",
+                        "detail": "near_plane_clip",
+                        "message": (
+                            "NEAR_PLANE_CLIP (d < 0.50m): You are standing < 0.50m from a surface/wall/table in this view. "
+                            "(1) If you have already reached the goal location, call stop() now! "
+                            "(2) Do NOT make tiny adjustments to (u, v) around the same spot; either look higher (v in [0.35, 0.50]) "
+                            "or pick an open direction in another view (View 1, 2, or 3)."
+                        ),
+                    }
+                elif raw_val >= (self.config.d_max - 1e-3):
+                    return {
+                        "status": "reselect",
+                        "cause": "invalid_depth",
+                        "detail": "far_saturation",
+                        "message": "FAR_SATURATION (d >= 5.0m): Target is beyond camera range (5.0m). Pick a closer target (v in [0.60, 0.85]).",
+                    }
+                else:
+                    return {
+                        "status": "reselect",
+                        "cause": error_cause or "invalid_depth",
+                    }
 
         # Step 2: Deproject to camera optical vector and canonical agent frame
+        if used_fallback:
+            p_agent = compute_azimuth_ground_projection(
+                view_idx=view,
+                u=u,
+                config=self.config,
+                distance_m=1.25,
+            )
+            p_x, p_y, p_z = float(p_agent[0]), float(p_agent[1]), float(p_agent[2])
+            rho_raw = math.sqrt(p_x * p_x + p_z * p_z)
+            rho_executed = min(rho_raw, self.checker.rho_max)
+            fwd_steps = int(round(rho_executed / self.checker.forward_step_m))
+            th_raw = math.degrees(math.atan2(-p_x, -p_z))
+            th_deg = self.checker.turn_step_deg * round(th_raw / self.checker.turn_step_deg)
+            turn_steps = int(round(th_deg / self.checker.turn_step_deg))
+
+            return {
+                "status": "executed",
+                "theta_deg": round(th_deg, 1),
+                "rho_m": round(rho_executed, 2),
+                "moved_m": round(rho_executed, 2),
+                "collided": False,
+                "turn_steps": turn_steps,
+                "forward_steps": fwd_steps,
+                "p_agent": [round(p_x, 3), round(p_y, 3), round(p_z, 3)],
+                "view": view,
+                "u": u,
+                "v": v,
+                "reason": reason,
+                "fallback": "azimuth_ground_projection",
+            }
+
         p_c = deproject_pixel(x0, y0, z_c, self.config, is_normalized=False)
         p_agent = camera_to_agent_frame(p_c, view, self.config)
         p_x, p_y, p_z = float(p_agent[0]), float(p_agent[1]), float(p_agent[2])
