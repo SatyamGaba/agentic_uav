@@ -210,6 +210,35 @@ We are replicating **AgenticNav (arXiv:2606.10577, 2026)** for ground Vision-and
   3. **Egocentric Frustum Inversion & Odometry Reality Check**: Addressed portal overshoots and premature distant window stops.
 - **Trace Persistence**: All checkpoints and traces uploaded to Hugging Face dataset [`Krut27/agenticnav-benchmark-results`](https://huggingface.co/datasets/Krut27/agenticnav-benchmark-results).
 
+---
+
+## 10. Arm O + Remediation Full 100-Episode Benchmark (Job #657 - Executed November 10, 2026)
+
+- **Job ID**: **#657** (`benchmark-100ep-arm-o-remediation`).
+- **Benchmark Split**: Canonical 100-episode Habitat R2R-CE `val_unseen` (`r2rce_val_unseen_100_rand.json`).
+- **Primary Metrics**:
+  - **Success Rate (SR)**: **33.00% (33/100)** (95% CI: $[24.0\%, 42.0\%]$, Wilson: $[24.56\%, 42.69\%]$) — **all-time record**, +57.1% relative jump over Arm O baseline (21%), and +151% over paper-faithful Arm P (13.1%).
+  - **Success weighted by Path Length (SPL)**: **24.04** (95% CI: $[17.03, 31.41]$) — **all-time record**, >3x Arm P (7.83) and +80.5% over Arm O baseline (13.32).
+  - **Oracle Success Rate (OSR)**: **50.00%** (50 episodes physically reached $\le 3.0\text{ m}$).
+  - **Mean Navigation Error (NE)**: **7.06 m**.
+  - **Mean Trajectory Length**: **16.25 m** (lowest wandering recorded across all iterations, down from 25.45 m in Arm O and 27.21 m in Arm P).
+- **Failure Taxonomy**:
+  - **Successes**: **33**
+  - **Safety Deadlocks**: **0 (0.0%, 100% eliminated!)**
+  - **Protocol Violations**: **0 (0.0%, 100% eliminated!)**
+  - **Missed Stops**: **0 (0.0%, 100% eliminated!)**
+  - **Budget Exceeded (Loops)**: **2 (cut by 86.7% from 15 in Arm O baseline)**
+  - **Stop After Reach**: **17**
+  - **Stop Premature**: **48**
+- **Top Scene Performance**:
+  - `x8F5xyUWy9e`: **71.4% SR (5/7)**, **85.7% OSR**, **SPL 49.58**, **NE 2.18 m**
+  - `TbHJrupSAjP`: **40.0% SR (6/15)**, **53.3% OSR**, **SPL 22.62**, **NE 4.71 m**
+  - `zsNo4HB9uLZ`: **37.0% SR (10/27)**, **40.7% OSR**, **SPL 29.75**, **NE 7.10 m**
+  - `QUCTc6BB5sX`: **33.3% SR (6/18)**, **50.0% OSR**, **SPL 25.75**
+- **Phase 9 Verification Gate**: **PASS** (100/100 attempted and completed, 0 infrastructure errors, unique hashes confirmed).
+- **Hugging Face Traces**: Persisted and uploaded to `benchmark_results/arm_oracle_remediation_100/`.
+
+
 
 
 
