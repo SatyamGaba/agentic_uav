@@ -18,7 +18,7 @@ files = [
     "agenticnav_paper_replica/harness/tests/test_remediation_capabilities.py",
 ]
 
-print("Generating compressed git patch for remediation changes (f2ac482 -> HEAD)...")
+print("Generating compressed git patch for zero-shot remediation changes (f2ac482 -> HEAD)...")
 patch_bytes = subprocess.check_output(["git", "diff", "f2ac482", "HEAD", "--"] + files)
 gz_bytes = gzip.compress(patch_bytes)
 patch_b64 = base64.b64encode(gz_bytes).decode("ascii")
@@ -31,8 +31,8 @@ if token_path.exists():
 
 master_script = f"""#!/usr/bin/env bash
 echo "======================================================================"
-echo "STARTING FULL 100-EPISODE BENCHMARK (ARM O + REMEDIATION)"
-echo "Tasks: Dual-Hypothesis Gating, Sensor Fallback, Tool Sanitizer, Loop Warning, Doorway Frustum Inversion"
+echo "STARTING FULL 100-EPISODE BENCHMARK (ARM O + ZERO-SHOT REMEDIATION)"
+echo "Features: 5 Embodied Invariants, Truthful Sensor Telemetry, Strict Grammar"
 echo "Host: $(hostname), Date: $(date)"
 echo "Active GPU: $(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader)"
 echo "======================================================================"
@@ -42,7 +42,7 @@ cd /home/jovyan/scratch/UAV
 
 echo ""
 echo ">>> [STEP 1/5] APPLYING REMEDIATION PATCH"
-git checkout -f
+git checkout -f f2ac482 2>/dev/null || git checkout -f
 git clean -fd
 
 cat << 'EOF' | base64 -d | zcat | git apply -
@@ -50,7 +50,7 @@ cat << 'EOF' | base64 -d | zcat | git apply -
 EOF
 
 git add -A
-git commit -m "feat(remediation): apply full remediation suite for 100ep benchmark" || true
+git commit -m "feat(remediation): apply zero-shot 5 invariants remediation suite" || true
 git status
 git log -2 --oneline
 
@@ -66,6 +66,11 @@ echo "Dataset: agenticnav_paper_replica/data/r2rce_val_unseen_100_rand.json (100
 echo "Model: qwen3.8:27b"
 echo "Output: results/arm_oracle_remediation_100"
 echo ""
+
+if [ -d "results/arm_oracle_remediation_100" ] && [ ! -d "results/arm_oracle_remediation_100_v1" ]; then
+    cp -r results/arm_oracle_remediation_100 results/arm_oracle_remediation_100_v1
+    rm -rf results/arm_oracle_remediation_100
+fi
 
 /home/jovyan/.conda/envs/habitat/bin/python scripts/benchmark_r2rce_postfix.py \\
     --model "qwen3.8:27b" \\
@@ -140,7 +145,7 @@ if token and Path('results/arm_oracle_remediation_100').exists():
         path_in_repo='benchmark_results/arm_oracle_remediation_100',
         repo_id=repo_id,
         repo_type='dataset',
-        commit_message='feat: add Arm O + Remediation 100-episode benchmark results and traces',
+        commit_message='feat: add Arm O + Zero-Shot Remediation 100-episode benchmark results and traces',
     )
     print('Upload complete!')
 else:
@@ -150,38 +155,19 @@ else:
 echo "ALL BENCHMARK STEPS COMPLETED!"
 """
 
-def main():
+def submit_benchmark_job():
     print(f"Connecting to GPU cluster to submit job (script length: {len(master_script)} chars)...")
-    try:
-        job = cluster_client.submit_job(
-            name="benchmark-100ep-arm-o-remediation",
-            script=master_script,
-            time_limit_min=300,
-        )
-        print(f"Job successfully submitted! Job ID: #{job}")
-    except Exception as e:
-        print(f"Error submitting job: {e}")
-        return
-
-    print("Monitoring job progress...")
-    last_log_len = 0
-    while True:
-        try:
-            status_info = cluster_client.api_request(f"/jobs/{job}")
-            state = status_info.get("status", "unknown") if status_info else "unknown"
-            log = cluster_client.get_job_log(job)
-            if log and len(log) > last_log_len:
-                sys.stdout.write(log[last_log_len:])
-                sys.stdout.flush()
-                last_log_len = len(log)
-
-            if state in ("succeeded", "failed", "cancelled"):
-                print(f"\nJob finished with status: {state}")
-                break
-        except Exception as e:
-            print(f"[Polling notice: {e}]")
-        time.sleep(15)
+    job = cluster_client.submit_job(
+        name="benchmark-100ep-arm-o-zero-shot",
+        script=master_script,
+        time_limit_min=300,
+    )
+    print(f"\n=======================================================")
+    print(f"SUCCESS: Benchmark job #{job} successfully queued!")
+    print(f"Job Name: benchmark-100ep-arm-o-zero-shot")
+    print(f"Time Limit: 300 minutes (5 hours)")
+    print(f"=======================================================")
+    return job
 
 if __name__ == "__main__":
-    main()
-
+    submit_benchmark_job()
