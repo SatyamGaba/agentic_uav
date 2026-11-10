@@ -84,9 +84,9 @@ class TestRemediationNearPlaneClipping:
             depth_views=depth_views, obstacle_points_agent_xz=np.empty((0, 2)),
         )
         assert res_std["status"] == "reselect"
-        assert res_std["cause"] == "invalid_depth"
-        assert res_std["detail"] == "near_plane_clip"
-        assert "NEAR_PLANE_CLIP" in res_std["message"]
+        assert res_std["cause"] == "near_field_occlusion"
+        assert res_std["detail"] == "near_field_occlusion"
+        assert "NEAR_FIELD_OCCLUSION" in res_std["message"]
 
 
 class TestRemediationToolCallSanitizer:

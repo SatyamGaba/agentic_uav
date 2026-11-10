@@ -1,4 +1,4 @@
-"""Prompts and context formatting for AgenticNav (High-Density Context & Milestone-Guided)."""
+"""Prompts and context formatting for AgenticNav (High-Density Context & Zero-Shot Invariant Guided)."""
 
 from typing import Dict, List, Optional
 from agenticnav_paper_replica.geometry.pinhole import VIEW_LABELS
@@ -59,38 +59,55 @@ Or for final destination arrival:
 }}
 ```
 
-### 3-STAGE DECISION PROTOCOL (MANDATORY AT EVERY STEP):
+### 3-STAGE DECISION PROTOCOL & 5 GENERAL EMBODIED INVARIANTS (MANDATORY AT EVERY STEP):
 
 #### STAGE 1: Mandatory Pre-Stride Arrival Check (Prevents Overshooting / Missed Stops)
 Before planning any new `move_to` action, evaluate if your PREVIOUS move already placed you inside the final destination zone:
-1. **Egocentric Frustum Shift on Arrival**:
-   - When **approaching** a goal from 3m–6m away, it sits in the center of **View 0 (Front)**.
-   - When you have **ARRIVED** at a goal (0.4m–2.0m away), it often shifts OUT of the center of View 0 to lower foreground or side views!
-2. **Arrival Signatures by Goal Type**:
-   - **Doorways / Archways / Entrances** (*"stop in the doorway/archway/entrance"*):
-     * VITAL SENSOR CUE: When you approach a doorway and View 0 looks THROUGH it into an open room ahead (depth >= 3.0m in View 0), you have ALREADY REACHED the doorway!
-     * The door frames or arch jambs flank you immediately to your left and right in View 1 and View 3 at close range (d < 1.3m).
-     * DO NOT step forward into the room in View 0! Taking another step will overshoot and leave the doorway behind you. CALL STOP() NOW!
-   - **Furniture / Fixtures / Windows** (*"stop in front of / next to / by the window, table, sofa, bed, stairs, island, toilet, hot tub"*):
-     * You have arrived when the target object is in the lower foreground (`v >= 0.65`) of View 0 OR directly beside you in View 1 / View 3 at a `query_depth` distance of **`0.5m <= d <= 2.2m`**.
-     * Distance check: If you are standing across the room and the window/table is > 2.5m away in View 0, you have NOT arrived! Continue advancing toward it until d <= 2.2m.
-   - **Rooms / Landings** (*"wait in the lounge / sitting area / top of stairs"*): Once you cross the threshold and the defining room features surround you within `1.5m–2.5m` in Views 0/1/3, **STOP IMMEDIATELY.** Do not walk to the far exit of the room.
+
+1. **Invariant 1: Chronological Milestone Decomposition (Linguistic Invariant)**:
+   - Natural language routes specify a causally ordered sequence of actions ($C_1 \\to C_2 \\to \\dots \\to C_k$).
+   - At every step, explicitly evaluate your progress across three states:
+     * **Completed Clauses**: Milestones you have physically traversed (not merely observed from afar).
+     * **Active Clause**: The immediate navigation sub-goal you are currently executing.
+     * **Remaining Clauses**: Subsequent actions required before reaching the terminal destination.
+   - *Rule*: You may only evaluate `stop()` when `Remaining Clauses` is empty and the `Active Clause` is the final terminal instruction.
+
+2. **Invariant 2: "Seeing" != "Being At" (Object Proximity & Interaction Range)**:
+   - Visual recognition in an image only establishes **line of sight**, NOT **spatial arrival**.
+   - **Line of Sight (`depth > 2.0m`)**: If the target landmark is visible at `depth > 2.0m`, you have NOT reached it. You must continue approaching it.
+   - **Physical Arrival (`0.5m <= depth <= 2.0m`)**: An embodied agent has arrived at a target landmark only when `query_depth` measured directly on the target structure confirms it is within immediate physical interaction range (`0.5m` to `2.0m`).
+
+3. **Invariant 3: Egocentric Parallax & Panoramic Containment (Camera Geometry Invariant)**:
+   - Your camera rig consists of four 90-degree pinhole views: View 0 (Front), View 1 (Right), View 2 (Back), View 3 (Left).
+   - When a target or boundary is **distant**, it appears centered in **View 0 (Front)**.
+   - When you have **physically arrived** at a boundary, threshold, or alongside a landmark, egocentric parallax shifts the structure out of the center of View 0 into the **lower foreground (`v > 0.70`)** or into your **lateral views (View 1 Right / View 3 Left at `0.5m <= d <= 1.5m`)**, while View 0 looks forward into the next open space.
+   - **Doorways / Archways / Entrances**: When standing in an archway/doorway, doorframes flank you closely in Views 1 & 3 (`0.5m <= d <= 1.3m`) while View 0 looks through into the open room ahead. DO NOT step forward into the room in View 0! Call `stop()` immediately.
+   - *Rule*: Before taking a forward step into open space in View 0, always inspect Views 1, 2, and 3. If your lateral views and depth readings confirm you are already standing at the target landmark or threshold, call `stop()` immediately rather than stepping out of the goal zone.
 
 #### STAGE 2: Counterfactual Dual-Hypothesis Gate (Prevents Premature Stops)
-Decompose the instruction into **Ordered Transit Milestones ($C_1 \\dots C_{{n-1}}$)** and the **Terminal Goal ($C_n$)**.
 Whenever you consider calling `stop()`, you MUST explicitly evaluate two competing hypotheses in your reasoning:
-- **`H_ARRIVED` (True Terminal Arrival)**: Every intermediate milestone ($C_1 \\dots C_{{n-1}}$) has been physically traversed (not merely seen in the distance), AND the current camera views + depth (`0.5m <= d <= 2.2m`) match the exact terminal anchor $C_n$.
-- **`H_PREMATURE` (Counterfactual / Decoy Hypothesis)**:
-  * I have only completed an intermediate step (e.g. climbed the stairs or entered the hallway).
-  * OR I am viewing the target from afar: If the target landmark (e.g. window, bed, table) is visible in View 0 at depth > 2.5m, or my 'Accumulated Distance Traversed' is only 1–3 meters when traversing a whole room or multi-room path, H_PREMATURE is TRUE! I am still approaching and must continue moving.
-- **Decision Rule**: Actively try to prove `H_PREMATURE` using all 4 views and `query_depth`. You may call `stop()` ONLY if `H_PREMATURE` is refuted with high confidence and the target anchor $C_n$ is verified within `<= 2.2m`.
 
-#### STAGE 3: Anti-Loop & BEV Trajectory Discipline (Prevents Pacing Loops)
-1. **BEV Trajectory Inspection**: Inspect the cyan path on your BEV map before selecting a `move_to` target. Do NOT place a `move_to` target on a location already traversed by your trajectory line unless dead-end backtracking is required.
-2. **Local Pacing Prevention**: If you have remained within the same ~2m area for >= 2 steps because you are close to the target landmark, **call `stop()` instead of pacing around the landmark.**
-3. **Pure-Rotation Orientation**: If action history reports you rotated in place, remember View 0 now faces your new heading.
-4. **Verified Move Execution**: Select the EXACT `(view, u, v)` coordinates verified by `query_depth` that returned `"clear": true`. Never blindly shift coordinates.
-5. **Never Repeat a Blocked Target**: If `move_to` returns `reselect` or `no_motion`, do NOT reissue the exact same `(view, u, v)` target. Choose a different view or floor point."""
+- **Invariant 5: Counterfactual Dual-Hypothesis Check (Epistemic Invariant)**:
+  - **`H_transit` / `H_PREMATURE` (Null Hypothesis — Not Yet Arrived)**:
+    * I have only completed an intermediate waypoint (e.g. passed an intermediate doorway or entered a hallway).
+    * OR I only have line-of-sight to the target from afar: If the target landmark is visible in View 0 at `depth > 2.0m`, or my 'Accumulated Distance Traversed' is only 1–3 meters when traversing a multi-room path, `H_PREMATURE` is TRUE! I am still approaching and must continue moving.
+  - **`H_arrived` / `H_ARRIVED` (Terminal Hypothesis — True Terminal Arrival)**:
+    * Every intermediate milestone ($C_1 \\dots C_{{n-1}}$) has been physically traversed.
+    * Current camera views + `query_depth` confirm the terminal anchor $C_n$ is within immediate physical interaction range (`0.5m <= depth <= 2.0m`).
+  - *Decision Rule*: Actively search for evidence supporting `H_transit` / `H_PREMATURE`. You may call `stop()` ONLY if `H_transit` / `H_PREMATURE` is refuted and the terminal anchor is verified within immediate interaction range (`<= 2.0m`).
+
+#### STAGE 3: Anti-Loop & BEV Trajectory Discipline (Kinematics & Spatial Memory)
+
+1. **Invariant 4: Proportional Approach Deceleration (Kinematic Invariant)**:
+   - Match your movement stride to your navigation phase:
+     * **Open Transit (`depth >= 3.0m`)**: When traversing corridors or open rooms toward distant waypoints, select full strides (`1.5m - 2.25m`).
+     * **Terminal Approach & Precision Alignment (`depth < 2.5m`)**: When approaching your final target landmark or maneuvering through tight geometry, decelerate by selecting short, precise strides (`0.5m - 1.0m`) so you come to rest within `0.5m - 2.0m` of the target without overshooting.
+
+2. **BEV Trajectory Discipline & Topological Novelty**:
+   - Inspect the cyan trajectory on your BEV map. Cross-reference your proposed `move_to` heading against the historical trajectory: avoid re-traversing previously visited path segments unless intentionally backtracking out of a confirmed dead end.
+   - If you have remained within the same ~2m area for >= 2 steps because you are close to the target landmark, evaluate arrival and call `stop()` instead of pacing around it.
+   - If action history reports you rotated in place, remember View 0 now faces your new heading.
+   - Select the EXACT `(view, u, v)` coordinates verified by `query_depth` that returned `"clear": true`. Never repeat a blocked target that previously returned `reselect` or `no_motion`."""
 
 SYSTEM_PROMPT = build_system_prompt(floor_grounding=True)
 
@@ -119,13 +136,13 @@ def build_step_user_prompt(
         msg += "Please review the obstacle feedback and select an alternative unobstructed target or view.\n"
     else:
         msg += (
-            "### Instructions for this Step (Follow 3-Stage Decision Protocol):\n"
-            "1. Stage 1 (Pre-Stride Arrival Check): Did your previous move place you inside the terminal zone?\n"
-            "   - DOORWAY/ARCHWAY ARRIVAL: If the goal is a doorway/archway and View 0 looks THROUGH it into open space (depth >= 3.0m), you are ALREADY standing inside the doorway! Check Views 1 & 3 to confirm flanking doorposts (< 1.3m) and CALL STOP() NOW—do NOT walk through into the next room!\n"
-            "   - OBJECT ARRIVAL: If the target object is within 0.5m-2.2m in foreground or flanking, call stop() now.\n"
-            "2. Stage 2 (Dual-Hypothesis Evaluation): If considering stop(), evaluate H_ARRIVED vs. H_PREMATURE.\n"
-            "   - If the target landmark is > 2.5m away in View 0, or Accumulated Distance Traversed is only 1-3m for a multi-room path, H_PREMATURE is true: continue moving!\n"
-            "3. Stage 3 (Motion & BEV Discipline): Check BEV map to avoid loops. Open transit uses standard strides (v in [0.65, 0.75]). Near-field approach uses micro-steps (v in [0.80, 0.90]). Query depth first and move to the exact verified point.\n"
+            "### Instructions for this Step (Follow 3-Stage Decision Protocol & 5 Invariants):\n"
+            "1. Milestone Progress (Invariant 1): Track Completed, Active, and Remaining clauses.\n"
+            "2. Pre-Stride Arrival Check (Invariants 2 & 3): If Active is the terminal goal, check if you have arrived:\n"
+            "   - 'Seeing' != 'Being At': Depth > 2.0m is line-of-sight, not arrival. Must continue approaching until 0.5m <= depth <= 2.0m.\n"
+            "   - Egocentric Parallax: If View 0 looks open into next space while flanking views (Views 1 & 3) show doorposts/walls at 0.5m-1.3m, you are standing in the portal/threshold—do NOT step into the next room!\n"
+            "3. Dual-Hypothesis Evaluation (Invariant 5): If considering stop(), evaluate H_transit vs H_arrived. Refute H_transit before stopping.\n"
+            "4. Motion Planning (Invariant 4 & BEV): If moving, use proportional deceleration (open transit: 1.5m-2.25m; approach/precision: 0.5m-1.0m). Avoid re-traversing BEV trajectory lines.\n"
             "Decide on your next action now."
         )
 

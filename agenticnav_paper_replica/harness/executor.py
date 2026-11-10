@@ -135,10 +135,11 @@ class ToolExecutor:
                         "view": view,
                         "u": round(u, 2),
                         "v": round(v, 2),
-                        "error": "near_plane_clip",
+                        "error": "near_field_occlusion",
                         "message": (
-                            "Target distance is < 0.50m (surface/wall/table in immediate foreground). "
-                            "Look higher (v <= 0.50) or pick another direction."
+                            "Selected pixel (u, v) is closer than the 0.50m sensor minimum range (immediate foreground surface). "
+                            "If this surface is your final goal, call stop(). Otherwise, select a higher vertical coordinate (smaller v) "
+                            "to look past the foreground surface, or choose an unoccluded heading in another view."
                         ),
                     })
                 elif raw_val >= (self.config.d_max - 1e-3):
@@ -327,13 +328,12 @@ class ToolExecutor:
                 if 0.0 < raw_val <= (self.config.d_min + 1e-3):
                     return {
                         "status": "reselect",
-                        "cause": "invalid_depth",
-                        "detail": "near_plane_clip",
+                        "cause": "near_field_occlusion",
+                        "detail": "near_field_occlusion",
                         "message": (
-                            "NEAR_PLANE_CLIP (d < 0.50m): You are standing < 0.50m from a surface/wall/table in this view. "
-                            "(1) If you have already reached the goal location, call stop() now! "
-                            "(2) Do NOT make tiny adjustments to (u, v) around the same spot; either look higher (v in [0.35, 0.50]) "
-                            "or pick an open direction in another view (View 1, 2, or 3)."
+                            "NEAR_FIELD_OCCLUSION (d < 0.50m): Selected pixel (u, v) is closer than the 0.50m sensor minimum range (immediate foreground surface). "
+                            "If this surface is your final goal, call stop(). Otherwise, select a higher vertical coordinate (smaller v) "
+                            "to look past the foreground surface, or choose an unoccluded heading in another view."
                         ),
                     }
                 elif raw_val >= (self.config.d_max - 1e-3):
