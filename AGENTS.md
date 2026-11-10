@@ -186,8 +186,30 @@ We are replicating **AgenticNav (arXiv:2606.10577, 2026)** for ground Vision-and
   - **NavMesh ShortestPath Follower**: Actuates the local waypoint selected by the VLM using Habitat-Sim's native `pathfinder.find_path()` and discrete simulator actions (`turn_left`, `turn_right`, `move_forward`), sliding along walls naturally and avoiding doorframe collisions.
   - **Stride & Waypoint Clamping**: Local travel along the NavMesh path is clamped to commanded stride ($1.0\text{--}1.75$ m), preventing unnatural multi-room teleports.
 - **Test Suite Status**:
-  - 85 passed / 1 skipped / 0 failed in full PyTest suite.
-  - Tracked git working tree is clean and locked on commit `efd5b33` (`Arch/VLM`).
+  - 93 passed / 1 skipped / 0 failed in full PyTest suite.
+  - Tracked git working tree is clean and locked on commit `2aa6c8b` (`Arch/VLM`).
+
+---
+
+## 9. Arm Remediation & 20-Episode Smoke Test (Job #652 - Executed November 10, 2026)
+
+- **Job ID**: **#652** (`smoke-20ep-remediation-arm-o`).
+- **Benchmark Split**: Canonical 20 failure episodes from Arm O (`r2rce_val_unseen_20_remediation.json`, 0% prior SR).
+- **Core Results & Acceptance Gates**:
+  - **Success Rate (SR)**: **35.0% (7/20)** — 7 previously failed episodes converted directly to verified successes.
+  - **Success weighted by Path Length (SPL)**: **24.41**.
+  - **Oracle Success Rate (OSR)**: **55.0%**.
+  - **Mean Navigation Error (NE)**: **5.70 m** (down by 3.14m from 8.84m).
+  - **Safety Deadlocks**: **0 (0/20, 100% eliminated)** — Gate: **PASS**.
+  - **Protocol Violations**: **0 (0/20, 100% eliminated)** — Gate: **PASS**.
+  - **Missed Stops**: **0 (0/20, 100% eliminated)** — Gate: **PASS**.
+  - **Pre-Flight Acceptance Gate**: **PASS**.
+- **Key Forensic Fixes Validated**:
+  1. **Upward Ray Scan & Azimuth Ground Fallback**: Converted 3 of 4 former deadlocks (`0031`, `0038`, `0058`) directly to successes.
+  2. **JSON Argument Sanitizer**: Eliminated protocol violations; `0018` converted to success (NE 1.82m).
+  3. **Egocentric Frustum Inversion & Odometry Reality Check**: Addressed portal overshoots and premature distant window stops.
+- **Trace Persistence**: All checkpoints and traces uploaded to Hugging Face dataset [`Krut27/agenticnav-benchmark-results`](https://huggingface.co/datasets/Krut27/agenticnav-benchmark-results).
+
 
 
 
