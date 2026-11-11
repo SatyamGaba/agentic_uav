@@ -278,9 +278,6 @@ def main() -> int:
                         help="Run only the stop-immediately control; preserve main results.")
     args = parser.parse_args()
 
-    if not HABITAT_AVAILABLE:
-        raise RuntimeError("habitat_sim is not installed in the active Python environment.")
-
     # Model resolution: stop hard-coding; read from args or env var, fail loudly if empty
     if not args.baseline_only:
         model_name = args.model or os.environ.get("AGENTICNAV_MODEL_ID")
@@ -294,6 +291,9 @@ def main() -> int:
     is_locked = args.locked or "val_unseen_100" in str(args.episodes) or "locked" in str(args.episodes).lower()
     if is_locked and args.allow_dirty:
         raise RuntimeError("CRITICAL POLICY VIOLATION: --allow-dirty is strictly forbidden in locked evaluation mode!")
+
+    if not HABITAT_AVAILABLE:
+        raise RuntimeError("habitat_sim is not installed in the active Python environment.")
 
     # Enforce clean git working tree unless --allow-dirty is explicitly passed
     if not args.allow_dirty:

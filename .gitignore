@@ -26,6 +26,15 @@ audit/phase9_postfix/run*.log
 archive/legacy_airsim_uav/dependencies/
 archive/legacy_airsim_uav/**/dependencies/
 
+# Credentials and tokens
+*_token.txt
+*token*.txt
+
+# Deployment bundles and diffs
+*.b64
+*.diff
+*.tar.gz
+
 # OS
 .DS_Store
 Thumbs.db
