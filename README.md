@@ -115,16 +115,50 @@ UAV/
 
 ---
 
-## 5. Quickstart & Verification
+## 5. Environment Setup & External Assets
+
+Running full embodied navigation on a new machine or GPU cluster requires three external components not stored directly in git (due to large file sizes and copyright):
+
+### 1. Python Environment & Simulator (Habitat-Sim)
+- **OS**: Linux (Ubuntu 20.04 / 22.04) or Windows WSL2. (*Habitat-Sim requires Linux for GPU EGL rendering*).
+- **Setup via Conda**:
+  ```bash
+  conda create -n habitat python=3.9 -y
+  conda activate habitat
+  conda install -c aihabitat -c conda-forge habitat-sim withbullet headless -y
+  pip install numpy scipy matplotlib pillow requests pyyaml pytest torch
+  ```
+
+### 2. 3D Scene Meshes (Matterport3D)
+Habitat-Sim renders observations from photorealistic Matterport3D 3D building scans:
+- **Files**: `.glb` mesh files and `.navmesh` files for the evaluation buildings (e.g. `zsNo4HB9uLZ`, `TbHJrupSAjP`, `x8F5xyUWy9e`, `QUCTc6BB5sX`, etc.).
+- **Directory Layout**: Place or symlink the scene files under:
+  ```text
+  data/scene_datasets/mp3d/<scene_id>/<scene_id>.glb
+  ```
+  *(Or configure the path via `--scene-dir` when running the benchmark).*
+
+### 3. Vision-Language Model Service (Ollama / vLLM)
+The framework communicates with the vision model via HTTP API:
+- **Hardware**: Dedicated NVIDIA GPU with $\ge 20\text{ GB}$ VRAM (e.g., RTX 3090 / 4090, A5000, L40S, A100).
+- **Start Ollama & Pull Model**:
+  ```bash
+  ollama serve
+  ollama pull qwen3.8:27b
+  ```
+
+---
+
+## 6. Quickstart & Verification
 
 ### Running the Test Suite
-All unit and integration tests run in seconds without requiring GPU hardware or Habitat-Sim:
+All unit and integration tests run offline in seconds without requiring GPU hardware or Habitat-Sim:
 ```bash
 python -m pytest agenticnav_paper_replica/ -v
 ```
 
-### Running the Benchmark
-To evaluate the framework on the 100-episode R2R-CE benchmark (requires Habitat-Sim and an active model service):
+### Running the Full Benchmark
+Once the environment, scene meshes, and Ollama service are active:
 ```bash
 python scripts/benchmark_r2rce_postfix.py \
   --episodes agenticnav_paper_replica/data/r2rce_val_unseen_100_rand.json \
